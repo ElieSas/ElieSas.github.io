@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Abréviations Embarquées — Elie SASPORTES</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500&family=Bebas+Neue&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="article-style.css">
+<style>
+  .abbr-grid { display: grid; grid-template-columns: 1fr; gap: 2px; margin: 20px 0; }
+  .abbr-row { display: grid; grid-template-columns: 110px 1fr; background: var(--surface); border: 1px solid var(--border); border-left: 2px solid var(--accent); }
+  .abbr-row.red    { border-left-color: var(--accent2); }
+  .abbr-row.green  { border-left-color: var(--accent3); }
+  .abbr-row.purple { border-left-color: var(--accent4); }
+  .abbr-row.yellow { border-left-color: var(--accent5); }
+  .abbr-name { font-family: 'Space Mono', monospace; font-size: 12px; color: var(--accent); padding: 14px 16px; border-right: 1px solid var(--border); display: flex; align-items: center; font-weight: 700; letter-spacing: 0.04em; }
+  .abbr-row.red    .abbr-name { color: var(--accent2); }
+  .abbr-row.green  .abbr-name { color: var(--accent3); }
+  .abbr-row.purple .abbr-name { color: var(--accent4); }
+  .abbr-row.yellow .abbr-name { color: var(--accent5); }
+  .abbr-def  { padding: 14px 20px; }
+  .abbr-full { font-family: 'Space Mono', monospace; font-size: 11px; color: var(--text); letter-spacing: 0.04em; margin-bottom: 4px; }
+  .abbr-desc { font-size: 13px; color: var(--text-muted); line-height: 1.5; }
+</style>
+</head>
+<body>
+<nav>
+  <a href="index.html" class="nav-logo">ES · Ressources</a>
+  <a href="index.html#resources" class="nav-back">← Retour aux ressources</a>
+</nav>
+<div class="article-wrap">
+  <div class="article-meta">
+    <span class="meta-tag mt-blue">Référence</span>
+    <span class="meta-tag mt-green">Glossaire</span>
+    <span class="meta-info">Lecture rapide · à garder sous la main</span>
+  </div>
+  <h1>Abréviations<br><em class="blue">Embarquées</em></h1>
+  <p class="subtitle">Glossaire des acronymes les plus utilisés en systèmes embarqués — du firmware aux protocoles, en passant par les couches kernel et les outils de debug. Organisé par catégorie pour retrouver rapidement.</p>
+
+  <!-- ── ARCHITECTURE & CPU ── -->
+  <h2 class="h-blue">Architecture &amp; CPU</h2>
+  <div class="abbr-grid">
+    <div class="abbr-row"><div class="abbr-name">MCU</div><div class="abbr-def"><div class="abbr-full">Microcontroller Unit</div><div class="abbr-desc">Composant intégrant CPU + RAM + Flash + périphériques sur une même puce (STM32, AVR, PIC).</div></div></div>
+    <div class="abbr-row"><div class="abbr-name">MPU</div><div class="abbr-def"><div class="abbr-full">Microprocessor Unit (ou Memory Protection Unit)</div><div class="abbr-desc">Processeur sans périphériques intégrés, nécessitant RAM/Flash externes. MPU peut aussi désigner l'unité de protection mémoire des Cortex-M.</div></div></div>
+    <div class="abbr-row"><div class="abbr-name">SoC</div><div class="abbr-def"><div class="abbr-full">System on Chip</div><div class="abbr-desc">Puce intégrant un système complet : CPU, GPU, mémoire, modems, contrôleurs (ex: Snapdragon, STM32MP1).</div></div></div>
+    <div class="abbr-row"><div class="abbr-name">ISA</div><div class="abbr-def"><div class="abbr-full">Instruction Set Architecture</div><div class="abbr-desc">Jeu d'instructions du processeur (ARM, RISC-V, x86, Thumb-2).</div></div></div>
+    <div class="abbr-row"><div class="abbr-name">RISC</div><div class="abbr-def"><div class="abbr-full">Reduced Instruction Set Computing</div><div class="abbr-desc">Architecture avec peu d'instructions simples (ARM, RISC-V). S'oppose à CISC (x86).</div></div></div>
+    <div class="abbr-row"><div class="abbr-name">FPU</div><div class="abbr-def"><div class="abbr-full">Floating Point Unit</div><div class="abbr-desc">Unité de calcul flottant matériel. Sur Cortex-M4F/M7 : accélère drastiquement les calculs DSP.</div></div></div>
+    <div class="abbr-row"><div class="abbr-name">DMA</div><div class="abbr-def"><div class="abbr-full">Direct Memory Access</div><div class="abbr-desc">Transfert mémoire-périphérique sans intervention CPU. Essentiel pour UART/SPI/ADC haute vitesse.</div></div></div>
+    <div class="abbr-row"><div class="abbr-name">NVIC</div><div class="abbr-def"><div class="abbr-full">Nested Vectored Interrupt Controller</div><div class="abbr-desc">Contrôleur d'interruptions des Cortex-M. Gère priorités et préemption matérielles.</div></div></div>
+    <div class="abbr-row"><div class="abbr-name">MMU</div><div class="abbr-def"><div class="abbr-full">Memory Management Unit</div><div class="abbr-desc">Traduit adresses virtuelles → physiques. Présente sur Cortex-A (Linux), absente sur Cortex-M.</div></div></div>
+  </div>
+
+  <!-- ── MÉMOIRE ── -->
+  <h2 class="h-red">Mémoire</h2>
+  <div class="abbr-grid">
+    <div class="abbr-row red"><div class="abbr-name">RAM</div><div class="abbr-def"><div class="abbr-full">Random Access Memory</div><div class="abbr-desc">Mémoire volatile pour variables et stack. Perdue à l'extinction.</div></div></div>
+    <div class="abbr-row red"><div class="abbr-name">ROM</div><div class="abbr-def"><div class="abbr-full">Read-Only Memory</div><div class="abbr-desc">Mémoire non volatile en lecture seule (ou en pratique très peu modifiable).</div></div></div>
+    <div class="abbr-row red"><div class="abbr-name">EEPROM</div><div class="abbr-def"><div class="abbr-full">Electrically Erasable Programmable ROM</div><div class="abbr-desc">Mémoire non volatile modifiable octet par octet. Limitée en cycles d'écriture (~100k–1M).</div></div></div>
+    <div class="abbr-row red"><div class="abbr-name">SRAM</div><div class="abbr-def"><div class="abbr-full">Static RAM</div><div class="abbr-desc">RAM rapide à base de bascules. Utilisée pour les caches et la RAM interne des MCU.</div></div></div>
+    <div class="abbr-row red"><div class="abbr-name">DRAM</div><div class="abbr-def"><div class="abbr-full">Dynamic RAM</div><div class="abbr-desc">RAM à base de condensateurs, plus dense et moins chère, mais plus lente. Nécessite rafraîchissement.</div></div></div>
+    <div class="abbr-row red"><div class="abbr-name">SDRAM</div><div class="abbr-def"><div class="abbr-full">Synchronous DRAM</div><div class="abbr-desc">DRAM synchronisée sur une horloge (DDR4, LPDDR sur smartphones).</div></div></div>
+    <div class="abbr-row red"><div class="abbr-name">Flash</div><div class="abbr-def"><div class="abbr-full">Flash Memory (NOR / NAND)</div><div class="abbr-desc">Mémoire non volatile pour le firmware. NOR pour exécution directe, NAND pour stockage massif.</div></div></div>
+    <div class="abbr-row red"><div class="abbr-name">eMMC</div><div class="abbr-def"><div class="abbr-full">Embedded MultiMedia Card</div><div class="abbr-desc">Flash NAND + contrôleur intégrés. Stockage standard sur cartes Linux embarquées.</div></div></div>
+  </div>
+
+  <!-- ── PROTOCOLES ── -->
+  <h2 class="h-green">Protocoles de communication</h2>
+  <div class="abbr-grid">
+    <div class="abbr-row green"><div class="abbr-name">UART</div><div class="abbr-def"><div class="abbr-full">Universal Asynchronous Receiver/Transmitter</div><div class="abbr-desc">Liaison série asynchrone 2 fils (TX/RX). Débit typique 9600–921600 bauds.</div></div></div>
+    <div class="abbr-row green"><div class="abbr-name">USART</div><div class="abbr-def"><div class="abbr-full">Universal Synchronous/Asynchronous Receiver/Transmitter</div><div class="abbr-desc">UART qui supporte aussi un mode synchrone avec horloge.</div></div></div>
+    <div class="abbr-row green"><div class="abbr-name">SPI</div><div class="abbr-def"><div class="abbr-full">Serial Peripheral Interface</div><div class="abbr-desc">Bus série synchrone full-duplex 4 fils (SCLK, MOSI, MISO, CS). Très rapide (jusqu'à 50 MHz+).</div></div></div>
+    <div class="abbr-row green"><div class="abbr-name">I²C</div><div class="abbr-def"><div class="abbr-full">Inter-Integrated Circuit</div><div class="abbr-desc">Bus série synchrone half-duplex 2 fils (SDA, SCL). Multi-maître, multi-esclave par adresse.</div></div></div>
+    <div class="abbr-row green"><div class="abbr-name">CAN</div><div class="abbr-def"><div class="abbr-full">Controller Area Network</div><div class="abbr-desc">Bus différentiel robuste (CAN-H, CAN-L). Standard automobile et industriel.</div></div></div>
+    <div class="abbr-row green"><div class="abbr-name">USB</div><div class="abbr-def"><div class="abbr-full">Universal Serial Bus</div><div class="abbr-desc">Bus différentiel host-périphérique. Versions 2.0 (480 Mbps), 3.x (5+ Gbps).</div></div></div>
+    <div class="abbr-row green"><div class="abbr-name">MQTT</div><div class="abbr-def"><div class="abbr-full">Message Queuing Telemetry Transport</div><div class="abbr-desc">Protocole publish/subscribe léger pour IoT, basé sur TCP/IP.</div></div></div>
+    <div class="abbr-row green"><div class="abbr-name">BLE</div><div class="abbr-def"><div class="abbr-full">Bluetooth Low Energy</div><div class="abbr-desc">Version basse consommation de Bluetooth. Standard pour wearables et IoT.</div></div></div>
+    <div class="abbr-row green"><div class="abbr-name">LoRa</div><div class="abbr-def"><div class="abbr-full">Long Range</div><div class="abbr-desc">Modulation radio longue portée (km) basse consommation pour IoT.</div></div></div>
+  </div>
+
+  <!-- ── PÉRIPHÉRIQUES ── -->
+  <h2 class="h-purple">Périphériques &amp; Hardware</h2>
+  <div class="abbr-grid">
+    <div class="abbr-row purple"><div class="abbr-name">GPIO</div><div class="abbr-def"><div class="abbr-full">General Purpose Input/Output</div><div class="abbr-desc">Broche numérique configurable en entrée ou sortie logique.</div></div></div>
+    <div class="abbr-row purple"><div class="abbr-name">ADC</div><div class="abbr-def"><div class="abbr-full">Analog to Digital Converter</div><div class="abbr-desc">Convertit une tension analogique en valeur numérique. Résolution typique 10–16 bits.</div></div></div>
+    <div class="abbr-row purple"><div class="abbr-name">DAC</div><div class="abbr-def"><div class="abbr-full">Digital to Analog Converter</div><div class="abbr-desc">Convertit une valeur numérique en tension analogique de sortie.</div></div></div>
+    <div class="abbr-row purple"><div class="abbr-name">PWM</div><div class="abbr-def"><div class="abbr-full">Pulse Width Modulation</div><div class="abbr-desc">Signal carré à rapport cyclique variable. Pour contrôle moteur, LED, conversion DC-DC.</div></div></div>
+    <div class="abbr-row purple"><div class="abbr-name">RTC</div><div class="abbr-def"><div class="abbr-full">Real-Time Clock</div><div class="abbr-desc">Horloge temps-réel calendrier, alimentée par pile lithium quand le système est éteint.</div></div></div>
+    <div class="abbr-row purple"><div class="abbr-name">IRQ</div><div class="abbr-def"><div class="abbr-full">Interrupt Request</div><div class="abbr-desc">Signal demandant au CPU de suspendre son travail pour exécuter une routine d'interruption.</div></div></div>
+    <div class="abbr-row purple"><div class="abbr-name">ISR</div><div class="abbr-def"><div class="abbr-full">Interrupt Service Routine</div><div class="abbr-desc">Fonction exécutée en réponse à une IRQ. Doit être courte et non bloquante.</div></div></div>
+    <div class="abbr-row purple"><div class="abbr-name">EMC / EMI</div><div class="abbr-def"><div class="abbr-full">Electromagnetic Compatibility / Interference</div><div class="abbr-desc">EMC = conformité aux normes d'émission/immunité. EMI = perturbations électromagnétiques.</div></div></div>
+    <div class="abbr-row purple"><div class="abbr-name">ESD</div><div class="abbr-def"><div class="abbr-full">Electrostatic Discharge</div><div class="abbr-desc">Décharge électrostatique pouvant détruire les composants. Protection obligatoire sur entrées exposées.</div></div></div>
+  </div>
+
+  <!-- ── FIRMWARE & OS ── -->
+  <h2 class="h-yellow">Firmware, RTOS &amp; OS</h2>
+  <div class="abbr-grid">
+    <div class="abbr-row yellow"><div class="abbr-name">RTOS</div><div class="abbr-def"><div class="abbr-full">Real-Time Operating System</div><div class="abbr-desc">OS avec garanties temporelles. FreeRTOS, Zephyr, RTEMS, VxWorks, ThreadX.</div></div></div>
+    <div class="abbr-row yellow"><div class="abbr-name">HAL</div><div class="abbr-def"><div class="abbr-full">Hardware Abstraction Layer</div><div class="abbr-desc">Couche logicielle masquant les détails matériels. Permet de porter le code entre familles MCU.</div></div></div>
+    <div class="abbr-row yellow"><div class="abbr-name">BSP</div><div class="abbr-def"><div class="abbr-full">Board Support Package</div><div class="abbr-desc">Ensemble des drivers et configurations spécifiques à une carte. Indispensable pour Linux embarqué.</div></div></div>
+    <div class="abbr-row yellow"><div class="abbr-name">SDK</div><div class="abbr-def"><div class="abbr-full">Software Development Kit</div><div class="abbr-desc">Trousse à outils du fabricant : compilateur, debugger, bibliothèques, exemples.</div></div></div>
+    <div class="abbr-row yellow"><div class="abbr-name">IDE</div><div class="abbr-def"><div class="abbr-full">Integrated Development Environment</div><div class="abbr-desc">Environnement de développement intégré : éditeur + compilateur + debugger (STM32CubeIDE, VS Code...).</div></div></div>
+    <div class="abbr-row yellow"><div class="abbr-name">CMSIS</div><div class="abbr-def"><div class="abbr-full">Cortex Microcontroller Software Interface Standard</div><div class="abbr-desc">Standard ARM pour les headers et drivers de Cortex-M. Définit les registres NVIC, SysTick.</div></div></div>
+    <div class="abbr-row yellow"><div class="abbr-name">FOTA / OTA</div><div class="abbr-def"><div class="abbr-full">Firmware Over The Air</div><div class="abbr-desc">Mise à jour du firmware par réseau sans fil (BLE, WiFi, cellular).</div></div></div>
+    <div class="abbr-row yellow"><div class="abbr-name">RTC</div><div class="abbr-def"><div class="abbr-full">Run-Time Configuration / Real-Time Clock</div><div class="abbr-desc">Selon contexte : configuration au démarrage, ou horloge temps-réel matérielle.</div></div></div>
+  </div>
+
+  <!-- ── DEBUG & TOOLING ── -->
+  <h2 class="h-blue">Debug &amp; Outils</h2>
+  <div class="abbr-grid">
+    <div class="abbr-row"><div class="abbr-name">JTAG</div><div class="abbr-def"><div class="abbr-full">Joint Test Action Group</div><div class="abbr-desc">Standard de debug et programmation 4–5 fils. Aussi utilisé pour boundary scan en production.</div></div></div>
+    <div class="abbr-row"><div class="abbr-name">SWD</div><div class="abbr-def"><div class="abbr-full">Serial Wire Debug</div><div class="abbr-desc">Interface de debug ARM 2 fils (SWDIO, SWCLK). Plus compact que JTAG.</div></div></div>
+    <div class="abbr-row"><div class="abbr-name">ITM</div><div class="abbr-def"><div class="abbr-full">Instrumentation Trace Macrocell</div><div class="abbr-desc">Sortie de trace temps-réel sur Cortex-M3+. Pour printf debug sans bloquer.</div></div></div>
+    <div class="abbr-row"><div class="abbr-name">GDB</div><div class="abbr-def"><div class="abbr-full">GNU Debugger</div><div class="abbr-desc">Debugger standard Unix/Linux. Utilisé pour debug embarqué via gdb-server (OpenOCD, J-Link GDB).</div></div></div>
+    <div class="abbr-row"><div class="abbr-name">OCD</div><div class="abbr-def"><div class="abbr-full">On-Chip Debugger (OpenOCD)</div><div class="abbr-desc">Bridge open-source entre GDB et les sondes JTAG/SWD. Standard pour debug STM32.</div></div></div>
+    <div class="abbr-row"><div class="abbr-name">UART (debug)</div><div class="abbr-def"><div class="abbr-full">UART pour logs / console</div><div class="abbr-desc">Le moyen universel de debug en embarqué — printf via UART vers PC.</div></div></div>
+  </div>
+
+  <!-- ── BUILD & DEV ── -->
+  <h2 class="h-red">Build &amp; Méthodologie</h2>
+  <div class="abbr-grid">
+    <div class="abbr-row red"><div class="abbr-name">CI/CD</div><div class="abbr-def"><div class="abbr-full">Continuous Integration / Continuous Deployment</div><div class="abbr-desc">Pipeline automatisé compilation, test, déploiement. Jenkins, GitLab CI, Azure DevOps.</div></div></div>
+    <div class="abbr-row red"><div class="abbr-name">MISRA</div><div class="abbr-def"><div class="abbr-full">Motor Industry Software Reliability Association</div><div class="abbr-desc">Guidelines de codage C pour systèmes critiques (automobile, médical, aéronautique).</div></div></div>
+    <div class="abbr-row red"><div class="abbr-name">SIL</div><div class="abbr-def"><div class="abbr-full">Safety Integrity Level</div><div class="abbr-desc">Niveau de sûreté fonctionnelle (SIL 1–4). Norme IEC 61508 et dérivées.</div></div></div>
+    <div class="abbr-row red"><div class="abbr-name">ASIL</div><div class="abbr-def"><div class="abbr-full">Automotive Safety Integrity Level</div><div class="abbr-desc">Équivalent automobile du SIL, norme ISO 26262 (A à D, D le plus critique).</div></div></div>
+    <div class="abbr-row red"><div class="abbr-name">DO-178C</div><div class="abbr-def"><div class="abbr-full">Software Considerations in Airborne Systems</div><div class="abbr-desc">Norme aéronautique pour logiciels embarqués critiques (DAL A–E).</div></div></div>
+    <div class="abbr-row red"><div class="abbr-name">EN 50128</div><div class="abbr-def"><div class="abbr-full">Norme ferroviaire</div><div class="abbr-desc">Norme européenne pour les logiciels de systèmes de commande ferroviaires (SIL 0–4).</div></div></div>
+    <div class="abbr-row red"><div class="abbr-name">FW</div><div class="abbr-def"><div class="abbr-full">Firmware</div><div class="abbr-desc">Logiciel embarqué dans un composant matériel, généralement stocké en Flash.</div></div></div>
+    <div class="abbr-row red"><div class="abbr-name">SW / HW</div><div class="abbr-def"><div class="abbr-full">Software / Hardware</div><div class="abbr-desc">Abréviations omniprésentes — utilisées dans toute la documentation technique.</div></div></div>
+  </div>
+
+  <div class="callout">
+    <div class="callout-label">// pour aller plus loin</div>
+    <p>Cette liste couvre les abréviations rencontrées au quotidien. D'autres acronymes plus spécialisés (FPGA, CPLD, ASIC, RTL...) sont couverts dans l'article dédié au flot de conception VLSI.</p>
+  </div>
+
+</div>
+
+<footer class="page-footer">
+  <div class="pf-left">Elie SASPORTES · 2026</div>
+  <div class="pf-nav">
+    <a href="article-abbreviations-vlsi.html">Abréviations VLSI →</a>
+    <a href="index.html#resources">Toutes les ressources</a>
+  </div>
+</footer>
+
+</body>
+</html>

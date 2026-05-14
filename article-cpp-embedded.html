@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>C++, Algorithmes &amp; Embedded Tricks — Elie SASPORTES</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500&family=Bebas+Neue&display=swap" rel="stylesheet">
+<style>
+  :root{--bg:#0a0c0f;--bg2:#0f1217;--bg3:#141820;--surface:#1a1f2a;--border:#1e2535;--border-bright:#2a3548;--text:#e8eaf0;--text-muted:#6b7a99;--text-dim:#3d4a63;--accent:#00d4ff;--accent2:#ff6b35;--accent3:#7fff6b;--accent4:#c792ea}
+  *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth}
+  body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;font-weight:300;line-height:1.7}
+  body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(var(--border) 1px,transparent 1px),linear-gradient(90deg,var(--border) 1px,transparent 1px);background-size:48px 48px;opacity:0.3;pointer-events:none;z-index:0}
+  nav{position:fixed;top:0;left:0;right:0;z-index:100;display:flex;align-items:center;justify-content:space-between;padding:0 48px;height:64px;background:rgba(10,12,15,0.9);backdrop-filter:blur(16px);border-bottom:1px solid var(--border)}
+  .nav-logo{font-family:'Space Mono',monospace;font-size:12px;color:var(--accent);letter-spacing:0.1em;text-decoration:none;text-transform:uppercase}
+  .nav-back{font-family:'Space Mono',monospace;font-size:11px;color:var(--text-muted);text-decoration:none;letter-spacing:0.08em;transition:color 0.2s}
+  .nav-back:hover{color:var(--accent)}
+  .article-wrap{max-width:860px;margin:0 auto;padding:100px 48px 80px;position:relative;z-index:1}
+  .article-meta{display:flex;align-items:center;gap:12px;margin-bottom:32px;flex-wrap:wrap}
+  .meta-tag{font-family:'Space Mono',monospace;font-size:10px;padding:4px 10px;letter-spacing:0.12em;text-transform:uppercase}
+  .mt-red{color:var(--accent2);background:rgba(255,107,53,0.08);border:1px solid rgba(255,107,53,0.2)}
+  .mt-purple{color:var(--accent4);background:rgba(199,146,234,0.08);border:1px solid rgba(199,146,234,0.2)}
+  .mt-blue{color:var(--accent);background:rgba(0,212,255,0.08);border:1px solid rgba(0,212,255,0.2)}
+  .meta-info{font-family:'Space Mono',monospace;font-size:10px;color:var(--text-dim);letter-spacing:0.08em}
+  h1{font-family:'Bebas Neue',sans-serif;font-size:clamp(40px,6vw,72px);letter-spacing:0.04em;line-height:1;color:var(--text);margin-bottom:16px}
+  h1 em{color:var(--accent2);font-style:normal}
+  .subtitle{font-size:17px;color:var(--text-muted);max-width:600px;line-height:1.8;margin-bottom:48px;padding-bottom:48px;border-bottom:1px solid var(--border)}
+  h2{font-family:'Bebas Neue',sans-serif;font-size:32px;letter-spacing:0.05em;color:var(--text);margin:48px 0 20px;display:flex;align-items:center;gap:12px}
+  h2::before{content:'';width:3px;height:28px;background:var(--accent2);flex-shrink:0}
+  h3{font-family:'Space Mono',monospace;font-size:13px;color:var(--accent2);letter-spacing:0.1em;text-transform:uppercase;margin:28px 0 12px}
+  p{font-size:15px;color:var(--text-muted);line-height:1.9;margin-bottom:16px}
+  p strong{color:var(--text);font-weight:500}
+  .code-block{background:var(--bg3);border:1px solid var(--border);border-left:2px solid var(--accent2);padding:24px 28px;margin:24px 0;overflow-x:auto;position:relative}
+  .code-label{position:absolute;top:0;right:0;font-family:'Space Mono',monospace;font-size:9px;color:var(--text-dim);background:var(--border);padding:3px 10px;letter-spacing:0.1em;text-transform:uppercase}
+  pre{font-family:'Space Mono',monospace;font-size:12px;line-height:1.8;color:var(--text-muted)}
+  .kw{color:#c792ea}.cm{color:var(--text-dim);font-style:italic}.num{color:var(--accent2)}.fn{color:var(--accent)}.str{color:var(--accent3)}.def{color:#ffcb6b}
+  .diagram{background:var(--surface);border:1px solid var(--border-bright);padding:32px;margin:28px 0;position:relative;overflow:hidden}
+  .diagram::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,var(--accent2),transparent);opacity:0.5}
+  .diagram-title{font-family:'Space Mono',monospace;font-size:10px;color:var(--accent2);letter-spacing:0.15em;text-transform:uppercase;margin-bottom:20px}
+  .callout{border-left:2px solid var(--accent3);padding:16px 20px;background:rgba(127,255,107,0.04);margin:24px 0}
+  .callout-label{font-family:'Space Mono',monospace;font-size:9px;color:var(--accent3);letter-spacing:0.15em;text-transform:uppercase;margin-bottom:6px}
+  .callout p{color:var(--text-muted);font-size:14px;margin:0}
+  .warn{border-left:2px solid var(--accent2);padding:16px 20px;background:rgba(255,107,53,0.04);margin:24px 0}
+  .warn-label{font-family:'Space Mono',monospace;font-size:9px;color:var(--accent2);letter-spacing:0.15em;text-transform:uppercase;margin-bottom:6px}
+  .warn p{color:var(--text-muted);font-size:14px;margin:0}
+  .concept-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:24px 0}
+  .concept-card{background:var(--surface);border:1px solid var(--border);padding:20px;position:relative;overflow:hidden}
+  .concept-card::after{content:'';position:absolute;top:0;left:0;width:2px;height:100%;background:var(--accent2)}
+  .concept-card:nth-child(2)::after{background:var(--accent4)}
+  .concept-card:nth-child(3)::after{background:var(--accent3)}
+  .concept-card:nth-child(4)::after{background:var(--accent)}
+  .concept-label{font-family:'Space Mono',monospace;font-size:10px;color:var(--text-dim);letter-spacing:0.1em;text-transform:uppercase;margin-bottom:8px}
+  .concept-val{font-size:14px;color:var(--text-muted);line-height:1.6}
+  .concept-val code{font-family:'Space Mono',monospace;font-size:11px;color:var(--accent);background:var(--bg3);padding:1px 5px}
+
+  /* COMPLEXITY TABLE */
+  .cx-table{width:100%;border-collapse:collapse;font-family:'Space Mono',monospace;font-size:11px;margin:16px 0}
+  .cx-table th{background:var(--bg3);color:var(--text-dim);padding:8px 14px;text-align:left;border:1px solid var(--border);letter-spacing:0.08em;text-transform:uppercase;font-size:9px}
+  .cx-table td{padding:8px 14px;border:1px solid var(--border);color:var(--text-muted)}
+  .cx-o1{color:var(--accent3)}.cx-on{color:var(--accent)}.cx-onlog{color:var(--accent4)}.cx-on2{color:var(--accent2)}
+
+  /* SECTION BADGE */
+  .section-badge{display:inline-flex;align-items:center;gap:8px;font-family:'Space Mono',monospace;font-size:10px;color:var(--accent2);letter-spacing:0.15em;text-transform:uppercase;background:rgba(255,107,53,0.08);border:1px solid rgba(255,107,53,0.2);padding:4px 12px;margin-bottom:20px}
+
+  ::-webkit-scrollbar{width:4px}::-webkit-scrollbar-track{background:var(--bg)}::-webkit-scrollbar-thumb{background:var(--border-bright)}
+  @media(max-width:640px){.article-wrap{padding:88px 20px 48px}.concept-grid{grid-template-columns:1fr}nav{padding:0 20px}}
+</style>
+</head>
+<body>
+<nav>
+  <a href="index.html" class="nav-logo">ES · Ressources</a>
+  <a href="index.html#resources" class="nav-back">← Retour aux ressources</a>
+</nav>
+<div class="article-wrap">
+  <div class="article-meta">
+    <span class="meta-tag mt-red">C++</span>
+    <span class="meta-tag mt-purple">Algorithmes</span>
+    <span class="meta-tag mt-blue">Embarqué</span>
+    <span class="meta-info">Notes techniques · 15 min</span>
+  </div>
+  <h1>C++, <em class="red">Algos</em><br>&amp; Embedded Tricks</h1>
+  <p class="subtitle">Notes techniques sur le C++ appliqué au firmware — les quatre piliers OOP avec exemples drivers, complexité algorithmique des structures embarquées courantes, concepts OS essentiels et pièges classiques du C bas niveau.</p>
+
+  <!-- ══ SECTION 1 : C++ OOP ══ -->
+  <h2>C++ — Les 4 piliers OOP pour l'embarqué</h2>
+
+  <h3>1 · Encapsulation</h3>
+  <div class="code-block">
+    <span class="code-label">C++ · encapsulation</span>
+    <pre><span class="cm">// Masquer l'implémentation — exposer uniquement l'interface</span>
+<span class="kw">class</span> UartDriver {
+<span class="kw">public</span>:
+    <span class="fn">UartDriver</span>(<span class="kw">uint32_t</span> baudrate);
+    <span class="kw">bool</span> <span class="fn">send</span>(<span class="kw">const char</span> *msg, size_t len);
+    <span class="kw">bool</span> <span class="fn">recv</span>(<span class="kw">char</span> *buf, size_t &amp;len);
+
+<span class="kw">private</span>:
+    <span class="kw">uint32_t</span>    _baudrate;
+    RingBuffer  _rx_buf;    <span class="cm">// implémentation cachée</span>
+    <span class="kw">bool</span>        _init_done;
+
+    <span class="kw">void</span> <span class="fn">_configRegisters</span>();  <span class="cm">// privé = non exposé</span>
+};</pre>
+  </div>
+
+  <h3>2 · Héritage &amp; Polymorphisme — hiérarchie de drivers</h3>
+  <div class="code-block">
+    <span class="code-label">C++ · héritage pour drivers embarqués</span>
+    <pre><span class="cm">// Classe de base abstraite — interface commune</span>
+<span class="kw">class</span> Sensor {
+<span class="kw">public</span>:
+    <span class="kw">virtual float</span>  <span class="fn">read</span>()     = <span class="num">0</span>;  <span class="cm">// pure virtual</span>
+    <span class="kw">virtual bool</span>   <span class="fn">isReady</span>() = <span class="num">0</span>;
+    <span class="kw">virtual</span>        <span class="fn">~Sensor</span>() = <span class="kw">default</span>;  <span class="cm">// destructeur virtuel OBLIGATOIRE</span>
+};
+
+<span class="cm">// Implémentations concrètes</span>
+<span class="kw">class</span> BME280 : <span class="kw">public</span> Sensor {
+    <span class="kw">float</span>  <span class="fn">read</span>()     <span class="kw">override</span> { <span class="kw">return</span> <span class="fn">i2c_read_temp</span>(); }
+    <span class="kw">bool</span>   <span class="fn">isReady</span>() <span class="kw">override</span> { <span class="kw">return</span> <span class="fn">check_status_register</span>(); }
+};
+
+<span class="kw">class</span> SimSensor : <span class="kw">public</span> Sensor {
+    <span class="kw">float</span>  <span class="fn">read</span>()     <span class="kw">override</span> { <span class="kw">return</span> <span class="num">25.0f</span>; }  <span class="cm">// mock pour tests</span>
+    <span class="kw">bool</span>   <span class="fn">isReady</span>() <span class="kw">override</span> { <span class="kw">return true</span>; }
+};
+
+<span class="cm">// Le code applicatif utilise Sensor* sans savoir quel driver concret est dessous</span>
+<span class="kw">void</span> <span class="fn">acquire</span>(Sensor *s) {
+    <span class="kw">if</span> (s-&gt;<span class="fn">isReady</span>()) <span class="fn">log</span>(s-&gt;<span class="fn">read</span>());  <span class="cm">// dispatch dynamique via vtable</span>
+}
+
+<span class="cm">// Instanciation — choix à la compilation ou au runtime</span>
+Sensor *prod = <span class="kw">new</span> <span class="fn">BME280</span>();
+Sensor *test = <span class="kw">new</span> <span class="fn">SimSensor</span>();
+<span class="fn">acquire</span>(prod);  <span class="cm">// lit le vrai capteur</span>
+<span class="fn">acquire</span>(test);  <span class="cm">// lit la simulation</span></pre>
+  </div>
+
+  <div class="warn">
+    <div class="warn-label">⚠ Piège classique du destructeur</div>
+    <p><em>"Pourquoi le destructeur de la classe de base doit être virtuel ?"</em> — Si le destructeur n'est pas virtual et qu'on delete via un pointeur de base, seul le destructeur de base est appelé. Le destructeur de la classe dérivée n'est pas appelé → fuite de ressources. Avec virtual → dispatch dynamique, les deux destructeurs sont appelés dans le bon ordre.</p>
+  </div>
+
+  <h3>3 · Templates (généricité sans héritage)</h3>
+  <div class="code-block">
+    <span class="code-label">C++ · template ring buffer générique</span>
+    <pre><span class="cm">// Ring buffer générique — fonctionne pour uint8_t, Command_t, float...</span>
+<span class="kw">template</span>&lt;<span class="kw">typename</span> T, size_t N&gt;
+<span class="kw">class</span> RingBuffer {
+<span class="kw">public</span>:
+    <span class="kw">bool</span> <span class="fn">push</span>(<span class="kw">const</span> T &amp;item) {
+        size_t next = (head + <span class="num">1</span>) % N;
+        <span class="kw">if</span> (next == tail) <span class="kw">return false</span>;  <span class="cm">// plein</span>
+        buf[head] = item;
+        head = next;
+        <span class="kw">return true</span>;
+    }
+
+    <span class="kw">bool</span> <span class="fn">pop</span>(T &amp;item) {
+        <span class="kw">if</span> (head == tail) <span class="kw">return false</span>;  <span class="cm">// vide</span>
+        item = buf[tail];
+        tail = (tail + <span class="num">1</span>) % N;
+        <span class="kw">return true</span>;
+    }
+
+    <span class="kw">bool</span> <span class="fn">empty</span>() <span class="kw">const</span> { <span class="kw">return</span> head == tail; }
+
+<span class="kw">private</span>:
+    T      buf[N];
+    size_t head = <span class="num">0</span>, tail = <span class="num">0</span>;
+};
+
+<span class="cm">// Utilisation — tout à la compilation, zéro overhead runtime</span>
+RingBuffer&lt;<span class="kw">uint8_t</span>, <span class="num">64</span>&gt; uart_rx;
+RingBuffer&lt;Command_t, <span class="num">8</span>&gt;  cmd_queue;</pre>
+  </div>
+
+  <!-- ══ SECTION 2 : ALGORITHMES ══ -->
+  <h2>Algorithmes &amp; Complexité</h2>
+
+  <div class="diagram">
+    <div class="diagram-title">// Complexités usuelles en embarqué</div>
+    <table class="cx-table">
+      <tr><th>Algo</th><th>Best</th><th>Average</th><th>Worst</th><th>Embarqué ?</th></tr>
+      <tr><td>Accès tableau</td><td class="cx-o1">O(1)</td><td class="cx-o1">O(1)</td><td class="cx-o1">O(1)</td><td style="color:var(--accent3)">✓ Oui</td></tr>
+      <tr><td>Recherche linéaire</td><td class="cx-o1">O(1)</td><td class="cx-on">O(n)</td><td class="cx-on">O(n)</td><td style="color:var(--accent)">Si n petit</td></tr>
+      <tr><td>Recherche binaire</td><td class="cx-o1">O(1)</td><td class="cx-onlog">O(log n)</td><td class="cx-onlog">O(log n)</td><td style="color:var(--accent3)">✓ Oui</td></tr>
+      <tr><td>Tri à bulles</td><td class="cx-on">O(n)</td><td class="cx-on2">O(n²)</td><td class="cx-on2">O(n²)</td><td style="color:var(--accent2)">Rarement</td></tr>
+      <tr><td>Quicksort</td><td class="cx-onlog">O(n log n)</td><td class="cx-onlog">O(n log n)</td><td class="cx-on2">O(n²)</td><td style="color:var(--accent)">Avec précaution</td></tr>
+      <tr><td>Push/Pop ring buffer</td><td class="cx-o1">O(1)</td><td class="cx-o1">O(1)</td><td class="cx-o1">O(1)</td><td style="color:var(--accent3)">✓ Toujours</td></tr>
+    </table>
+  </div>
+
+  <div class="code-block">
+    <span class="code-label">C · recherche binaire — exercice whiteboard classique</span>
+    <pre><span class="cm">// Complexité : O(log n) — tableau trié obligatoire</span>
+<span class="kw">int</span> <span class="fn">binary_search</span>(<span class="kw">const int</span> *arr, <span class="kw">int</span> n, <span class="kw">int</span> target) {
+    <span class="kw">int</span> left = <span class="num">0</span>, right = n - <span class="num">1</span>;
+
+    <span class="kw">while</span> (left &lt;= right) {
+        <span class="kw">int</span> mid = left + (right - left) / <span class="num">2</span>;  <span class="cm">// évite overflow vs (l+r)/2</span>
+
+        <span class="kw">if</span>      (arr[mid] == target) <span class="kw">return</span> mid;
+        <span class="kw">else if</span> (arr[mid] &lt; target)  left  = mid + <span class="num">1</span>;
+        <span class="kw">else</span>                          right = mid - <span class="num">1</span>;
+    }
+    <span class="kw">return</span> -<span class="num">1</span>;  <span class="cm">// non trouvé</span>
+}
+
+<span class="cm">// Cas classique : "Trouve le premier doublon dans un tableau"</span>
+<span class="kw">int</span> <span class="fn">first_duplicate</span>(<span class="kw">const int</span> *arr, <span class="kw">int</span> n) {
+    <span class="cm">// Approche O(n²) naïve — voir si on peut faire mieux</span>
+    <span class="kw">for</span> (<span class="kw">int</span> i = <span class="num">0</span>; i &lt; n; i++)
+        <span class="kw">for</span> (<span class="kw">int</span> j = i + <span class="num">1</span>; j &lt; n; j++)
+            <span class="kw">if</span> (arr[i] == arr[j]) <span class="kw">return</span> arr[i];
+    <span class="kw">return</span> -<span class="num">1</span>;
+    <span class="cm">// Amélioration O(n) avec hash set — mais pas de malloc en embarqué critique</span>
+}</pre>
+  </div>
+
+  <!-- ══ SECTION 3 : EMBEDDED TRICKS ══ -->
+  <h2>Embedded Tricks &amp; Questions Pièges</h2>
+
+  <h3>volatile, const, restrict</h3>
+  <div class="code-block">
+    <span class="code-label">C · qualificateurs critiques</span>
+    <pre><span class="cm">// volatile — interdit les optimisations du compilateur</span>
+<span class="cm">// TOUJOURS sur les variables modifiées par une ISR ou hardware</span>
+<span class="kw">volatile uint32_t</span> tick_count;   <span class="cm">// ISR l'incrémente</span>
+<span class="kw">volatile uint32_t</span> *reg = (<span class="kw">volatile uint32_t</span>*)0x40020000;  <span class="cm">// registre GPIO</span>
+
+<span class="cm">// const — valeur ne change pas → optimisation et sécurité</span>
+<span class="kw">void</span> <span class="fn">GPIO_Init</span>(<span class="kw">const</span> GPIO_Config_t *cfg);  <span class="cm">// cfg ne sera pas modifié</span>
+
+<span class="cm">// Piège : que fait ce code ?</span>
+<span class="kw">int</span> x = <span class="num">5</span>;
+<span class="cm">/* Sans volatile, le compilateur peut "cacher" x dans un registre
+   et ne jamais relire la mémoire → boucle infinie si ISR modifie x */</span>
+<span class="kw">while</span> (x != <span class="num">0</span>);  <span class="cm">// ← comportement indéfini sans volatile</span></pre>
+  </div>
+
+  <h3>Bitfields &amp; Masques</h3>
+  <div class="code-block">
+    <span class="code-label">C · opérations bit à bit — whiteboard classique</span>
+    <pre><span class="cm">// Mettre un bit à 1 (set)</span>
+reg |= (<span class="num">1U</span> &lt;&lt; n);
+
+<span class="cm">// Mettre un bit à 0 (clear)</span>
+reg &amp;= ~(<span class="num">1U</span> &lt;&lt; n);
+
+<span class="cm">// Toggler un bit</span>
+reg ^= (<span class="num">1U</span> &lt;&lt; n);
+
+<span class="cm">// Lire un bit</span>
+<span class="kw">bool</span> bit_val = (reg &gt;&gt; n) &amp; <span class="num">1U</span>;
+
+<span class="cm">// Modifier un champ de bits (ex: bits 5:4 = 0b10)</span>
+reg &amp;= ~(<span class="num">0x3U</span> &lt;&lt; <span class="num">4</span>);   <span class="cm">// effacer bits 5:4</span>
+reg |=  (<span class="num">0x2U</span> &lt;&lt; <span class="num">4</span>);   <span class="cm">// écrire 0b10</span>
+
+<span class="cm">// Cas classique : "Est-ce que n est une puissance de 2 ?"</span>
+<span class="kw">bool</span> <span class="fn">is_power_of_2</span>(<span class="kw">uint32_t</span> n) {
+    <span class="kw">return</span> (n &gt; <span class="num">0</span>) &amp;&amp; ((n &amp; (n - <span class="num">1</span>)) == <span class="num">0</span>);
+    <span class="cm">// Astuce : 8 = 0b1000, 7 = 0b0111 → 8 & 7 = 0</span>
+}
+
+<span class="cm">// Compter les bits à 1 (Hamming weight)</span>
+<span class="kw">int</span> <span class="fn">count_bits</span>(<span class="kw">uint32_t</span> n) {
+    <span class="kw">int</span> count = <span class="num">0</span>;
+    <span class="kw">while</span> (n) { count += n &amp; <span class="num">1</span>; n &gt;&gt;= <span class="num">1</span>; }
+    <span class="kw">return</span> count;
+}</pre>
+  </div>
+
+  <h3>OS Concepts — Questions fréquentes</h3>
+  <div class="concept-grid">
+    <div class="concept-card">
+      <div class="concept-label">ISR vs Task FreeRTOS</div>
+      <div class="concept-val">ISR : contexte hardware, non bloquant, pas de vTaskDelay. Task : contexte software, peut attendre, a sa propre stack. Les deux partagent la même mémoire → protéger avec xSemaphoreGiveFromISR.</div>
+    </div>
+    <div class="concept-card">
+      <div class="concept-label">Stack vs Heap</div>
+      <div class="concept-val">Stack : allocation automatique, déterministe, taille fixe. Heap : allocation dynamique (malloc), non déterministe, fragmentation possible. En embarqué critique → préférer stack et buffers statiques.</div>
+    </div>
+    <div class="concept-card">
+      <div class="concept-label">Race Condition</div>
+      <div class="concept-val">Deux tâches lisent-modifient-écrivent la même variable sans protection. Solution : mutex, section critique, ou variable atomique. Exemple : <code>count++</code> n'est pas atomique sur ARM (3 instructions).</div>
+    </div>
+    <div class="concept-card">
+      <div class="concept-label">Malloc en embarqué critique</div>
+      <div class="concept-val">Non déterministe (temps d'exécution variable), fragmentation heap, peut retourner NULL. En critique (DO-178C, IEC 61508) : allocation dynamique interdite après init. Utiliser des pools statiques.</div>
+    </div>
+  </div>
+
+  <h3>Watchdog — Hardware vs Software</h3>
+  <div class="code-block">
+    <span class="code-label">C · différence watchdog matériel vs logiciel</span>
+    <pre><span class="cm">// Watchdog MATÉRIEL (IWDG/WWDG STM32)</span>
+<span class="cm">// Timer hardware indépendant — reset si non rafraîchi dans le délai</span>
+<span class="cm">// Persiste même si le firmware est bloqué dans une ISR</span>
+IWDG-&gt;KR = <span class="num">0xAAAA</span>;  <span class="cm">// "kick" le watchdog (reload)</span>
+<span class="cm">// Si on n'exécute pas cette ligne → reset automatique MCU</span>
+
+<span class="cm">// Watchdog LOGICIEL (notre pattern séance 12)</span>
+<span class="cm">// Tâche FreeRTOS surveille d'autres tâches via sémaphore</span>
+<span class="cm">// Plus flexible mais ne résiste pas à un blocage kernel-level</span>
+<span class="cm">// Les deux sont complémentaires en production</span></pre>
+  </div>
+
+  <div class="callout">
+    <div class="callout-label">// règles courtes à mémoriser</div>
+    <p>
+      <strong>Complexité ring buffer push/pop :</strong> O(1) — index arithmétique<br>
+      <strong>Pourquoi éviter malloc en critique :</strong> Non déterministe, fragmentation<br>
+      <strong>Mutex vs sémaphore binaire :</strong> Mutex = propriété + priority inheritance. Sémaphore = signal sans propriétaire<br>
+      <strong>Effet de volatile :</strong> Interdit au compilateur de cacher la variable en registre — re-lit toujours depuis la mémoire<br>
+      <strong>ISR et vTaskDelay :</strong> Jamais combinables — utiliser xSemaphoreGiveFromISR puis portYIELD_FROM_ISR
+    </p>
+  </div>
+</div>
+<footer style="max-width:860px;margin:0 auto;padding:32px 48px;border-top:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;position:relative;z-index:1">
+  <div style="font-family:'Space Mono',monospace;font-size:11px;color:var(--text-dim)">Elie SASPORTES · 2026</div>
+  <div style="display:flex;gap:24px">
+    <a href="article-linux-driver.html" style="font-family:'Space Mono',monospace;font-size:10px;color:var(--text-dim);text-decoration:none;letter-spacing:0.08em;text-transform:uppercase" onmouseover="this.style.color='var(--accent)'" onmouseout="this.style.color='var(--text-dim)'">← Linux Kernel</a>
+    <a href="index.html#resources" style="font-family:'Space Mono',monospace;font-size:10px;color:var(--text-dim);text-decoration:none;letter-spacing:0.08em;text-transform:uppercase" onmouseover="this.style.color='var(--accent)'" onmouseout="this.style.color='var(--text-dim)'">Toutes les ressources</a>
+  </div>
+</footer>
+</body>
+</html>

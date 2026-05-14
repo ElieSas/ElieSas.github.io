@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Linux Kernel — Character Device &amp; Driver I2C — Elie SASPORTES</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500&family=Bebas+Neue&display=swap" rel="stylesheet">
+<style>
+  :root{--bg:#0a0c0f;--bg2:#0f1217;--bg3:#141820;--surface:#1a1f2a;--border:#1e2535;--border-bright:#2a3548;--text:#e8eaf0;--text-muted:#6b7a99;--text-dim:#3d4a63;--accent:#00d4ff;--accent2:#ff6b35;--accent3:#7fff6b;--accent4:#ffcb6b}
+  *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth}
+  body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;font-weight:300;line-height:1.7}
+  body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(var(--border) 1px,transparent 1px),linear-gradient(90deg,var(--border) 1px,transparent 1px);background-size:48px 48px;opacity:0.3;pointer-events:none;z-index:0}
+  nav{position:fixed;top:0;left:0;right:0;z-index:100;display:flex;align-items:center;justify-content:space-between;padding:0 48px;height:64px;background:rgba(10,12,15,0.9);backdrop-filter:blur(16px);border-bottom:1px solid var(--border)}
+  .nav-logo{font-family:'Space Mono',monospace;font-size:12px;color:var(--accent);letter-spacing:0.1em;text-decoration:none;text-transform:uppercase}
+  .nav-back{font-family:'Space Mono',monospace;font-size:11px;color:var(--text-muted);text-decoration:none;letter-spacing:0.08em;transition:color 0.2s}
+  .nav-back:hover{color:var(--accent)}
+  .article-wrap{max-width:860px;margin:0 auto;padding:100px 48px 80px;position:relative;z-index:1}
+  .article-meta{display:flex;align-items:center;gap:12px;margin-bottom:32px;flex-wrap:wrap}
+  .meta-tag{font-family:'Space Mono',monospace;font-size:10px;padding:4px 10px;letter-spacing:0.12em;text-transform:uppercase}
+  .mt-yellow{color:var(--accent4);background:rgba(255,203,107,0.08);border:1px solid rgba(255,203,107,0.2)}
+  .mt-blue{color:var(--accent);background:rgba(0,212,255,0.08);border:1px solid rgba(0,212,255,0.2)}
+  .meta-info{font-family:'Space Mono',monospace;font-size:10px;color:var(--text-dim);letter-spacing:0.08em}
+  h1{font-family:'Bebas Neue',sans-serif;font-size:clamp(40px,6vw,72px);letter-spacing:0.04em;line-height:1;color:var(--text);margin-bottom:16px}
+  h1 em{color:var(--accent4);font-style:normal}
+  .subtitle{font-size:17px;color:var(--text-muted);max-width:600px;line-height:1.8;margin-bottom:48px;padding-bottom:48px;border-bottom:1px solid var(--border)}
+  h2{font-family:'Bebas Neue',sans-serif;font-size:32px;letter-spacing:0.05em;color:var(--text);margin:48px 0 20px;display:flex;align-items:center;gap:12px}
+  h2::before{content:'';width:3px;height:28px;background:var(--accent4);flex-shrink:0}
+  p{font-size:15px;color:var(--text-muted);line-height:1.9;margin-bottom:16px}
+  p strong{color:var(--text);font-weight:500}
+  .code-block{background:var(--bg3);border:1px solid var(--border);border-left:2px solid var(--accent4);padding:24px 28px;margin:24px 0;overflow-x:auto;position:relative}
+  .code-label{position:absolute;top:0;right:0;font-family:'Space Mono',monospace;font-size:9px;color:var(--text-dim);background:var(--border);padding:3px 10px;letter-spacing:0.1em;text-transform:uppercase}
+  pre{font-family:'Space Mono',monospace;font-size:12px;line-height:1.8;color:var(--text-muted)}
+  .kw{color:#c792ea}.cm{color:var(--text-dim);font-style:italic}.num{color:var(--accent2)}.fn{color:var(--accent)}.str{color:var(--accent3)}.def{color:#ffcb6b}
+  .diagram{background:var(--surface);border:1px solid var(--border-bright);padding:32px;margin:28px 0;position:relative;overflow:hidden}
+  .diagram::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,var(--accent4),transparent);opacity:0.5}
+  .diagram-title{font-family:'Space Mono',monospace;font-size:10px;color:var(--accent4);letter-spacing:0.15em;text-transform:uppercase;margin-bottom:20px}
+  .callout{border-left:2px solid var(--accent3);padding:16px 20px;background:rgba(127,255,107,0.04);margin:24px 0}
+  .callout-label{font-family:'Space Mono',monospace;font-size:9px;color:var(--accent3);letter-spacing:0.15em;text-transform:uppercase;margin-bottom:6px}
+  .callout p{color:var(--text-muted);font-size:14px;margin:0}
+  .warn{border-left:2px solid var(--accent2);padding:16px 20px;background:rgba(255,107,53,0.04);margin:24px 0}
+  .warn-label{font-family:'Space Mono',monospace;font-size:9px;color:var(--accent2);letter-spacing:0.15em;text-transform:uppercase;margin-bottom:6px}
+  .warn p{color:var(--text-muted);font-size:14px;margin:0}
+  .concept-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:24px 0}
+  .concept-card{background:var(--surface);border:1px solid var(--border);padding:20px;position:relative;overflow:hidden}
+  .concept-card::after{content:'';position:absolute;top:0;left:0;width:2px;height:100%;background:var(--accent4)}
+  .concept-card:nth-child(2)::after{background:var(--accent)}
+  .concept-card:nth-child(3)::after{background:var(--accent3)}
+  .concept-card:nth-child(4)::after{background:var(--accent2)}
+  .concept-label{font-family:'Space Mono',monospace;font-size:10px;color:var(--text-dim);letter-spacing:0.1em;text-transform:uppercase;margin-bottom:8px}
+  .concept-val{font-size:14px;color:var(--text-muted);line-height:1.6}
+  .concept-val code{font-family:'Space Mono',monospace;font-size:11px;color:var(--accent);background:var(--bg3);padding:1px 5px}
+
+  /* KERNEL LAYERS */
+  .layers{display:flex;flex-direction:column;gap:2px;margin:20px 0}
+  .layer{padding:14px 24px;border:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;position:relative}
+  .layer::before{content:'';position:absolute;left:0;top:0;bottom:0;width:4px}
+  .layer.us::before{background:var(--accent3)}
+  .layer.sc::before{background:var(--accent4)}
+  .layer.ks::before{background:var(--accent)}
+  .layer.hw::before{background:var(--text-dim)}
+  .layer-name{font-family:'Space Mono',monospace;font-size:11px;letter-spacing:0.05em}
+  .layer.us .layer-name{color:var(--accent3)}
+  .layer.sc .layer-name{color:var(--accent4)}
+  .layer.ks .layer-name{color:var(--accent)}
+  .layer.hw .layer-name{color:var(--text-dim)}
+  .layer-detail{font-family:'Space Mono',monospace;font-size:10px;color:var(--text-dim);text-align:right}
+
+  /* CMD TABLE */
+  .cmd-table{width:100%;border-collapse:collapse;font-family:'Space Mono',monospace;font-size:11px;margin:16px 0}
+  .cmd-table th{background:var(--bg3);color:var(--text-dim);padding:8px 14px;text-align:left;border:1px solid var(--border);letter-spacing:0.08em;text-transform:uppercase;font-size:9px}
+  .cmd-table td{padding:8px 14px;border:1px solid var(--border);color:var(--text-muted)}
+  .cmd-table td:first-child{color:var(--accent4)}
+
+  ::-webkit-scrollbar{width:4px}::-webkit-scrollbar-track{background:var(--bg)}::-webkit-scrollbar-thumb{background:var(--border-bright)}
+  @media(max-width:640px){.article-wrap{padding:88px 20px 48px}.concept-grid{grid-template-columns:1fr}nav{padding:0 20px}}
+</style>
+</head>
+<body>
+<nav>
+  <a href="index.html" class="nav-logo">ES · Ressources</a>
+  <a href="index.html#resources" class="nav-back">← Retour aux ressources</a>
+</nav>
+<div class="article-wrap">
+  <div class="article-meta">
+    <span class="meta-tag mt-yellow">Linux Embarqué</span>
+    <span class="meta-tag mt-blue">Kernel Module</span>
+    <span class="meta-info">Séances 20–21 · 14 min</span>
+  </div>
+  <h1>Linux Kernel —<br>Character Device<br>&amp; Driver <em>I2C</em></h1>
+  <p class="subtitle">Écrire un module kernel Linux depuis zéro — enregistrement d'un character device, interface file_operations, puis driver I2C intégré dans le sous-système Linux.</p>
+
+  <h2>Architecture kernel Linux</h2>
+  <div class="diagram">
+    <div class="diagram-title">// Les 4 niveaux d'accès hardware sur Linux</div>
+    <div class="layers">
+      <div class="layer us"><div class="layer-name">Userspace</div><div class="layer-detail">cat /dev/hello · Python · echo 1 > sysfs</div></div>
+      <div style="text-align:center;font-family:'Space Mono',monospace;font-size:11px;color:var(--text-dim);padding:3px 0">↕ syscalls (open, read, write, ioctl)</div>
+      <div class="layer sc"><div class="layer-name">VFS — Virtual File System</div><div class="layer-detail">interface unifiée — tout est fichier</div></div>
+      <div style="text-align:center;font-family:'Space Mono',monospace;font-size:11px;color:var(--text-dim);padding:3px 0">↕ file_operations struct</div>
+      <div class="layer ks"><div class="layer-name">Notre module kernel (.ko)</div><div class="layer-detail">hello_dev.ko · tmp_i2c.ko</div></div>
+      <div style="text-align:center;font-family:'Space Mono',monospace;font-size:11px;color:var(--text-dim);padding:3px 0">↕ sous-systèmes kernel (I2C core, GPIO...)</div>
+      <div class="layer hw"><div class="layer-name">Hardware</div><div class="layer-detail">registres, bus I2C physique</div></div>
+    </div>
+  </div>
+
+  <h2>Character Device — Séance 20</h2>
+  <p>Un character device crée une entrée dans <code style="font-family:'Space Mono',monospace;color:var(--accent);font-size:13px">/dev/</code> accessible depuis userspace comme un fichier ordinaire. Le kernel route les appels <code>open/read/write</code> vers nos fonctions via la struct <code>file_operations</code>.</p>
+
+  <div class="code-block">
+    <span class="code-label">C · hello_dev.c — structure complète</span>
+    <pre><span class="def">#include &lt;linux/init.h&gt;
+#include &lt;linux/module.h&gt;
+#include &lt;linux/fs.h&gt;
+#include &lt;linux/uaccess.h&gt;</span>
+
+MODULE_LICENSE(<span class="str">"GPL"</span>);
+MODULE_AUTHOR(<span class="str">"ElieSas"</span>);
+MODULE_DESCRIPTION(<span class="str">"Character device minimal"</span>);
+
+<span class="cm">/* Variables du module — static = privées au fichier .c */</span>
+<span class="kw">static int</span>    major_number;
+<span class="kw">static char</span>   message[<span class="num">256</span>] = {<span class="num">0</span>};
+<span class="kw">static size_t</span> message_len;
+
+<span class="cm">/* ── Implémentation des callbacks file_operations ── */</span>
+
+<span class="kw">static int</span> <span class="fn">dev_open</span>(struct inode *i, struct file *f) {
+    <span class="fn">printk</span>(KERN_INFO <span class="str">"hello_dev: opened\n"</span>);
+    <span class="kw">return</span> <span class="num">0</span>;
+}
+
+<span class="kw">static int</span> <span class="fn">dev_release</span>(struct inode *i, struct file *f) {
+    <span class="fn">printk</span>(KERN_INFO <span class="str">"hello_dev: closed\n"</span>);
+    <span class="kw">return</span> <span class="num">0</span>;
+}
+
+<span class="kw">static ssize_t</span> <span class="fn">dev_read</span>(struct file *f, <span class="kw">char __user</span> *buf,
+                          size_t len, loff_t *off) {
+    <span class="cm">/* copy_to_user : kernel → userspace (ne jamais utiliser memcpy !) */</span>
+    <span class="kw">if</span> (<span class="fn">copy_to_user</span>(buf, message, message_len)) <span class="kw">return</span> -EFAULT;
+    <span class="kw">return</span> message_len;
+}
+
+<span class="kw">static ssize_t</span> <span class="fn">dev_write</span>(struct file *f, <span class="kw">const char __user</span> *buf,
+                           size_t len, loff_t *off) {
+    <span class="cm">/* copy_from_user : userspace → kernel */</span>
+    <span class="kw">if</span> (<span class="fn">copy_from_user</span>(message, buf, len)) <span class="kw">return</span> -EFAULT;
+    message_len = len;
+    <span class="kw">return</span> len;
+}
+
+<span class="cm">/* ── Table des callbacks — lien entre VFS et nos fonctions ── */</span>
+<span class="kw">static struct</span> file_operations fops = {
+    .owner   = THIS_MODULE,
+    .open    = dev_open,
+    .release = dev_release,
+    .read    = dev_read,
+    .write   = dev_write,
+};
+
+<span class="cm">/* ── Cycle de vie du module ── */</span>
+<span class="kw">static int</span> <span class="fn">__init</span> hello_init(<span class="kw">void</span>) {
+    major_number = <span class="fn">register_chrdev</span>(<span class="num">0</span>, <span class="str">"hello_dev"</span>, &amp;fops);
+    <span class="fn">printk</span>(KERN_INFO <span class="str">"hello_dev: major=%d\n"</span>, major_number);
+    <span class="kw">return</span> <span class="num">0</span>;
+}
+
+<span class="kw">static void</span> <span class="fn">__exit</span> hello_exit(<span class="kw">void</span>) {
+    <span class="fn">unregister_chrdev</span>(major_number, <span class="str">"hello_dev"</span>);
+}
+
+<span class="fn">module_init</span>(hello_init);
+<span class="fn">module_exit</span>(hello_exit);</pre>
+  </div>
+
+  <h2>Commandes essentielles</h2>
+  <div class="diagram">
+    <div class="diagram-title">// Workflow module kernel</div>
+    <table class="cmd-table">
+      <tr><th>Commande</th><th>Action</th></tr>
+      <tr><td>make</td><td>Compiler le module → hello_dev.ko</td></tr>
+      <tr><td>sudo insmod hello_dev.ko</td><td>Charger le module dans le kernel</td></tr>
+      <tr><td>lsmod | grep hello</td><td>Vérifier que le module est chargé</td></tr>
+      <tr><td>cat /proc/devices</td><td>Trouver le numéro major attribué</td></tr>
+      <tr><td>sudo mknod /dev/hello c 240 0</td><td>Créer le fichier device (major=240, minor=0)</td></tr>
+      <tr><td>dmesg | tail -10</td><td>Lire les printk() du module</td></tr>
+      <tr><td>echo "test" > /dev/hello</td><td>Écrire depuis userspace → dev_write()</td></tr>
+      <tr><td>cat /dev/hello</td><td>Lire depuis userspace → dev_read()</td></tr>
+      <tr><td>sudo rmmod hello_dev</td><td>Décharger le module</td></tr>
+    </table>
+  </div>
+
+  <h2>Driver I2C kernel — Séance 21</h2>
+  <p>Le driver I2C s'intègre dans le <strong>sous-système I2C du kernel</strong> via <code>i2c_driver</code> et les callbacks <code>probe/remove</code>. Le kernel appelle <code>probe</code> automatiquement quand un périphérique correspondant est détecté sur le bus.</p>
+
+  <div class="diagram">
+    <div class="diagram-title">// Architecture driver I2C vs character device</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;font-family:'Space Mono',monospace;font-size:11px">
+      <div>
+        <div style="color:var(--accent4);margin-bottom:12px">Character device (séance 20)</div>
+        <div style="color:var(--text-dim);line-height:2">register_chrdev()<br>→ /dev/hello<br>Interface : open/read/write<br>Pas d'intégration sous-système</div>
+      </div>
+      <div>
+        <div style="color:var(--accent);margin-bottom:12px">Driver I2C (séance 21)</div>
+        <div style="color:var(--text-dim);line-height:2">i2c_add_driver()<br>→ /sys/bus/i2c/devices/<br>Interface : sysfs automatique<br>Intégration complète kernel</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="code-block">
+    <span class="code-label">C · tmp_i2c.c — driver I2C capteur température</span>
+    <pre><span class="def">#include &lt;linux/i2c.h&gt;
+#include &lt;linux/module.h&gt;
+#include &lt;linux/sysfs.h&gt;
+#include &lt;linux/device.h&gt;
+#include &lt;linux/slab.h&gt;</span>
+
+<span class="cm">/* Structure privée — une instance par capteur détecté */</span>
+<span class="kw">struct</span> tmp_data {
+    <span class="kw">struct</span> i2c_client *client;  <span class="cm">// handle vers le périphérique I2C</span>
+    <span class="kw">int</span>                temp_raw;
+};
+
+<span class="cm">/* Attribut sysfs — expose /sys/.../temperature en lecture */</span>
+<span class="kw">static ssize_t</span> <span class="fn">temperature_show</span>(<span class="kw">struct</span> device *dev,
+                                  <span class="kw">struct</span> device_attribute *attr, <span class="kw">char</span> *buf) {
+    <span class="kw">struct</span> tmp_data *data = dev_get_drvdata(dev);
+    <span class="cm">/* Sur vrai hardware : i2c_smbus_read_word_data(data->client, 0x00) */</span>
+    data-&gt;temp_raw += <span class="num">1</span>;  <span class="cm">// simulation</span>
+    <span class="kw">return</span> <span class="fn">sprintf</span>(buf, <span class="str">"%d\n"</span>, data-&gt;temp_raw);
+}
+<span class="fn">static DEVICE_ATTR_RO</span>(temperature);  <span class="cm">// macro kernel — génère l'attribut</span>
+
+<span class="cm">/* probe() — appelé par le kernel quand le périphérique est détecté */</span>
+<span class="kw">static int</span> <span class="fn">tmp_probe</span>(<span class="kw">struct</span> i2c_client *client) {
+    <span class="kw">struct</span> tmp_data *data = <span class="fn">devm_kzalloc</span>(&amp;client-&gt;dev,
+                             <span class="kw">sizeof</span>(*data), GFP_KERNEL);
+    <span class="kw">if</span> (!data) <span class="kw">return</span> -ENOMEM;
+
+    data-&gt;client = client;
+    <span class="fn">dev_set_drvdata</span>(&amp;client-&gt;dev, data);  <span class="cm">// stocker le contexte</span>
+
+    <span class="fn">device_create_file</span>(&amp;client-&gt;dev, &amp;dev_attr_temperature);
+    <span class="fn">dev_info</span>(&amp;client-&gt;dev, <span class="str">"tmp_i2c: probe ok @ 0x%02x\n"</span>, client-&gt;addr);
+    <span class="kw">return</span> <span class="num">0</span>;
+}
+
+<span class="cm">/* remove() — appelé lors du rmmod ou déconnexion */</span>
+<span class="kw">static void</span> <span class="fn">tmp_remove</span>(<span class="kw">struct</span> i2c_client *client) {
+    <span class="fn">device_remove_file</span>(&amp;client-&gt;dev, &amp;dev_attr_temperature);
+    <span class="fn">dev_info</span>(&amp;client-&gt;dev, <span class="str">"tmp_i2c: removed\n"</span>);
+}
+
+<span class="cm">/* Table de correspondance — déclenche le probe pour adresse 0x48 */</span>
+<span class="kw">static const struct</span> i2c_device_id tmp_id[] = {
+    { <span class="str">"tmp102"</span>, <span class="num">0</span> }, {}
+};
+MODULE_DEVICE_TABLE(i2c, tmp_id);
+
+<span class="kw">static struct</span> i2c_driver tmp_driver = {
+    .driver = { .name = <span class="str">"tmp102"</span>, .owner = THIS_MODULE },
+    .probe  = tmp_probe,
+    .remove = tmp_remove,
+    .id_table = tmp_id,
+};
+<span class="fn">module_i2c_driver</span>(tmp_driver);  <span class="cm">// macro qui gère init/exit automatiquement</span>
+
+MODULE_LICENSE(<span class="str">"GPL"</span>);
+MODULE_AUTHOR(<span class="str">"ElieSas"</span>);</pre>
+  </div>
+
+  <div class="callout">
+    <div class="callout-label">// devm_ = device-managed memory</div>
+    <p>Toujours préférer <code>devm_kzalloc</code> à <code>kmalloc</code> — la mémoire est libérée automatiquement par le kernel lors du remove. Évite les fuites mémoire en cas d'erreur dans probe.</p>
+  </div>
+
+  <div class="warn">
+    <div class="warn-label">⚠ Règles kernel space</div>
+    <p>En espace kernel : pas de libc, pas de float, pas de printf (→ printk). Pour les accès userspace : toujours <code>copy_to_user()</code> / <code>copy_from_user()</code>. Un crash kernel = kernel panic — pas de try/catch.</p>
+  </div>
+
+  <h2>Points clés à retenir</h2>
+  <div class="concept-grid">
+    <div class="concept-card">
+      <div class="concept-label">file_operations = contrat VFS</div>
+      <div class="concept-val">La struct <code>file_operations</code> est le lien entre le VFS et notre driver. Chaque champ est un pointeur de fonction. Les champs non remplis restent NULL → opération non supportée.</div>
+    </div>
+    <div class="concept-card">
+      <div class="concept-label">Numéro majeur = type de device</div>
+      <div class="concept-val">Le major identifie le driver. Le minor identifie l'instance. Passer 0 à <code>register_chrdev</code> → le kernel attribue un major dynamiquement.</div>
+    </div>
+    <div class="concept-card">
+      <div class="concept-label">probe/remove = cycle de vie</div>
+      <div class="concept-val">Le kernel appelle <code>probe</code> quand un périphérique matche la table d'ID. <code>remove</code> est appelé au déchargement ou déconnexion. Toujours nettoyer dans remove ce qu'on a créé dans probe.</div>
+    </div>
+    <div class="concept-card">
+      <div class="concept-label">sysfs > /dev pour les capteurs</div>
+      <div class="concept-val">Pour des capteurs lus périodiquement, l'interface sysfs (<code>/sys/.../temperature</code>) est plus propre qu'un character device — intégration avec udev, Python, et les outils Linux standard.</div>
+    </div>
+  </div>
+</div>
+<footer style="max-width:860px;margin:0 auto;padding:32px 48px;border-top:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;position:relative;z-index:1">
+  <div style="font-family:'Space Mono',monospace;font-size:11px;color:var(--text-dim)">Elie SASPORTES · 2026</div>
+  <div style="display:flex;gap:24px">
+    <a href="article-freertos-ipc.html" style="font-family:'Space Mono',monospace;font-size:10px;color:var(--text-dim);text-decoration:none;letter-spacing:0.08em;text-transform:uppercase" onmouseover="this.style.color='var(--accent)'" onmouseout="this.style.color='var(--text-dim)'">← FreeRTOS IPC</a>
+    <a href="article-cpp-embedded.html" style="font-family:'Space Mono',monospace;font-size:10px;color:var(--text-dim);text-decoration:none;letter-spacing:0.08em;text-transform:uppercase" onmouseover="this.style.color='var(--accent)'" onmouseout="this.style.color='var(--text-dim)'">C++ &amp; Algos →</a>
+  </div>
+</footer>
+</body>
+</html>

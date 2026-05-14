@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GPIO bare-metal sur STM32 — Elie SASPORTES</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500&family=Bebas+Neue&display=swap" rel="stylesheet">
+<style>
+  :root { --bg:#0a0c0f;--bg2:#0f1217;--bg3:#141820;--surface:#1a1f2a;--border:#1e2535;--border-bright:#2a3548;--text:#e8eaf0;--text-muted:#6b7a99;--text-dim:#3d4a63;--accent:#00d4ff;--accent2:#ff6b35;--accent3:#7fff6b; }
+  *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth}
+  body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;font-weight:300;line-height:1.7}
+  body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(var(--border) 1px,transparent 1px),linear-gradient(90deg,var(--border) 1px,transparent 1px);background-size:48px 48px;opacity:0.3;pointer-events:none;z-index:0}
+
+  nav{position:fixed;top:0;left:0;right:0;z-index:100;display:flex;align-items:center;justify-content:space-between;padding:0 48px;height:64px;background:rgba(10,12,15,0.9);backdrop-filter:blur(16px);border-bottom:1px solid var(--border)}
+  .nav-logo{font-family:'Space Mono',monospace;font-size:12px;color:var(--accent);letter-spacing:0.1em;text-decoration:none;text-transform:uppercase}
+  .nav-back{font-family:'Space Mono',monospace;font-size:11px;color:var(--text-muted);text-decoration:none;letter-spacing:0.08em;transition:color 0.2s}
+  .nav-back:hover{color:var(--accent)}
+
+  .article-wrap{max-width:860px;margin:0 auto;padding:100px 48px 80px;position:relative;z-index:1}
+
+  .article-meta{display:flex;align-items:center;gap:12px;margin-bottom:32px}
+  .meta-tag{font-family:'Space Mono',monospace;font-size:10px;color:var(--accent);background:rgba(0,212,255,0.08);border:1px solid rgba(0,212,255,0.2);padding:4px 10px;letter-spacing:0.12em;text-transform:uppercase}
+  .meta-info{font-family:'Space Mono',monospace;font-size:10px;color:var(--text-dim);letter-spacing:0.08em}
+
+  h1{font-family:'Bebas Neue',sans-serif;font-size:clamp(40px,6vw,72px);letter-spacing:0.04em;line-height:1;color:var(--text);margin-bottom:16px}
+  h1 em{color:var(--accent);font-style:normal}
+
+  .subtitle{font-size:17px;color:var(--text-muted);max-width:600px;line-height:1.8;margin-bottom:48px;padding-bottom:48px;border-bottom:1px solid var(--border)}
+
+  h2{font-family:'Bebas Neue',sans-serif;font-size:32px;letter-spacing:0.05em;color:var(--text);margin:48px 0 20px;display:flex;align-items:center;gap:12px}
+  h2::before{content:'';width:3px;height:28px;background:var(--accent);flex-shrink:0}
+
+  h3{font-family:'Space Mono',monospace;font-size:13px;color:var(--accent);letter-spacing:0.1em;text-transform:uppercase;margin:28px 0 12px}
+
+  p{font-size:15px;color:var(--text-muted);line-height:1.9;margin-bottom:16px}
+  p strong{color:var(--text);font-weight:500}
+
+  /* CODE BLOCKS */
+  .code-block{background:var(--bg3);border:1px solid var(--border);border-left:2px solid var(--accent);padding:24px 28px;margin:24px 0;overflow-x:auto;position:relative}
+  .code-block .code-label{position:absolute;top:0;right:0;font-family:'Space Mono',monospace;font-size:9px;color:var(--text-dim);background:var(--border);padding:3px 10px;letter-spacing:0.1em;text-transform:uppercase}
+  pre{font-family:'Space Mono',monospace;font-size:12px;line-height:1.8;color:var(--text-muted)}
+  .kw{color:#c792ea}
+  .cm{color:var(--text-dim);font-style:italic}
+  .num{color:var(--accent2)}
+  .fn{color:var(--accent)}
+  .str{color:var(--accent3)}
+  .def{color:#ffcb6b}
+
+  /* VISUAL DIAGRAMS */
+  .diagram{background:var(--surface);border:1px solid var(--border-bright);padding:32px;margin:28px 0;position:relative;overflow:hidden}
+  .diagram::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,var(--accent),transparent);opacity:0.4}
+  .diagram-title{font-family:'Space Mono',monospace;font-size:10px;color:var(--accent);letter-spacing:0.15em;text-transform:uppercase;margin-bottom:20px}
+
+  /* REGISTER VISUAL */
+  .register{display:flex;flex-direction:column;gap:8px;margin:16px 0}
+  .reg-row{display:flex;align-items:center;gap:8px}
+  .reg-name{font-family:'Space Mono',monospace;font-size:10px;color:var(--text-dim);width:80px;letter-spacing:0.06em;flex-shrink:0;text-align:right}
+  .reg-bits{display:flex;gap:2px;flex:1}
+  .reg-bit{height:28px;flex:1;display:flex;align-items:center;justify-content:center;font-family:'Space Mono',monospace;font-size:9px;border:1px solid var(--border);color:var(--text-dim);position:relative}
+  .reg-bit.on{background:rgba(0,212,255,0.15);border-color:var(--accent);color:var(--accent)}
+  .reg-bit.orange{background:rgba(255,107,53,0.15);border-color:var(--accent2);color:var(--accent2)}
+  .reg-bit.green{background:rgba(127,255,107,0.15);border-color:var(--accent3);color:var(--accent3)}
+  .reg-bit.grp{flex:2}
+  .reg-bit.grp3{flex:3}
+  .reg-labels{display:flex;gap:2px;flex:1;margin-left:88px}
+  .reg-label{flex:1;font-family:'Space Mono',monospace;font-size:8px;color:var(--text-dim);text-align:center;padding-top:4px}
+
+  /* MEMORY MAP */
+  .mem-map{display:flex;flex-direction:column;gap:2px}
+  .mem-row{display:flex;align-items:stretch;gap:2px}
+  .mem-addr{font-family:'Space Mono',monospace;font-size:9px;color:var(--text-dim);width:100px;display:flex;align-items:center;justify-content:flex-end;padding-right:8px;flex-shrink:0}
+  .mem-block{flex:1;padding:10px 14px;font-family:'Space Mono',monospace;font-size:10px;border:1px solid var(--border)}
+  .mem-block.active{background:rgba(0,212,255,0.08);border-color:var(--accent);color:var(--accent)}
+  .mem-block.orange{background:rgba(255,107,53,0.08);border-color:var(--accent2);color:var(--accent2)}
+  .mem-block.green{background:rgba(127,255,107,0.08);border-color:var(--accent3);color:var(--accent3)}
+  .mem-block.dim{color:var(--text-dim)}
+
+  /* CONCEPT CARDS */
+  .concept-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:24px 0}
+  .concept-card{background:var(--surface);border:1px solid var(--border);padding:20px;position:relative;overflow:hidden}
+  .concept-card::after{content:'';position:absolute;top:0;left:0;width:2px;height:100%;background:var(--accent)}
+  .concept-card:nth-child(2)::after{background:var(--accent2)}
+  .concept-card:nth-child(3)::after{background:var(--accent3)}
+  .concept-card:nth-child(4)::after{background:var(--accent)}
+  .concept-label{font-family:'Space Mono',monospace;font-size:10px;color:var(--text-dim);letter-spacing:0.1em;text-transform:uppercase;margin-bottom:8px}
+  .concept-val{font-size:14px;color:var(--text-muted);line-height:1.6}
+  .concept-val code{font-family:'Space Mono',monospace;font-size:11px;color:var(--accent);background:var(--bg3);padding:1px 5px}
+
+  /* CALLOUT */
+  .callout{border-left:2px solid var(--accent3);padding:16px 20px;background:rgba(127,255,107,0.04);margin:24px 0}
+  .callout-label{font-family:'Space Mono',monospace;font-size:9px;color:var(--accent3);letter-spacing:0.15em;text-transform:uppercase;margin-bottom:6px}
+  .callout p{color:var(--text-muted);font-size:14px;margin:0}
+
+  .warn{border-left:2px solid var(--accent2);padding:16px 20px;background:rgba(255,107,53,0.04);margin:24px 0}
+  .warn-label{font-family:'Space Mono',monospace;font-size:9px;color:var(--accent2);letter-spacing:0.15em;text-transform:uppercase;margin-bottom:6px}
+  .warn p{color:var(--text-muted);font-size:14px;margin:0}
+
+  /* STRUCT DIAGRAM */
+  .struct-visual{border:1px solid var(--border-bright);margin:20px 0}
+  .struct-header{background:var(--bg3);border-bottom:1px solid var(--border);padding:10px 16px;font-family:'Space Mono',monospace;font-size:11px;color:var(--accent);letter-spacing:0.08em}
+  .struct-field{display:flex;align-items:center;border-bottom:1px solid var(--border);padding:10px 16px;gap:16px}
+  .struct-field:last-child{border-bottom:none}
+  .struct-type{font-family:'Space Mono',monospace;font-size:10px;color:var(--accent2);width:100px;flex-shrink:0}
+  .struct-name{font-family:'Space Mono',monospace;font-size:11px;color:var(--text);flex:1}
+  .struct-desc{font-family:'Space Mono',monospace;font-size:9px;color:var(--text-dim);text-align:right}
+
+  /* FLOW */
+  .flow{display:flex;flex-direction:column;gap:0;align-items:flex-start;margin:20px 0}
+  .flow-step{display:flex;align-items:center;gap:12px;position:relative}
+  .flow-box{background:var(--bg3);border:1px solid var(--border);padding:10px 18px;font-family:'Space Mono',monospace;font-size:11px;color:var(--text-muted);letter-spacing:0.05em}
+  .flow-box.accent{border-color:var(--accent);color:var(--accent);background:rgba(0,212,255,0.06)}
+  .flow-arrow{color:var(--text-dim);font-size:18px;padding:4px 0;margin-left:20px}
+
+  footer{border-top:1px solid var(--border);padding:32px 48px;display:flex;justify-content:space-between;align-items:center;position:relative;z-index:1;max-width:860px;margin:0 auto}
+  .footer-nav{display:flex;gap:24px}
+  .footer-nav a{font-family:'Space Mono',monospace;font-size:10px;color:var(--text-dim);text-decoration:none;letter-spacing:0.08em;text-transform:uppercase;transition:color 0.2s}
+  .footer-nav a:hover{color:var(--accent)}
+
+  ::-webkit-scrollbar{width:4px}
+  ::-webkit-scrollbar-track{background:var(--bg)}
+  ::-webkit-scrollbar-thumb{background:var(--border-bright)}
+
+  @media(max-width:640px){.article-wrap{padding:88px 20px 48px}.concept-grid{grid-template-columns:1fr}nav{padding:0 20px}}
+</style>
+</head>
+<body>
+
+<nav>
+  <a href="index.html" class="nav-logo">ES <span style="color:var(--text-dim)">·</span> Ressources</a>
+  <a href="index.html#resources" class="nav-back">← Retour aux ressources</a>
+</nav>
+
+<div class="article-wrap">
+
+  <div class="article-meta">
+    <span class="meta-tag">Article</span>
+    <span class="meta-tag" style="color:var(--accent3);background:rgba(127,255,107,0.08);border-color:rgba(127,255,107,0.2)">STM32</span>
+    <span class="meta-info">Sessions 1–2 · 8 min de lecture</span>
+  </div>
+
+  <h1>GPIO <em>Bare-Metal</em><br>sur STM32</h1>
+  <p class="subtitle">Du registre AHB1ENR à la construction d'un driver générique avec structs et pointeurs de fonction — sans HAL, sans abstraction magique.</p>
+
+  <!-- ── SECTION 1 ── -->
+  <h2>Pourquoi bare-metal ?</h2>
+  <p>Utiliser le HAL STM32 (la bibliothèque officielle ST) c'est pratique, mais ça masque ce qui se passe réellement dans le microcontrôleur. En bare-metal, on écrit directement dans les <strong>registres matériels</strong> — on comprend exactement ce qu'on contrôle, et on gagne en performance et en maîtrise.</p>
+
+  <div class="callout">
+    <div class="callout-label">// principe fondamental</div>
+    <p>Sur un STM32, <strong>tout est registre</strong>. Une broche GPIO, une horloge, un timer — chaque fonctionnalité est contrôlée par des bits précis dans des registres mappés en mémoire.</p>
+  </div>
+
+  <!-- ── SECTION 2 ── -->
+  <h2>La carte mémoire STM32</h2>
+  <p>Le cœur Cortex-M voit tout comme de la mémoire. Les registres des périphériques sont à des adresses fixes — c'est le <strong>memory-mapped I/O</strong>.</p>
+
+  <div class="diagram">
+    <div class="diagram-title">// memory_map.h — adresses clés STM32F4</div>
+    <div class="mem-map">
+      <div class="mem-row"><div class="mem-addr">0xFFFFFFFF</div><div class="mem-block dim">Cortex-M core (NVIC, SysTick...)</div></div>
+      <div class="mem-row"><div class="mem-addr">0x40023800</div><div class="mem-block active">RCC — Reset &amp; Clock Control</div></div>
+      <div class="mem-row"><div class="mem-addr">0x40021000</div><div class="mem-block orange">GPIOF, GPIOE, GPIOD...</div></div>
+      <div class="mem-row"><div class="mem-addr">0x40020000</div><div class="mem-block green">GPIOA — base address</div></div>
+      <div class="mem-row"><div class="mem-addr">0x20000000</div><div class="mem-block dim">SRAM — variables, stack</div></div>
+      <div class="mem-row"><div class="mem-addr">0x08000000</div><div class="mem-block dim">Flash — code, const</div></div>
+    </div>
+  </div>
+
+  <!-- ── SECTION 3 ── -->
+  <h2>Activer l'horloge : RCC_AHB1ENR</h2>
+  <p>Avant de toucher une GPIO, il faut <strong>activer son horloge</strong> dans le registre RCC_AHB1ENR. Sans ça, écrire dans les registres GPIO ne fait rien — le périphérique est éteint.</p>
+
+  <div class="diagram">
+    <div class="diagram-title">// RCC->AHB1ENR (32 bits) — chaque bit = un port GPIO</div>
+    <div class="register">
+      <div class="reg-row">
+        <div class="reg-name">AHB1ENR</div>
+        <div class="reg-bits">
+          <div class="reg-bit">...</div>
+          <div class="reg-bit">7</div>
+          <div class="reg-bit">6</div>
+          <div class="reg-bit">5</div>
+          <div class="reg-bit">4</div>
+          <div class="reg-bit orange">3<br><span style="font-size:7px">GPIOD</span></div>
+          <div class="reg-bit orange">2<br><span style="font-size:7px">GPIOC</span></div>
+          <div class="reg-bit orange">1<br><span style="font-size:7px">GPIOB</span></div>
+          <div class="reg-bit on">0<br><span style="font-size:7px">GPIOA</span></div>
+        </div>
+      </div>
+    </div>
+    <p style="font-family:'Space Mono',monospace;font-size:11px;color:var(--text-dim);margin-top:12px">bit 0 = 1 → GPIOA activé &nbsp;|&nbsp; bit 1 = 1 → GPIOB activé &nbsp;|&nbsp; etc.</p>
+  </div>
+
+  <div class="code-block">
+    <span class="code-label">C · rcc_init.c</span>
+    <pre><span class="cm">// Activer l'horloge de GPIOA</span>
+<span class="cm">// RCC est un pointeur vers la struct des registres RCC</span>
+RCC-&gt;AHB1ENR |= (<span class="num">1U</span> &lt;&lt; <span class="num">0</span>);   <span class="cm">// bit 0 = GPIOA</span>
+RCC-&gt;AHB1ENR |= (<span class="num">1U</span> &lt;&lt; <span class="num">1</span>);   <span class="cm">// bit 1 = GPIOB</span>
+
+<span class="cm">// Ou avec les macros du CMSIS :</span>
+RCC-&gt;AHB1ENR |= RCC_AHB1ENR_GPIOAEN;
+RCC-&gt;AHB1ENR |= RCC_AHB1ENR_GPIOBEN;</pre>
+  </div>
+
+  <div class="warn">
+    <div class="warn-label">⚠ erreur fréquente</div>
+    <p>Ne jamais utiliser <code style="font-family:'Space Mono',monospace;color:var(--accent2);font-size:12px">=</code> mais toujours <code style="font-family:'Space Mono',monospace;color:var(--accent2);font-size:12px">|=</code> pour ne pas effacer les bits des autres ports déjà activés.</p>
+  </div>
+
+  <!-- ── SECTION 4 ── -->
+  <h2>Configurer le mode : MODER</h2>
+  <p>Chaque broche GPIO a <strong>2 bits dans MODER</strong> pour définir son mode : entrée, sortie, alternatif (UART, SPI...) ou analogique.</p>
+
+  <div class="diagram">
+    <div class="diagram-title">// GPIOA->MODER — 2 bits par pin (32 bits total = 16 pins)</div>
+    <div class="register">
+      <div class="reg-row">
+        <div class="reg-name">MODER</div>
+        <div class="reg-bits">
+          <div class="reg-bit grp">...[31:10]</div>
+          <div class="reg-bit grp orange on">MODER4[5:4]<br><span style="font-size:7px">PA4</span></div>
+          <div class="reg-bit grp orange">MODER3[7:6]</div>
+          <div class="reg-bit grp orange">MODER2[5:4]</div>
+          <div class="reg-bit grp orange">MODER1[3:2]</div>
+          <div class="reg-bit grp on">MODER0[1:0]<br><span style="font-size:7px">PA0=OUT</span></div>
+        </div>
+      </div>
+    </div>
+    <div style="margin-top:16px;display:grid;grid-template-columns:repeat(4,1fr);gap:8px">
+      <div style="font-family:'Space Mono',monospace;font-size:10px;padding:8px;background:var(--bg3);border:1px solid var(--border);color:var(--text-dim)"><span style="color:var(--accent)">00</span> → Entrée</div>
+      <div style="font-family:'Space Mono',monospace;font-size:10px;padding:8px;background:var(--bg3);border:1px solid var(--border);color:var(--text-dim)"><span style="color:var(--accent)">01</span> → Sortie</div>
+      <div style="font-family:'Space Mono',monospace;font-size:10px;padding:8px;background:var(--bg3);border:1px solid var(--border);color:var(--text-dim)"><span style="color:var(--accent)">10</span> → Alternatif</div>
+      <div style="font-family:'Space Mono',monospace;font-size:10px;padding:8px;background:var(--bg3);border:1px solid var(--border);color:var(--text-dim)"><span style="color:var(--accent)">11</span> → Analogique</div>
+    </div>
+  </div>
+
+  <div class="code-block">
+    <span class="code-label">C · gpio_raw.c</span>
+    <pre><span class="cm">// Configurer PA5 en sortie (LED sur Nucleo)</span>
+<span class="cm">// Étape 1 : effacer les 2 bits de PA5 (bits 11:10)</span>
+GPIOA-&gt;MODER &amp;= ~(<span class="num">0x3U</span> &lt;&lt; (<span class="num">5</span> * <span class="num">2</span>));
+
+<span class="cm">// Étape 2 : écrire 01 = sortie</span>
+GPIOA-&gt;MODER |=  (<span class="num">0x1U</span> &lt;&lt; (<span class="num">5</span> * <span class="num">2</span>));
+
+<span class="cm">// Allumer la LED : mettre PA5 à 1</span>
+GPIOA-&gt;ODR |= (<span class="num">1U</span> &lt;&lt; <span class="num">5</span>);
+
+<span class="cm">// Éteindre : mettre PA5 à 0</span>
+GPIOA-&gt;ODR &amp;= ~(<span class="num">1U</span> &lt;&lt; <span class="num">5</span>);
+
+<span class="cm">// Toggle propre (atomique) via BSRR</span>
+GPIOA-&gt;BSRR = (<span class="num">1U</span> &lt;&lt; (<span class="num">5</span> + <span class="num">16</span>));  <span class="cm">// reset PA5</span>
+GPIOA-&gt;BSRR = (<span class="num">1U</span> &lt;&lt; <span class="num">5</span>);          <span class="cm">// set PA5</span></pre>
+  </div>
+
+  <!-- ── SECTION 5 ── -->
+  <h2>Le driver générique : structs + pointeurs</h2>
+  <p>Copier-coller du code brut pour chaque broche est vite ingérable. La solution : <strong>encapsuler la configuration dans une struct</strong> et passer un pointeur — le firmware devient modulaire et réutilisable.</p>
+
+  <div class="diagram">
+    <div class="diagram-title">// Architecture du driver générique</div>
+    <div class="struct-visual">
+      <div class="struct-header">typedef struct GPIO_Config_t</div>
+      <div class="struct-field">
+        <div class="struct-type">GPIO_TypeDef*</div>
+        <div class="struct-name">port</div>
+        <div class="struct-desc">GPIOA, GPIOB, GPIOC...</div>
+      </div>
+      <div class="struct-field">
+        <div class="struct-type">uint8_t</div>
+        <div class="struct-name">pin</div>
+        <div class="struct-desc">0 → 15</div>
+      </div>
+      <div class="struct-field">
+        <div class="struct-type">uint8_t</div>
+        <div class="struct-name">mode</div>
+        <div class="struct-desc">GPIO_MODE_OUTPUT / INPUT / AF</div>
+      </div>
+      <div class="struct-field">
+        <div class="struct-type">uint8_t</div>
+        <div class="struct-name">pull</div>
+        <div class="struct-desc">GPIO_PULL_NONE / UP / DOWN</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="code-block">
+    <span class="code-label">C · gpio_driver.c</span>
+    <pre><span class="cm">// Initialisation via pointeur sur config</span>
+<span class="kw">void</span> <span class="fn">GPIO_Init</span>(<span class="kw">const</span> GPIO_Config_t *cfg) {
+    <span class="cm">// 1. Activer l'horloge du port</span>
+    <span class="fn">RCC_EnableGPIOClock</span>(cfg-&gt;port);
+
+    <span class="cm">// 2. Configurer MODER</span>
+    cfg-&gt;port-&gt;MODER &amp;= ~(<span class="num">0x3U</span> &lt;&lt; (cfg-&gt;pin * <span class="num">2</span>));
+    cfg-&gt;port-&gt;MODER |=  (cfg-&gt;mode &lt;&lt; (cfg-&gt;pin * <span class="num">2</span>));
+
+    <span class="cm">// 3. Configurer PUPDR (pull-up/down)</span>
+    cfg-&gt;port-&gt;PUPDR &amp;= ~(<span class="num">0x3U</span> &lt;&lt; (cfg-&gt;pin * <span class="num">2</span>));
+    cfg-&gt;port-&gt;PUPDR |=  (cfg-&gt;pull &lt;&lt; (cfg-&gt;pin * <span class="num">2</span>));
+}
+
+<span class="cm">// Utilisation — propre et lisible</span>
+GPIO_Config_t led = {
+    .port = GPIOA,
+    .pin  = <span class="num">5</span>,
+    .mode = GPIO_MODE_OUTPUT,
+    .pull = GPIO_PULL_NONE
+};
+<span class="fn">GPIO_Init</span>(&amp;led);
+<span class="fn">GPIO_Write</span>(&amp;led, <span class="num">1</span>);  <span class="cm">// allumer</span></pre>
+  </div>
+
+  <!-- ── SECTION 6 : POINTS CLÉS ── -->
+  <h2>Points clés à retenir</h2>
+
+  <div class="concept-grid">
+    <div class="concept-card">
+      <div class="concept-label">Ordre obligatoire</div>
+      <div class="concept-val">Toujours activer l'horloge RCC <strong>avant</strong> de configurer les registres GPIO — sinon les écritures sont ignorées silencieusement.</div>
+    </div>
+    <div class="concept-card">
+      <div class="concept-label">Masque avant écriture</div>
+      <div class="concept-val">Toujours <code>&amp;= ~(mask)</code> pour effacer les bits cibles avant <code>|= valeur</code>. Ne jamais faire <code>= valeur</code> directement.</div>
+    </div>
+    <div class="concept-card">
+      <div class="concept-label">BSRR vs ODR</div>
+      <div class="concept-val">Préférer <code>BSRR</code> à <code>ODR</code> pour set/reset : opération atomique, pas de risque de corruption par interruption.</div>
+    </div>
+    <div class="concept-card">
+      <div class="concept-label">Généricité via struct</div>
+      <div class="concept-val">Passer <code>const GPIO_Config_t*</code> aux fonctions driver plutôt que des paramètres séparés — le code est plus lisible, testable et réutilisable.</div>
+    </div>
+  </div>
+
+  <!-- ── SECTION 7 : FLOW ── -->
+  <h2>Séquence d'initialisation</h2>
+  <div class="flow">
+    <div class="flow-step"><div class="flow-box accent">1. RCC→AHB1ENR |= (1 &lt;&lt; port)</div></div>
+    <div class="flow-arrow">↓</div>
+    <div class="flow-step"><div class="flow-box">2. MODER : effacer 2 bits → écrire mode</div></div>
+    <div class="flow-arrow">↓</div>
+    <div class="flow-step"><div class="flow-box">3. OTYPER : push-pull (0) ou open-drain (1)</div></div>
+    <div class="flow-arrow">↓</div>
+    <div class="flow-step"><div class="flow-box">4. OSPEEDR : vitesse de commutation</div></div>
+    <div class="flow-arrow">↓</div>
+    <div class="flow-step"><div class="flow-box">5. PUPDR : pull-up / pull-down / none</div></div>
+    <div class="flow-arrow">↓</div>
+    <div class="flow-step"><div class="flow-box accent">6. ODR / BSRR : contrôle de l'état logique</div></div>
+  </div>
+
+  <div class="callout" style="margin-top:40px">
+    <div class="callout-label">// session suivante</div>
+    <p>La prochaine étape naturelle : ajouter des <strong>pointeurs de fonction (callbacks)</strong> au driver pour rendre les transitions d'état configurables à l'exécution.</p>
+  </div>
+
+</div>
+
+<footer style="max-width:860px;margin:0 auto;padding:32px 48px;border-top:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;position:relative;z-index:1">
+  <div style="font-family:'Space Mono',monospace;font-size:11px;color:var(--text-dim)">Elie SASPORTES · 2026</div>
+  <div style="display:flex;gap:24px">
+    <a href="article-architecture.html" style="font-family:'Space Mono',monospace;font-size:10px;color:var(--text-dim);text-decoration:none;letter-spacing:0.08em;text-transform:uppercase;transition:color 0.2s" onmouseover="this.style.color='var(--accent)'" onmouseout="this.style.color='var(--text-dim)'">Article suivant →</a>
+    <a href="index.html" style="font-family:'Space Mono',monospace;font-size:10px;color:var(--text-dim);text-decoration:none;letter-spacing:0.08em;text-transform:uppercase;transition:color 0.2s" onmouseover="this.style.color='var(--accent)'" onmouseout="this.style.color='var(--text-dim)'">Accueil</a>
+  </div>
+</footer>
+
+</body>
+</html>

@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FreeRTOS — Tâches &amp; Scheduler Préemptif — Elie SASPORTES</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500&family=Bebas+Neue&display=swap" rel="stylesheet">
+<style>
+  :root{--bg:#0a0c0f;--bg2:#0f1217;--bg3:#141820;--surface:#1a1f2a;--border:#1e2535;--border-bright:#2a3548;--text:#e8eaf0;--text-muted:#6b7a99;--text-dim:#3d4a63;--accent:#00d4ff;--accent2:#ff6b35;--accent3:#7fff6b;--accent4:#c792ea}
+  *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth}
+  body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;font-weight:300;line-height:1.7}
+  body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(var(--border) 1px,transparent 1px),linear-gradient(90deg,var(--border) 1px,transparent 1px);background-size:48px 48px;opacity:0.3;pointer-events:none;z-index:0}
+  nav{position:fixed;top:0;left:0;right:0;z-index:100;display:flex;align-items:center;justify-content:space-between;padding:0 48px;height:64px;background:rgba(10,12,15,0.9);backdrop-filter:blur(16px);border-bottom:1px solid var(--border)}
+  .nav-logo{font-family:'Space Mono',monospace;font-size:12px;color:var(--accent);letter-spacing:0.1em;text-decoration:none;text-transform:uppercase}
+  .nav-back{font-family:'Space Mono',monospace;font-size:11px;color:var(--text-muted);text-decoration:none;letter-spacing:0.08em;transition:color 0.2s}
+  .nav-back:hover{color:var(--accent)}
+  .article-wrap{max-width:860px;margin:0 auto;padding:100px 48px 80px;position:relative;z-index:1}
+  .article-meta{display:flex;align-items:center;gap:12px;margin-bottom:32px;flex-wrap:wrap}
+  .meta-tag{font-family:'Space Mono',monospace;font-size:10px;padding:4px 10px;letter-spacing:0.12em;text-transform:uppercase}
+  .mt-blue{color:var(--accent);background:rgba(0,212,255,0.08);border:1px solid rgba(0,212,255,0.2)}
+  .mt-purple{color:var(--accent4);background:rgba(199,146,234,0.08);border:1px solid rgba(199,146,234,0.2)}
+  .meta-info{font-family:'Space Mono',monospace;font-size:10px;color:var(--text-dim);letter-spacing:0.08em}
+  h1{font-family:'Bebas Neue',sans-serif;font-size:clamp(40px,6vw,72px);letter-spacing:0.04em;line-height:1;color:var(--text);margin-bottom:16px}
+  h1 em{color:var(--accent4);font-style:normal}
+  .subtitle{font-size:17px;color:var(--text-muted);max-width:600px;line-height:1.8;margin-bottom:48px;padding-bottom:48px;border-bottom:1px solid var(--border)}
+  h2{font-family:'Bebas Neue',sans-serif;font-size:32px;letter-spacing:0.05em;color:var(--text);margin:48px 0 20px;display:flex;align-items:center;gap:12px}
+  h2::before{content:'';width:3px;height:28px;background:var(--accent4);flex-shrink:0}
+  p{font-size:15px;color:var(--text-muted);line-height:1.9;margin-bottom:16px}
+  p strong{color:var(--text);font-weight:500}
+  .code-block{background:var(--bg3);border:1px solid var(--border);border-left:2px solid var(--accent4);padding:24px 28px;margin:24px 0;overflow-x:auto;position:relative}
+  .code-label{position:absolute;top:0;right:0;font-family:'Space Mono',monospace;font-size:9px;color:var(--text-dim);background:var(--border);padding:3px 10px;letter-spacing:0.1em;text-transform:uppercase}
+  pre{font-family:'Space Mono',monospace;font-size:12px;line-height:1.8;color:var(--text-muted)}
+  .kw{color:#c792ea}.cm{color:var(--text-dim);font-style:italic}.num{color:var(--accent2)}.fn{color:var(--accent)}.str{color:var(--accent3)}.def{color:#ffcb6b}
+  .diagram{background:var(--surface);border:1px solid var(--border-bright);padding:32px;margin:28px 0;position:relative;overflow:hidden}
+  .diagram::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,var(--accent4),transparent);opacity:0.5}
+  .diagram-title{font-family:'Space Mono',monospace;font-size:10px;color:var(--accent4);letter-spacing:0.15em;text-transform:uppercase;margin-bottom:20px}
+  .callout{border-left:2px solid var(--accent3);padding:16px 20px;background:rgba(127,255,107,0.04);margin:24px 0}
+  .callout-label{font-family:'Space Mono',monospace;font-size:9px;color:var(--accent3);letter-spacing:0.15em;text-transform:uppercase;margin-bottom:6px}
+  .callout p{color:var(--text-muted);font-size:14px;margin:0}
+  .warn{border-left:2px solid var(--accent2);padding:16px 20px;background:rgba(255,107,53,0.04);margin:24px 0}
+  .warn-label{font-family:'Space Mono',monospace;font-size:9px;color:var(--accent2);letter-spacing:0.15em;text-transform:uppercase;margin-bottom:6px}
+  .warn p{color:var(--text-muted);font-size:14px;margin:0}
+  .concept-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:24px 0}
+  .concept-card{background:var(--surface);border:1px solid var(--border);padding:20px;position:relative;overflow:hidden}
+  .concept-card::after{content:'';position:absolute;top:0;left:0;width:2px;height:100%;background:var(--accent4)}
+  .concept-card:nth-child(2)::after{background:var(--accent)}
+  .concept-card:nth-child(3)::after{background:var(--accent3)}
+  .concept-card:nth-child(4)::after{background:var(--accent2)}
+  .concept-label{font-family:'Space Mono',monospace;font-size:10px;color:var(--text-dim);letter-spacing:0.1em;text-transform:uppercase;margin-bottom:8px}
+  .concept-val{font-size:14px;color:var(--text-muted);line-height:1.6}
+  .concept-val code{font-family:'Space Mono',monospace;font-size:11px;color:var(--accent);background:var(--bg3);padding:1px 5px}
+
+  /* TASK STATE MACHINE */
+  .states{display:flex;gap:2px;margin:16px 0;flex-wrap:wrap}
+  .state-box{padding:12px 20px;border:1px solid var(--border);font-family:'Space Mono',monospace;font-size:11px;text-align:center;flex:1;min-width:120px}
+  .state-box.active{border-color:var(--accent3);color:var(--accent3);background:rgba(127,255,107,0.08)}
+  .state-box.ready{border-color:var(--accent);color:var(--accent);background:rgba(0,212,255,0.08)}
+  .state-box.blocked{border-color:var(--accent2);color:var(--accent2);background:rgba(255,107,53,0.08)}
+  .state-box.suspended{border-color:var(--text-dim);color:var(--text-dim);background:var(--bg3)}
+  .state-arrow{display:flex;align-items:center;justify-content:center;font-family:'Space Mono',monospace;font-size:11px;color:var(--text-dim);padding:0 4px}
+
+  /* PRIORITY TABLE */
+  .priority-table{width:100%;border-collapse:collapse;font-family:'Space Mono',monospace;font-size:11px;margin:20px 0}
+  .priority-table th{background:var(--bg3);color:var(--text-dim);padding:10px 14px;text-align:left;border:1px solid var(--border);letter-spacing:0.08em;text-transform:uppercase;font-size:9px}
+  .priority-table td{padding:10px 14px;border:1px solid var(--border);color:var(--text-muted)}
+  .priority-table tr:nth-child(even) td{background:rgba(255,255,255,0.01)}
+  .prio-high{color:var(--accent3)}
+  .prio-med{color:var(--accent)}
+  .prio-low{color:var(--text-dim)}
+
+  ::-webkit-scrollbar{width:4px}::-webkit-scrollbar-track{background:var(--bg)}::-webkit-scrollbar-thumb{background:var(--border-bright)}
+  @media(max-width:640px){.article-wrap{padding:88px 20px 48px}.concept-grid{grid-template-columns:1fr}nav{padding:0 20px}.states{flex-direction:column}}
+</style>
+</head>
+<body>
+<nav>
+  <a href="index.html" class="nav-logo">ES · Ressources</a>
+  <a href="index.html#resources" class="nav-back">← Retour aux ressources</a>
+</nav>
+<div class="article-wrap">
+  <div class="article-meta">
+    <span class="meta-tag mt-purple">FreeRTOS</span>
+    <span class="meta-tag mt-blue">Phase 2</span>
+    <span class="meta-info">Séances 11–12 · 10 min</span>
+  </div>
+  <h1>FreeRTOS — Tâches<br>&amp; Scheduler <em>Préemptif</em></h1>
+  <p class="subtitle">Du scheduler coopératif au RTOS — comment FreeRTOS gère plusieurs tâches indépendantes, les priorités, et la préemption automatique sur simulateur Windows.</p>
+
+  <h2>Coopératif vs Préemptif</h2>
+  <p>Le scheduler coopératif vu en Phase 1 est simple mais limité : une tâche qui prend du temps retarde toutes les autres. FreeRTOS est <strong>préemptif</strong> — il interrompt une tâche à tout moment pour en exécuter une de priorité plus haute.</p>
+
+  <div class="concept-grid">
+    <div class="concept-card">
+      <div class="concept-label">Coopératif (Phase 1)</div>
+      <div class="concept-val">Chaque tâche cède la main volontairement. Simple, prédictible, mais une tâche lente bloque toutes les autres.</div>
+    </div>
+    <div class="concept-card">
+      <div class="concept-label">Préemptif (FreeRTOS)</div>
+      <div class="concept-val">Le scheduler interrompt à chaque tick. Une tâche haute priorité prend le CPU immédiatement, sans attendre. Temps-réel garanti.</div>
+    </div>
+  </div>
+
+  <h2>États d'une tâche FreeRTOS</h2>
+  <div class="diagram">
+    <div class="diagram-title">// Task state machine — 4 états possibles</div>
+    <div class="states">
+      <div class="state-box ready">READY<br><span style="font-size:9px;color:var(--text-dim)">prête à tourner</span></div>
+      <div class="state-arrow">→ scheduler →</div>
+      <div class="state-box active">RUNNING<br><span style="font-size:9px;color:var(--text-dim)">sur le CPU</span></div>
+      <div class="state-arrow">→ vTaskDelay() →</div>
+      <div class="state-box blocked">BLOCKED<br><span style="font-size:9px;color:var(--text-dim)">attend un event</span></div>
+    </div>
+    <div style="margin-top:12px;display:flex;align-items:center;gap:12px">
+      <div class="state-box suspended" style="max-width:200px">SUSPENDED<br><span style="font-size:9px">vTaskSuspend()</span></div>
+      <div style="font-family:'Space Mono',monospace;font-size:11px;color:var(--text-dim)">← état explicite, jamais schedulé</div>
+    </div>
+    <div style="margin-top:16px;font-family:'Space Mono',monospace;font-size:10px;color:var(--text-dim);line-height:2">
+      RUNNING → READY : préemption (tâche de plus haute prio arrive)<br>
+      BLOCKED → READY : délai expiré, queue reçue, sémaphore donné<br>
+      RUNNING → BLOCKED : vTaskDelay(), xQueueReceive() bloquant
+    </div>
+  </div>
+
+  <h2>Créer une tâche : xTaskCreate</h2>
+  <div class="code-block">
+    <span class="code-label">C · freertos_tasks.c</span>
+    <pre><span class="cm">// Prototype d'une fonction tâche — toujours void, toujours boucle infinie</span>
+<span class="kw">void</span> <span class="fn">vTaskAcquisition</span>(<span class="kw">void</span> *pvParams) {
+    AppContext_t *ctx = (AppContext_t *)pvParams;  <span class="cm">// récupérer le contexte</span>
+
+    <span class="kw">for</span> (;;) {
+        <span class="cm">// Travail de la tâche</span>
+        <span class="fn">console_print</span>(ctx, <span class="str">"[ACQ] lecture capteur\n"</span>);
+
+        <span class="fn">vTaskDelay</span>(<span class="fn">pdMS_TO_TICKS</span>(<span class="num">500</span>));  <span class="cm">// dormir 500ms — libère le CPU</span>
+    }
+    <span class="cm">// Ne jamais retourner — si la tâche se termine, appeler vTaskDelete(NULL)</span>
+}
+
+<span class="kw">int</span> <span class="fn">main</span>(<span class="kw">void</span>) {
+    AppContext_t ctx = { .mutex = <span class="fn">xSemaphoreCreateMutex</span>() };
+
+    <span class="cm">// Créer 3 tâches avec des priorités différentes</span>
+    <span class="fn">xTaskCreate</span>(
+        vTaskAcquisition,   <span class="cm">// fonction</span>
+        <span class="str">"Acquisition"</span>,      <span class="cm">// nom (debug)</span>
+        <span class="num">1024</span>,               <span class="cm">// stack en words (pas en octets !)</span>
+        &amp;ctx,               <span class="cm">// pvParams → passé à la tâche</span>
+        <span class="num">3</span>,                  <span class="cm">// priorité (plus haut = plus urgent)</span>
+        <span class="num">NULL</span>                <span class="cm">// handle optionnel</span>
+    );
+
+    <span class="fn">xTaskCreate</span>(vTaskDisplay, <span class="str">"Display"</span>, <span class="num">1024</span>, &amp;ctx, <span class="num">2</span>, <span class="num">NULL</span>);
+    <span class="fn">xTaskCreate</span>(vTaskLogger,  <span class="str">"Logger"</span>,  <span class="num">1024</span>, &amp;ctx, <span class="num">1</span>, <span class="num">NULL</span>);
+
+    <span class="fn">vTaskStartScheduler</span>();  <span class="cm">// démarre FreeRTOS — ne retourne jamais</span>
+    <span class="kw">for</span> (;;);
+}</pre>
+  </div>
+
+  <h2>Priorités et préemption</h2>
+  <div class="diagram">
+    <div class="diagram-title">// Règles de scheduling FreeRTOS</div>
+    <table class="priority-table">
+      <tr><th>Priorité</th><th>Tâche</th><th>Comportement</th><th>Typiquement</th></tr>
+      <tr><td class="prio-high">Haute (3+)</td><td>Acquisition, ISR handler</td><td>Préempte toutes les autres immédiatement</td><td>Temps-réel strict</td></tr>
+      <tr><td class="prio-med">Moyenne (2)</td><td>Traitement, affichage</td><td>Tourne quand haute prio est bloquée</td><td>Logique applicative</td></tr>
+      <tr><td class="prio-low">Basse (1)</td><td>Logging, monitoring</td><td>Tourne seulement si tout le reste est bloqué</td><td>Tâches de fond</td></tr>
+    </table>
+    <div style="font-family:'Space Mono',monospace;font-size:10px;color:var(--text-dim);margin-top:12px">
+      ⚠ Deux tâches de même priorité → round-robin (time slicing à chaque tick)<br>
+      ⚠ Une tâche haute prio qui ne bloque jamais → toutes les autres sont affamées (starvation)
+    </div>
+  </div>
+
+  <h2>Le pattern contexte (AppContext)</h2>
+  <p>Plutôt que des variables globales, toutes les ressources partagées (queue, mutex, flags) sont regroupées dans une <strong>struct AppContext</strong> passée à chaque tâche via <code style="font-family:'Space Mono',monospace;color:var(--accent);font-size:13px">pvParams</code>.</p>
+
+  <div class="code-block">
+    <span class="code-label">C · app_context.h</span>
+    <pre><span class="kw">typedef struct</span> {
+    QueueHandle_t     cmd_queue;    <span class="cm">// file de commandes inter-tâches</span>
+    SemaphoreHandle_t mutex;        <span class="cm">// protection stdout partagé</span>
+    <span class="kw">volatile bool</span>     shutdown_req; <span class="cm">// signal d'arrêt propre</span>
+} AppContext_t;
+
+<span class="cm">// Dans chaque tâche :</span>
+<span class="kw">void</span> <span class="fn">vMyTask</span>(<span class="kw">void</span> *pvParams) {
+    AppContext_t *ctx = (AppContext_t *)pvParams;
+    <span class="cm">// Accès via ctx->mutex, ctx->cmd_queue, etc.</span>
+    <span class="cm">// Zéro variable globale dans le code applicatif</span>
+}</pre>
+  </div>
+
+  <div class="callout">
+    <div class="callout-label">// avantages pattern contexte</div>
+    <p>Zéro globale applicative · <code>console_print</code> protège stdout via le mutex du contexte · La queue est partagée proprement · On pourrait instancier deux <code>AppContext</code> indépendants sans toucher au code des tâches.</p>
+  </div>
+
+  <h2>Stack sizing et uxTaskGetStackHighWaterMark</h2>
+  <p>Chaque tâche a sa propre pile allouée statiquement. Trop petite → stack overflow silencieux sur STM32. FreeRTOS fournit un outil de diagnostic :</p>
+
+  <div class="code-block">
+    <span class="code-label">C · stack_monitor.c</span>
+    <pre><span class="cm">// Dans une tâche de monitoring (basse priorité)</span>
+<span class="kw">void</span> <span class="fn">vTaskMonitor</span>(<span class="kw">void</span> *pvParams) {
+    <span class="kw">for</span> (;;) {
+        UBaseType_t watermark = <span class="fn">uxTaskGetStackHighWaterMark</span>(<span class="num">NULL</span>);
+        <span class="fn">printf</span>(<span class="str">"[MON] Stack libre min: %lu words\n"</span>, watermark);
+        <span class="cm">// Si watermark < 20 → stack trop petite, risque d'overflow</span>
+        <span class="fn">vTaskDelay</span>(<span class="fn">pdMS_TO_TICKS</span>(<span class="num">2000</span>));
+    }
+}</pre>
+  </div>
+
+  <div class="warn">
+    <div class="warn-label">⚠ stack en words, pas en octets</div>
+    <p>Le 4ème argument de <code style="font-family:'Space Mono',monospace;color:var(--accent2);font-size:12px">xTaskCreate</code> est en <strong>words</strong> (4 octets sur ARM Cortex-M). Passer <code style="font-family:'Space Mono',monospace;color:var(--accent2);font-size:12px">128</code> donne 512 octets de pile — souvent insuffisant. Commencer à 256 et ajuster selon le watermark.</p>
+  </div>
+
+  <h2>Points clés à retenir</h2>
+  <div class="concept-grid">
+    <div class="concept-card">
+      <div class="concept-label">vTaskDelay obligatoire</div>
+      <div class="concept-val">Toute tâche doit appeler <code>vTaskDelay()</code> ou attendre sur une queue/sémaphore — sinon elle monopolise le CPU et affame les tâches de priorité inférieure.</div>
+    </div>
+    <div class="concept-card">
+      <div class="concept-label">Ne jamais retourner</div>
+      <div class="concept-val">Une fonction tâche ne doit jamais retourner. Si la tâche a terminé son travail, appeler <code>vTaskDelete(NULL)</code> pour se supprimer proprement.</div>
+    </div>
+    <div class="concept-card">
+      <div class="concept-label">pvParams = contexte</div>
+      <div class="concept-val">Passer toutes les ressources partagées via <code>pvParams</code> plutôt que des globales — code plus testable, plus modulaire, et thread-safe par construction.</div>
+    </div>
+    <div class="concept-card">
+      <div class="concept-label">configASSERT en debug</div>
+      <div class="concept-val">Toujours vérifier les valeurs de retour : <code>xTaskCreate</code> retourne <code>pdPASS</code> ou <code>errCOULD_NOT_ALLOCATE_REQUIRED_MEMORY</code>. Ne jamais ignorer silencieusement.</div>
+    </div>
+  </div>
+</div>
+<footer style="max-width:860px;margin:0 auto;padding:32px 48px;border-top:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;position:relative;z-index:1">
+  <div style="font-family:'Space Mono',monospace;font-size:11px;color:var(--text-dim)">Elie SASPORTES · 2026</div>
+  <div style="display:flex;gap:24px">
+    <a href="article-scheduler.html" style="font-family:'Space Mono',monospace;font-size:10px;color:var(--text-dim);text-decoration:none;letter-spacing:0.08em;text-transform:uppercase" onmouseover="this.style.color='var(--accent)'" onmouseout="this.style.color='var(--text-dim)'">← Scheduler coopératif</a>
+    <a href="article-freertos-ipc.html" style="font-family:'Space Mono',monospace;font-size:10px;color:var(--text-dim);text-decoration:none;letter-spacing:0.08em;text-transform:uppercase" onmouseover="this.style.color='var(--accent)'" onmouseout="this.style.color='var(--text-dim)'">Queues &amp; Mutex →</a>
+  </div>
+</footer>
+</body>
+</html>

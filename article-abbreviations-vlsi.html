@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Abréviations VLSI — Elie SASPORTES</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500&family=Bebas+Neue&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="article-style.css">
+<style>
+  .abbr-grid { display: grid; grid-template-columns: 1fr; gap: 2px; margin: 20px 0; }
+  .abbr-row { display: grid; grid-template-columns: 110px 1fr; background: var(--surface); border: 1px solid var(--border); border-left: 2px solid var(--accent); }
+  .abbr-row.red    { border-left-color: var(--accent2); }
+  .abbr-row.green  { border-left-color: var(--accent3); }
+  .abbr-row.purple { border-left-color: var(--accent4); }
+  .abbr-row.yellow { border-left-color: var(--accent5); }
+  .abbr-name { font-family: 'Space Mono', monospace; font-size: 12px; color: var(--accent); padding: 14px 16px; border-right: 1px solid var(--border); display: flex; align-items: center; font-weight: 700; letter-spacing: 0.04em; }
+  .abbr-row.red    .abbr-name { color: var(--accent2); }
+  .abbr-row.green  .abbr-name { color: var(--accent3); }
+  .abbr-row.purple .abbr-name { color: var(--accent4); }
+  .abbr-row.yellow .abbr-name { color: var(--accent5); }
+  .abbr-def  { padding: 14px 20px; }
+  .abbr-full { font-family: 'Space Mono', monospace; font-size: 11px; color: var(--text); letter-spacing: 0.04em; margin-bottom: 4px; }
+  .abbr-desc { font-size: 13px; color: var(--text-muted); line-height: 1.5; }
+
+  /* FLOW DIAGRAM */
+  .flow { margin: 24px 0; }
+  .flow-step { display: flex; align-items: center; gap: 16px; padding: 14px 20px; background: var(--surface); border: 1px solid var(--border); margin-bottom: 2px; position: relative; }
+  .flow-step::before { content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 3px; }
+  .flow-step.s1::before { background: var(--accent); }
+  .flow-step.s2::before { background: var(--accent4); }
+  .flow-step.s3::before { background: var(--accent5); }
+  .flow-step.s4::before { background: var(--accent2); }
+  .flow-step.s5::before { background: var(--accent3); }
+  .flow-num { font-family: 'Bebas Neue', sans-serif; font-size: 28px; color: var(--text-dim); width: 50px; flex-shrink: 0; }
+  .flow-content { flex: 1; }
+  .flow-title { font-family: 'Space Mono', monospace; font-size: 12px; color: var(--text); letter-spacing: 0.05em; margin-bottom: 4px; }
+  .flow-desc { font-family: 'Space Mono', monospace; font-size: 10px; color: var(--text-dim); line-height: 1.6; }
+  .flow-arrow { text-align: center; font-family: 'Space Mono', monospace; font-size: 14px; color: var(--text-dim); padding: 6px 0; }
+</style>
+</head>
+<body>
+<nav>
+  <a href="index.html" class="nav-logo">ES · Ressources</a>
+  <a href="index.html#resources" class="nav-back">← Retour aux ressources</a>
+</nav>
+<div class="article-wrap">
+  <div class="article-meta">
+    <span class="meta-tag mt-purple">VLSI</span>
+    <span class="meta-tag mt-blue">Conception de chips</span>
+    <span class="meta-info">Référence · Flot de conception</span>
+  </div>
+  <h1>Abréviations<br><em class="purple">VLSI</em></h1>
+  <p class="subtitle">Glossaire du flot de conception de circuits intégrés — du design front-end RTL au back-end physique, jusqu'à la fonderie. Organisé selon les étapes du flot industriel ASIC/FPGA.</p>
+
+  <!-- ── FLOW OVERVIEW ── -->
+  <h2 class="h-purple">Vue d'ensemble du flot</h2>
+  <div class="diagram d-purple">
+    <div class="diagram-title">// Flot de conception VLSI — du concept au silicium</div>
+    <div class="flow">
+      <div class="flow-step s1">
+        <div class="flow-num">1</div>
+        <div class="flow-content">
+          <div class="flow-title">Spécification &amp; Architecture</div>
+          <div class="flow-desc">Définition des besoins, partitionnement HW/SW, choix de l'architecture (CPU, mémoires, IPs)</div>
+        </div>
+      </div>
+      <div class="flow-arrow">↓</div>
+      <div class="flow-step s2">
+        <div class="flow-num">2</div>
+        <div class="flow-content">
+          <div class="flow-title">Design RTL (Front-end)</div>
+          <div class="flow-desc">Écriture du code Verilog/VHDL, simulation comportementale, vérification fonctionnelle</div>
+        </div>
+      </div>
+      <div class="flow-arrow">↓</div>
+      <div class="flow-step s3">
+        <div class="flow-num">3</div>
+        <div class="flow-content">
+          <div class="flow-title">Synthèse logique</div>
+          <div class="flow-desc">RTL → netlist de portes logiques. Optimisations vitesse / surface / consommation</div>
+        </div>
+      </div>
+      <div class="flow-arrow">↓</div>
+      <div class="flow-step s4">
+        <div class="flow-num">4</div>
+        <div class="flow-content">
+          <div class="flow-title">Place &amp; Route (Back-end)</div>
+          <div class="flow-desc">Placement physique des cellules, routage des connexions, analyse timing, DRC/LVS</div>
+        </div>
+      </div>
+      <div class="flow-arrow">↓</div>
+      <div class="flow-step s5">
+        <div class="flow-num">5</div>
+        <div class="flow-content">
+          <div class="flow-title">Tape-out &amp; Fabrication</div>
+          <div class="flow-desc">Envoi en fonderie (GDSII), fabrication des masques, production, test, package</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── TYPES DE CIRCUITS ── -->
+  <h2 class="h-blue">Types de circuits</h2>
+  <div class="abbr-grid">
+    <div class="abbr-row"><div class="abbr-name">VLSI</div><div class="abbr-def"><div class="abbr-full">Very Large Scale Integration</div><div class="abbr-desc">Conception de circuits intégrant des millions/milliards de transistors sur une même puce.</div></div></div>
+    <div class="abbr-row"><div class="abbr-name">ASIC</div><div class="abbr-def"><div class="abbr-full">Application Specific Integrated Circuit</div><div class="abbr-desc">Circuit dédié à une application, fabriqué sur masques. Hautes performances, NRE élevé.</div></div></div>
+    <div class="abbr-row"><div class="abbr-name">FPGA</div><div class="abbr-def"><div class="abbr-full">Field Programmable Gate Array</div><div class="abbr-desc">Circuit reprogrammable à base de cellules logiques configurables. Idéal pour prototypage et petites séries.</div></div></div>
+    <div class="abbr-row"><div class="abbr-name">CPLD</div><div class="abbr-def"><div class="abbr-full">Complex Programmable Logic Device</div><div class="abbr-desc">Circuit logique programmable plus petit qu'un FPGA, à base de macrocellules.</div></div></div>
+    <div class="abbr-row"><div class="abbr-name">SoC</div><div class="abbr-def"><div class="abbr-full">System on Chip</div><div class="abbr-desc">ASIC complexe intégrant CPU + mémoire + périphériques + IPs analogiques sur une seule puce.</div></div></div>
+    <div class="abbr-row"><div class="abbr-name">IP</div><div class="abbr-def"><div class="abbr-full">Intellectual Property (block)</div><div class="abbr-desc">Bloc de design réutilisable (CPU core, contrôleur USB, PHY...). Soft IP = RTL, Hard IP = layout.</div></div></div>
+  </div>
+
+  <!-- ── DESIGN RTL ── -->
+  <h2 class="h-green">Design RTL &amp; Front-end</h2>
+  <div class="abbr-grid">
+    <div class="abbr-row green"><div class="abbr-name">RTL</div><div class="abbr-def"><div class="abbr-full">Register Transfer Level</div><div class="abbr-desc">Niveau d'abstraction décrivant les transferts entre registres à chaque coup d'horloge.</div></div></div>
+    <div class="abbr-row green"><div class="abbr-name">HDL</div><div class="abbr-def"><div class="abbr-full">Hardware Description Language</div><div class="abbr-desc">Langage de description matériel. Les deux standards : Verilog et VHDL.</div></div></div>
+    <div class="abbr-row green"><div class="abbr-name">SV</div><div class="abbr-def"><div class="abbr-full">SystemVerilog</div><div class="abbr-desc">Extension de Verilog ajoutant des constructions OOP pour la vérification (UVM).</div></div></div>
+    <div class="abbr-row green"><div class="abbr-name">VHDL</div><div class="abbr-def"><div class="abbr-full">VHSIC Hardware Description Language</div><div class="abbr-desc">HDL fortement typé, populaire en Europe et dans l'aéronautique/défense.</div></div></div>
+    <div class="abbr-row green"><div class="abbr-name">TB</div><div class="abbr-def"><div class="abbr-full">Testbench</div><div class="abbr-desc">Environnement de simulation pour vérifier le comportement du design.</div></div></div>
+    <div class="abbr-row green"><div class="abbr-name">DUT</div><div class="abbr-def"><div class="abbr-full">Design Under Test</div><div class="abbr-desc">Le module testé dans un testbench.</div></div></div>
+    <div class="abbr-row green"><div class="abbr-name">UVM</div><div class="abbr-def"><div class="abbr-full">Universal Verification Methodology</div><div class="abbr-desc">Méthodologie de vérification standardisée basée sur SystemVerilog OOP.</div></div></div>
+    <div class="abbr-row green"><div class="abbr-name">FSM</div><div class="abbr-def"><div class="abbr-full">Finite State Machine</div><div class="abbr-desc">Machine à états finis. Mealy (sortie = état + entrée) ou Moore (sortie = état seul).</div></div></div>
+    <div class="abbr-row green"><div class="abbr-name">CDC</div><div class="abbr-def"><div class="abbr-full">Clock Domain Crossing</div><div class="abbr-desc">Passage d'un signal entre deux domaines d'horloge différents. Synchronisation requise.</div></div></div>
+  </div>
+
+  <!-- ── SYNTHESIS ── -->
+  <h2 class="h-yellow">Synthèse &amp; Optimisation</h2>
+  <div class="abbr-grid">
+    <div class="abbr-row yellow"><div class="abbr-name">EDA</div><div class="abbr-def"><div class="abbr-full">Electronic Design Automation</div><div class="abbr-desc">Logiciels de CAO microélectronique. Trois grands éditeurs : Synopsys, Cadence, Siemens EDA (Mentor).</div></div></div>
+    <div class="abbr-row yellow"><div class="abbr-name">STA</div><div class="abbr-def"><div class="abbr-full">Static Timing Analysis</div><div class="abbr-desc">Analyse statique du timing pour vérifier le respect des contraintes (setup, hold) sur tous les chemins.</div></div></div>
+    <div class="abbr-row yellow"><div class="abbr-name">SDC</div><div class="abbr-def"><div class="abbr-full">Synopsys Design Constraints</div><div class="abbr-desc">Format de fichier décrivant horloges, délais I/O, contraintes timing pour les outils EDA.</div></div></div>
+    <div class="abbr-row yellow"><div class="abbr-name">DFT</div><div class="abbr-def"><div class="abbr-full">Design For Testability</div><div class="abbr-desc">Ajout de chaînes scan, BIST, JTAG pour faciliter le test après fabrication.</div></div></div>
+    <div class="abbr-row yellow"><div class="abbr-name">BIST</div><div class="abbr-def"><div class="abbr-full">Built-In Self Test</div><div class="abbr-desc">Logique de test intégrée dans la puce, pour autotest sans équipement externe.</div></div></div>
+    <div class="abbr-row yellow"><div class="abbr-name">DRC</div><div class="abbr-def"><div class="abbr-full">Design Rule Check</div><div class="abbr-desc">Vérification que le layout respecte les règles géométriques de la fonderie.</div></div></div>
+    <div class="abbr-row yellow"><div class="abbr-name">LVS</div><div class="abbr-def"><div class="abbr-full">Layout Versus Schematic</div><div class="abbr-desc">Vérifie que le layout physique correspond bien au schéma logique d'origine.</div></div></div>
+    <div class="abbr-row yellow"><div class="abbr-name">ERC</div><div class="abbr-def"><div class="abbr-full">Electrical Rule Check</div><div class="abbr-desc">Vérifie la cohérence électrique (court-circuits, broches flottantes).</div></div></div>
+  </div>
+
+  <!-- ── BACK END ── -->
+  <h2 class="h-red">Back-end &amp; Physique</h2>
+  <div class="abbr-grid">
+    <div class="abbr-row red"><div class="abbr-name">P&amp;R</div><div class="abbr-def"><div class="abbr-full">Place and Route</div><div class="abbr-desc">Étape de back-end : placement physique des cellules et routage des interconnexions.</div></div></div>
+    <div class="abbr-row red"><div class="abbr-name">PDK</div><div class="abbr-def"><div class="abbr-full">Process Design Kit</div><div class="abbr-desc">Kit fourni par la fonderie : règles, modèles SPICE, librairies, contraintes pour un nœud donné.</div></div></div>
+    <div class="abbr-row red"><div class="abbr-name">GDSII</div><div class="abbr-def"><div class="abbr-full">Graphic Database System II</div><div class="abbr-desc">Format de fichier final envoyé en fonderie. Décrit chaque couche du masque physique.</div></div></div>
+    <div class="abbr-row red"><div class="abbr-name">PPA</div><div class="abbr-def"><div class="abbr-full">Power, Performance, Area</div><div class="abbr-desc">Triade d'optimisation en VLSI — toujours un compromis entre les trois.</div></div></div>
+    <div class="abbr-row red"><div class="abbr-name">IR drop</div><div class="abbr-def"><div class="abbr-full">Voltage Drop</div><div class="abbr-desc">Chute de tension sur le réseau d'alimentation due à la résistance des interconnexions.</div></div></div>
+    <div class="abbr-row red"><div class="abbr-name">CTS</div><div class="abbr-def"><div class="abbr-full">Clock Tree Synthesis</div><div class="abbr-desc">Construction d'un arbre d'horloge équilibré pour minimiser le skew.</div></div></div>
+    <div class="abbr-row red"><div class="abbr-name">ECO</div><div class="abbr-def"><div class="abbr-full">Engineering Change Order</div><div class="abbr-desc">Modification locale du design après synthèse/P&amp;R, sans tout recompiler.</div></div></div>
+    <div class="abbr-row red"><div class="abbr-name">Floorplan</div><div class="abbr-def"><div class="abbr-full">Plan d'occupation</div><div class="abbr-desc">Plan macroscopique de la puce : positions des grands blocs, alimentations, I/Os.</div></div></div>
+  </div>
+
+  <!-- ── FABRICATION ── -->
+  <h2 class="h-purple">Fabrication &amp; Test</h2>
+  <div class="abbr-grid">
+    <div class="abbr-row purple"><div class="abbr-name">Tape-out</div><div class="abbr-def"><div class="abbr-full">Envoi en fonderie</div><div class="abbr-desc">Moment où le GDSII final est envoyé en fonderie. Point de non-retour : chaque erreur coûte des millions.</div></div></div>
+    <div class="abbr-row purple"><div class="abbr-name">Wafer</div><div class="abbr-def"><div class="abbr-full">Plaquette de silicium</div><div class="abbr-desc">Disque de silicium sur lequel sont fabriqués les chips. Diamètre standard : 200 mm ou 300 mm.</div></div></div>
+    <div class="abbr-row purple"><div class="abbr-name">Die</div><div class="abbr-def"><div class="abbr-full">Puce individuelle</div><div class="abbr-desc">Une puce découpée du wafer. C'est ce qui sera ensuite mis en boîtier.</div></div></div>
+    <div class="abbr-row purple"><div class="abbr-name">Yield</div><div class="abbr-def"><div class="abbr-full">Rendement</div><div class="abbr-desc">Pourcentage de dies fonctionnels par wafer. Métrique économique critique en fabrication.</div></div></div>
+    <div class="abbr-row purple"><div class="abbr-name">NRE</div><div class="abbr-def"><div class="abbr-full">Non-Recurring Engineering</div><div class="abbr-desc">Coût fixe initial pour développer et masquer un ASIC. Plusieurs millions pour les nœuds avancés.</div></div></div>
+    <div class="abbr-row purple"><div class="abbr-name">PVT</div><div class="abbr-def"><div class="abbr-full">Process, Voltage, Temperature</div><div class="abbr-desc">Trois variables qui font varier les performances. Vérification dans tous les coins (corners) du PVT.</div></div></div>
+    <div class="abbr-row purple"><div class="abbr-name">ATE</div><div class="abbr-def"><div class="abbr-full">Automatic Test Equipment</div><div class="abbr-desc">Testeur industriel utilisé en production pour tester chaque puce avant expédition.</div></div></div>
+    <div class="abbr-row purple"><div class="abbr-name">Foundry</div><div class="abbr-def"><div class="abbr-full">Fonderie</div><div class="abbr-desc">Usine fabriquant les puces. TSMC, Samsung, GlobalFoundries, Intel Foundry, STMicroelectronics.</div></div></div>
+  </div>
+
+  <!-- ── NODES ── -->
+  <h2 class="h-blue">Nœuds technologiques</h2>
+  <div class="abbr-grid">
+    <div class="abbr-row"><div class="abbr-name">nm</div><div class="abbr-def"><div class="abbr-full">Nanomètre (nœud)</div><div class="abbr-desc">Échelle des transistors. Aujourd'hui : 3 nm en production, 2 nm en développement. Pour l'embarqué : 28–180 nm souvent suffisant.</div></div></div>
+    <div class="abbr-row"><div class="abbr-name">CMOS</div><div class="abbr-def"><div class="abbr-full">Complementary Metal-Oxide-Semiconductor</div><div class="abbr-desc">Technologie dominante depuis les années 1980. Faible consommation statique, base de toute l'électronique numérique moderne.</div></div></div>
+    <div class="abbr-row"><div class="abbr-name">FinFET</div><div class="abbr-def"><div class="abbr-full">Fin Field-Effect Transistor</div><div class="abbr-desc">Transistor 3D, standard sous 22 nm. Remplace le MOS planaire pour limiter les fuites.</div></div></div>
+    <div class="abbr-row"><div class="abbr-name">GAA</div><div class="abbr-def"><div class="abbr-full">Gate-All-Around</div><div class="abbr-desc">Successeur du FinFET, utilisé à partir de 2 nm. Grille entoure complètement le canal.</div></div></div>
+    <div class="abbr-row"><div class="abbr-name">FD-SOI</div><div class="abbr-def"><div class="abbr-full">Fully Depleted Silicon On Insulator</div><div class="abbr-desc">Technologie alternative au FinFET, utilisée par STMicroelectronics. Idéal pour faible consommation.</div></div></div>
+    <div class="abbr-row"><div class="abbr-name">BEOL / FEOL</div><div class="abbr-def"><div class="abbr-full">Back/Front End Of Line</div><div class="abbr-desc">FEOL = fabrication des transistors. BEOL = couches d'interconnexion métalliques au-dessus.</div></div></div>
+  </div>
+
+</div>
+
+<footer class="page-footer">
+  <div class="pf-left">Elie SASPORTES · 2026</div>
+  <div class="pf-nav">
+    <a href="article-abbreviations-embedded.html">← Abréviations embarqué</a>
+    <a href="index.html#resources">Toutes les ressources</a>
+  </div>
+</footer>
+
+</body>
+</html>

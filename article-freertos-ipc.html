@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FreeRTOS — Queues, Mutex &amp; Sémaphores — Elie SASPORTES</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500&family=Bebas+Neue&display=swap" rel="stylesheet">
+<style>
+  :root{--bg:#0a0c0f;--bg2:#0f1217;--bg3:#141820;--surface:#1a1f2a;--border:#1e2535;--border-bright:#2a3548;--text:#e8eaf0;--text-muted:#6b7a99;--text-dim:#3d4a63;--accent:#00d4ff;--accent2:#ff6b35;--accent3:#7fff6b;--accent4:#c792ea}
+  *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth}
+  body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;font-weight:300;line-height:1.7}
+  body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(var(--border) 1px,transparent 1px),linear-gradient(90deg,var(--border) 1px,transparent 1px);background-size:48px 48px;opacity:0.3;pointer-events:none;z-index:0}
+  nav{position:fixed;top:0;left:0;right:0;z-index:100;display:flex;align-items:center;justify-content:space-between;padding:0 48px;height:64px;background:rgba(10,12,15,0.9);backdrop-filter:blur(16px);border-bottom:1px solid var(--border)}
+  .nav-logo{font-family:'Space Mono',monospace;font-size:12px;color:var(--accent);letter-spacing:0.1em;text-decoration:none;text-transform:uppercase}
+  .nav-back{font-family:'Space Mono',monospace;font-size:11px;color:var(--text-muted);text-decoration:none;letter-spacing:0.08em;transition:color 0.2s}
+  .nav-back:hover{color:var(--accent)}
+  .article-wrap{max-width:860px;margin:0 auto;padding:100px 48px 80px;position:relative;z-index:1}
+  .article-meta{display:flex;align-items:center;gap:12px;margin-bottom:32px;flex-wrap:wrap}
+  .meta-tag{font-family:'Space Mono',monospace;font-size:10px;padding:4px 10px;letter-spacing:0.12em;text-transform:uppercase}
+  .mt-blue{color:var(--accent);background:rgba(0,212,255,0.08);border:1px solid rgba(0,212,255,0.2)}
+  .mt-purple{color:var(--accent4);background:rgba(199,146,234,0.08);border:1px solid rgba(199,146,234,0.2)}
+  .meta-info{font-family:'Space Mono',monospace;font-size:10px;color:var(--text-dim);letter-spacing:0.08em}
+  h1{font-family:'Bebas Neue',sans-serif;font-size:clamp(40px,6vw,72px);letter-spacing:0.04em;line-height:1;color:var(--text);margin-bottom:16px}
+  h1 em{color:var(--accent4);font-style:normal}
+  .subtitle{font-size:17px;color:var(--text-muted);max-width:600px;line-height:1.8;margin-bottom:48px;padding-bottom:48px;border-bottom:1px solid var(--border)}
+  h2{font-family:'Bebas Neue',sans-serif;font-size:32px;letter-spacing:0.05em;color:var(--text);margin:48px 0 20px;display:flex;align-items:center;gap:12px}
+  h2::before{content:'';width:3px;height:28px;background:var(--accent4);flex-shrink:0}
+  p{font-size:15px;color:var(--text-muted);line-height:1.9;margin-bottom:16px}
+  p strong{color:var(--text);font-weight:500}
+  .code-block{background:var(--bg3);border:1px solid var(--border);border-left:2px solid var(--accent4);padding:24px 28px;margin:24px 0;overflow-x:auto;position:relative}
+  .code-label{position:absolute;top:0;right:0;font-family:'Space Mono',monospace;font-size:9px;color:var(--text-dim);background:var(--border);padding:3px 10px;letter-spacing:0.1em;text-transform:uppercase}
+  pre{font-family:'Space Mono',monospace;font-size:12px;line-height:1.8;color:var(--text-muted)}
+  .kw{color:#c792ea}.cm{color:var(--text-dim);font-style:italic}.num{color:var(--accent2)}.fn{color:var(--accent)}.str{color:var(--accent3)}.def{color:#ffcb6b}
+  .diagram{background:var(--surface);border:1px solid var(--border-bright);padding:32px;margin:28px 0;position:relative;overflow:hidden}
+  .diagram::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,var(--accent4),transparent);opacity:0.5}
+  .diagram-title{font-family:'Space Mono',monospace;font-size:10px;color:var(--accent4);letter-spacing:0.15em;text-transform:uppercase;margin-bottom:20px}
+  .callout{border-left:2px solid var(--accent3);padding:16px 20px;background:rgba(127,255,107,0.04);margin:24px 0}
+  .callout-label{font-family:'Space Mono',monospace;font-size:9px;color:var(--accent3);letter-spacing:0.15em;text-transform:uppercase;margin-bottom:6px}
+  .callout p{color:var(--text-muted);font-size:14px;margin:0}
+  .warn{border-left:2px solid var(--accent2);padding:16px 20px;background:rgba(255,107,53,0.04);margin:24px 0}
+  .warn-label{font-family:'Space Mono',monospace;font-size:9px;color:var(--accent2);letter-spacing:0.15em;text-transform:uppercase;margin-bottom:6px}
+  .warn p{color:var(--text-muted);font-size:14px;margin:0}
+  .concept-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:24px 0}
+  .concept-card{background:var(--surface);border:1px solid var(--border);padding:20px;position:relative;overflow:hidden}
+  .concept-card::after{content:'';position:absolute;top:0;left:0;width:2px;height:100%;background:var(--accent4)}
+  .concept-card:nth-child(2)::after{background:var(--accent)}
+  .concept-card:nth-child(3)::after{background:var(--accent3)}
+  .concept-card:nth-child(4)::after{background:var(--accent2)}
+  .concept-label{font-family:'Space Mono',monospace;font-size:10px;color:var(--text-dim);letter-spacing:0.1em;text-transform:uppercase;margin-bottom:8px}
+  .concept-val{font-size:14px;color:var(--text-muted);line-height:1.6}
+  .concept-val code{font-family:'Space Mono',monospace;font-size:11px;color:var(--accent);background:var(--bg3);padding:1px 5px}
+
+  /* IPC TOOL TABLE */
+  .ipc-table{width:100%;border-collapse:collapse;font-family:'Space Mono',monospace;font-size:11px;margin:20px 0}
+  .ipc-table th{background:var(--bg3);color:var(--text-dim);padding:10px 14px;text-align:left;border:1px solid var(--border);letter-spacing:0.08em;text-transform:uppercase;font-size:9px}
+  .ipc-table td{padding:10px 14px;border:1px solid var(--border);color:var(--text-muted);font-size:11px}
+  .ipc-table tr:nth-child(even) td{background:rgba(255,255,255,0.01)}
+
+  /* PRODUCER CONSUMER */
+  .pc-diagram{display:grid;grid-template-columns:1fr auto 1fr;gap:0;align-items:center;margin:20px 0}
+  .pc-box{background:var(--bg3);border:1px solid var(--border);padding:16px;font-family:'Space Mono',monospace;font-size:11px;text-align:center}
+  .pc-box.producer{border-color:var(--accent3);color:var(--accent3)}
+  .pc-box.consumer{border-color:var(--accent);color:var(--accent)}
+  .pc-queue{background:var(--surface);border:1px solid var(--accent4);padding:12px 8px;display:flex;flex-direction:column;gap:2px;align-items:center}
+  .pc-item{width:40px;height:16px;background:rgba(199,146,234,0.2);border:1px solid var(--accent4);font-size:8px;font-family:'Space Mono',monospace;color:var(--accent4);display:flex;align-items:center;justify-content:center}
+  .pc-arrow{font-family:'Space Mono',monospace;font-size:14px;color:var(--text-dim);text-align:center;padding:0 8px}
+
+  ::-webkit-scrollbar{width:4px}::-webkit-scrollbar-track{background:var(--bg)}::-webkit-scrollbar-thumb{background:var(--border-bright)}
+  @media(max-width:640px){.article-wrap{padding:88px 20px 48px}.concept-grid{grid-template-columns:1fr}nav{padding:0 20px}.pc-diagram{grid-template-columns:1fr;gap:8px}}
+</style>
+</head>
+<body>
+<nav>
+  <a href="index.html" class="nav-logo">ES · Ressources</a>
+  <a href="index.html#resources" class="nav-back">← Retour aux ressources</a>
+</nav>
+<div class="article-wrap">
+  <div class="article-meta">
+    <span class="meta-tag mt-purple">FreeRTOS</span>
+    <span class="meta-tag mt-blue">IPC</span>
+    <span class="meta-info">Séances 13–14 · 12 min</span>
+  </div>
+  <h1>FreeRTOS — Queues,<br><em>Mutex</em> &amp; Sémaphores</h1>
+  <p class="subtitle">Les outils de communication inter-tâches (IPC) de FreeRTOS — pattern producteur/consommateur, protection de ressources partagées, et les pièges classiques du multithreading.</p>
+
+  <h2>Vue d'ensemble des outils IPC</h2>
+  <div class="diagram">
+    <div class="diagram-title">// Récapitulatif — outils de communication FreeRTOS</div>
+    <table class="ipc-table">
+      <tr><th>Outil</th><th>Usage</th><th>Bloquant ?</th><th>Données ?</th></tr>
+      <tr><td style="color:var(--accent4)">xQueueSend</td><td>Envoyer une donnée</td><td>Optionnel (timeout)</td><td>Oui — copie par valeur</td></tr>
+      <tr><td style="color:var(--accent4)">xQueueReceive</td><td>Recevoir une donnée</td><td>Oui (bloque si vide)</td><td>Oui — copie vers buffer</td></tr>
+      <tr><td style="color:var(--accent4)">xQueuePeek</td><td>Inspecter sans retirer</td><td>Optionnel</td><td>Oui — non consommé</td></tr>
+      <tr><td style="color:var(--accent3)">xSemaphoreTake/Give</td><td>Synchro ou mutex</td><td>Oui (bloque)</td><td>Non</td></tr>
+      <tr><td style="color:var(--accent)">xTaskNotify</td><td>Signal léger inter-tâches</td><td>Non (fire &amp; forget)</td><td>32 bits optionnels</td></tr>
+    </table>
+  </div>
+
+  <h2>Queue — Pattern Producteur / Consommateur</h2>
+  <p>La queue est la primitive de communication de base. Elle transmet des <strong>données par valeur</strong> d'une tâche à une autre de manière thread-safe — pas de mutex nécessaire pour accéder à la queue elle-même.</p>
+
+  <div class="diagram">
+    <div class="diagram-title">// Producteur → Queue → Consommateur</div>
+    <div class="pc-diagram">
+      <div class="pc-box producer">vTaskProducer<br><span style="font-size:9px;color:var(--text-dim)">prio 3 — haute</span><br><br>xQueueSend()</div>
+      <div style="display:flex;flex-direction:column;align-items:center">
+        <div class="pc-arrow">→</div>
+        <div class="pc-queue">
+          <div style="font-family:'Space Mono',monospace;font-size:9px;color:var(--accent4);margin-bottom:4px">QUEUE[5]</div>
+          <div class="pc-item">cmd3</div>
+          <div class="pc-item">cmd2</div>
+          <div class="pc-item">cmd1</div>
+        </div>
+        <div class="pc-arrow">→</div>
+      </div>
+      <div class="pc-box consumer">vTaskConsumer<br><span style="font-size:9px;color:var(--text-dim)">prio 2 — normale</span><br><br>xQueueReceive()</div>
+    </div>
+    <div style="font-family:'Space Mono',monospace;font-size:10px;color:var(--text-dim);margin-top:12px">
+      Queue pleine → xQueueSend() bloque le producteur jusqu'à qu'une place se libère<br>
+      Queue vide  → xQueueReceive() bloque le consommateur jusqu'à qu'un élément arrive
+    </div>
+  </div>
+
+  <div class="code-block">
+    <span class="code-label">C · producer_consumer.c</span>
+    <pre><span class="cm">// Dans main — créer la queue avant les tâches</span>
+QueueHandle_t cmd_queue = <span class="fn">xQueueCreate</span>(<span class="num">5</span>, <span class="kw">sizeof</span>(Command_t));
+
+<span class="cm">// Producteur — envoie des commandes</span>
+<span class="kw">void</span> <span class="fn">vTaskProducer</span>(<span class="kw">void</span> *pvParams) {
+    AppContext_t *ctx = (AppContext_t *)pvParams;
+    Command_t cmd;
+    <span class="kw">uint32_t</span> seq = <span class="num">0</span>;
+
+    <span class="kw">for</span> (;;) {
+        cmd.id    = seq++;
+        cmd.value = <span class="fn">sensor_read</span>();
+
+        <span class="cm">// Envoyer — bloquer 100ms max si queue pleine</span>
+        <span class="kw">if</span> (<span class="fn">xQueueSend</span>(ctx-&gt;cmd_queue, &amp;cmd, <span class="fn">pdMS_TO_TICKS</span>(<span class="num">100</span>)) != pdTRUE) {
+            <span class="fn">console_print</span>(ctx, <span class="str">"[PROD] Queue pleine!\n"</span>);
+        }
+        <span class="fn">vTaskDelay</span>(<span class="fn">pdMS_TO_TICKS</span>(<span class="num">200</span>));
+    }
+}
+
+<span class="cm">// Consommateur — traite les commandes</span>
+<span class="kw">void</span> <span class="fn">vTaskConsumer</span>(<span class="kw">void</span> *pvParams) {
+    AppContext_t *ctx = (AppContext_t *)pvParams;
+    Command_t cmd;
+
+    <span class="kw">for</span> (;;) {
+        <span class="cm">// Bloquer indéfiniment jusqu'à réception</span>
+        <span class="kw">if</span> (<span class="fn">xQueueReceive</span>(ctx-&gt;cmd_queue, &amp;cmd, portMAX_DELAY) == pdTRUE) {
+            <span class="fn">process_command</span>(&amp;cmd);
+        }
+    }
+}</pre>
+  </div>
+
+  <h2>Mutex — Protéger une ressource partagée</h2>
+  <p>Quand plusieurs tâches accèdent à une même ressource (stdout, bus I2C, buffer partagé), il faut garantir l'accès exclusif. Le mutex est un sémaphore binaire avec <strong>gestion de la priorité</strong> intégrée.</p>
+
+  <div class="code-block">
+    <span class="code-label">C · mutex_usage.c</span>
+    <pre><span class="cm">// console_print — impression thread-safe via mutex</span>
+<span class="kw">void</span> <span class="fn">console_print</span>(AppContext_t *ctx, <span class="kw">const char</span> *msg) {
+    <span class="cm">// Prendre le mutex — bloquer si une autre tâche l'a</span>
+    <span class="kw">if</span> (<span class="fn">xSemaphoreTake</span>(ctx-&gt;mutex, <span class="fn">pdMS_TO_TICKS</span>(<span class="num">100</span>)) == pdTRUE) {
+        <span class="fn">printf</span>(<span class="str">"%s"</span>, msg);   <span class="cm">// section critique — un seul thread à la fois</span>
+        <span class="fn">xSemaphoreGive</span>(ctx-&gt;mutex);  <span class="cm">// libérer immédiatement</span>
+    }
+    <span class="cm">// Si timeout : on perd le message — logique de dégradation gracieuse</span>
+}</pre>
+  </div>
+
+  <div class="warn">
+    <div class="warn-label">⚠ Priority Inversion</div>
+    <p>Si une tâche haute prio attend un mutex tenu par une tâche basse prio, et qu'une tâche moyenne prio préempte la tâche basse — la tâche haute est indirectement bloquée par la moyenne. Solution : utiliser <strong>xSemaphoreCreateMutex()</strong> (pas Binary) — FreeRTOS applique alors la <strong>Priority Inheritance</strong> automatiquement.</p>
+  </div>
+
+  <h2>Sémaphore binaire — Synchronisation</h2>
+  <p>Le sémaphore binaire sert à la <strong>synchronisation</strong> entre une ISR et une tâche. L'ISR donne le sémaphore (signal rapide), la tâche le prend (traitement lourd hors interruption).</p>
+
+  <div class="code-block">
+    <span class="code-label">C · watchdog_semaphore.c — pattern séance 12</span>
+    <pre><span class="cm">// Watchdog logiciel via sémaphore binaire</span>
+SemaphoreHandle_t wdg_sem;
+
+<span class="kw">void</span> <span class="fn">vTaskWorker</span>(<span class="kw">void</span> *pvParams) {
+    <span class="kw">for</span> (;;) {
+        <span class="fn">do_work</span>();
+        <span class="fn">xSemaphoreGive</span>(wdg_sem);  <span class="cm">// signaler "je suis vivant"</span>
+        <span class="fn">vTaskDelay</span>(<span class="fn">pdMS_TO_TICKS</span>(<span class="num">500</span>));
+    }
+}
+
+<span class="kw">void</span> <span class="fn">vTaskWatchdog</span>(<span class="kw">void</span> *pvParams) {
+    <span class="kw">const</span> TickType_t timeout = <span class="fn">pdMS_TO_TICKS</span>(<span class="num">1500</span>); <span class="cm">// 3x la période</span>
+
+    <span class="kw">for</span> (;;) {
+        <span class="cm">// Attendre le signal — timeout si worker bloqué</span>
+        <span class="kw">if</span> (<span class="fn">xSemaphoreTake</span>(wdg_sem, timeout) != pdTRUE) {
+            <span class="fn">handle_watchdog_timeout</span>();  <span class="cm">// reset, log, alarm...</span>
+        }
+    }
+}</pre>
+  </div>
+
+  <h2>xQueuePeek — Inspecter sans consommer</h2>
+  <div class="code-block">
+    <span class="code-label">C · queue_peek.c — pattern séance 14</span>
+    <pre><span class="cm">// Inspecter le prochain élément sans le retirer de la queue</span>
+<span class="cm">// Utile pour décider si on veut le consommer ou laisser une autre tâche le faire</span>
+Command_t next_cmd;
+<span class="kw">if</span> (<span class="fn">xQueuePeek</span>(ctx-&gt;cmd_queue, &amp;next_cmd, <span class="num">0</span>) == pdTRUE) {
+    <span class="kw">if</span> (next_cmd.priority == HIGH) {
+        <span class="fn">xQueueReceive</span>(ctx-&gt;cmd_queue, &amp;next_cmd, <span class="num">0</span>); <span class="cm">// consommer</span>
+        <span class="fn">handle_high_priority</span>(&amp;next_cmd);
+    }
+    <span class="cm">// sinon laisser pour une autre tâche</span>
+}
+
+<span class="cm">// uxQueueMessagesWaiting — nombre d'éléments en attente</span>
+<span class="kw">uint32_t</span> pending = <span class="fn">uxQueueMessagesWaiting</span>(ctx-&gt;cmd_queue);
+<span class="fn">printf</span>(<span class="str">"Queue: %lu éléments en attente\n"</span>, pending);</pre>
+  </div>
+
+  <h2>Points clés à retenir</h2>
+  <div class="concept-grid">
+    <div class="concept-card">
+      <div class="concept-label">Queue = thread-safe par nature</div>
+      <div class="concept-val">Pas besoin de mutex pour accéder à une queue — FreeRTOS gère l'accès concurrent en interne. Le mutex n'est nécessaire que pour les ressources non-FreeRTOS (stdout, SPI bus...).</div>
+    </div>
+    <div class="concept-card">
+      <div class="concept-label">Mutex ≠ Sémaphore binaire</div>
+      <div class="concept-val">Utiliser <code>xSemaphoreCreateMutex()</code> pour protéger des ressources — il implémente la priority inheritance. Réserver <code>CreateBinary()</code> pour la synchronisation ISR/tâche.</div>
+    </div>
+    <div class="concept-card">
+      <div class="concept-label">Timeout = toujours</div>
+      <div class="concept-val">Ne jamais passer <code>portMAX_DELAY</code> sauf si on est certain que l'événement arrivera. Préférer un timeout explicite avec gestion de l'échec.</div>
+    </div>
+    <div class="concept-card">
+      <div class="concept-label">Deadlock</div>
+      <div class="concept-val">Tâche A tient mutex1, attend mutex2. Tâche B tient mutex2, attend mutex1. Solution : toujours acquérir les mutex dans le même ordre dans toutes les tâches.</div>
+    </div>
+  </div>
+</div>
+<footer style="max-width:860px;margin:0 auto;padding:32px 48px;border-top:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;position:relative;z-index:1">
+  <div style="font-family:'Space Mono',monospace;font-size:11px;color:var(--text-dim)">Elie SASPORTES · 2026</div>
+  <div style="display:flex;gap:24px">
+    <a href="article-freertos-tasks.html" style="font-family:'Space Mono',monospace;font-size:10px;color:var(--text-dim);text-decoration:none;letter-spacing:0.08em;text-transform:uppercase" onmouseover="this.style.color='var(--accent)'" onmouseout="this.style.color='var(--text-dim)'">← Tâches FreeRTOS</a>
+    <a href="article-linux-driver.html" style="font-family:'Space Mono',monospace;font-size:10px;color:var(--text-dim);text-decoration:none;letter-spacing:0.08em;text-transform:uppercase" onmouseover="this.style.color='var(--accent)'" onmouseout="this.style.color='var(--text-dim)'">Linux Kernel →</a>
+  </div>
+</footer>
+</body>
+</html>

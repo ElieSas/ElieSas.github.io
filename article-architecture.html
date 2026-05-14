@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Architecture multi-fichiers embarquée — Elie SASPORTES</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500&family=Bebas+Neue&display=swap" rel="stylesheet">
+<style>
+  :root{--bg:#0a0c0f;--bg2:#0f1217;--bg3:#141820;--surface:#1a1f2a;--border:#1e2535;--border-bright:#2a3548;--text:#e8eaf0;--text-muted:#6b7a99;--text-dim:#3d4a63;--accent:#00d4ff;--accent2:#ff6b35;--accent3:#7fff6b}
+  *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth}
+  body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;font-weight:300;line-height:1.7}
+  body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(var(--border) 1px,transparent 1px),linear-gradient(90deg,var(--border) 1px,transparent 1px);background-size:48px 48px;opacity:0.3;pointer-events:none;z-index:0}
+  nav{position:fixed;top:0;left:0;right:0;z-index:100;display:flex;align-items:center;justify-content:space-between;padding:0 48px;height:64px;background:rgba(10,12,15,0.9);backdrop-filter:blur(16px);border-bottom:1px solid var(--border)}
+  .nav-logo{font-family:'Space Mono',monospace;font-size:12px;color:var(--accent);letter-spacing:0.1em;text-decoration:none;text-transform:uppercase}
+  .nav-back{font-family:'Space Mono',monospace;font-size:11px;color:var(--text-muted);text-decoration:none;letter-spacing:0.08em;transition:color 0.2s}
+  .nav-back:hover{color:var(--accent)}
+  .article-wrap{max-width:860px;margin:0 auto;padding:100px 48px 80px;position:relative;z-index:1}
+  .article-meta{display:flex;align-items:center;gap:12px;margin-bottom:32px}
+  .meta-tag{font-family:'Space Mono',monospace;font-size:10px;color:var(--accent2);background:rgba(255,107,53,0.08);border:1px solid rgba(255,107,53,0.2);padding:4px 10px;letter-spacing:0.12em;text-transform:uppercase}
+  .meta-tag.blue{color:var(--accent);background:rgba(0,212,255,0.08);border-color:rgba(0,212,255,0.2)}
+  .meta-info{font-family:'Space Mono',monospace;font-size:10px;color:var(--text-dim);letter-spacing:0.08em}
+  h1{font-family:'Bebas Neue',sans-serif;font-size:clamp(40px,6vw,72px);letter-spacing:0.04em;line-height:1;color:var(--text);margin-bottom:16px}
+  h1 em{color:var(--accent2);font-style:normal}
+  .subtitle{font-size:17px;color:var(--text-muted);max-width:600px;line-height:1.8;margin-bottom:48px;padding-bottom:48px;border-bottom:1px solid var(--border)}
+  h2{font-family:'Bebas Neue',sans-serif;font-size:32px;letter-spacing:0.05em;color:var(--text);margin:48px 0 20px;display:flex;align-items:center;gap:12px}
+  h2::before{content:'';width:3px;height:28px;background:var(--accent2);flex-shrink:0}
+  h3{font-family:'Space Mono',monospace;font-size:13px;color:var(--accent2);letter-spacing:0.1em;text-transform:uppercase;margin:28px 0 12px}
+  p{font-size:15px;color:var(--text-muted);line-height:1.9;margin-bottom:16px}
+  p strong{color:var(--text);font-weight:500}
+  .code-block{background:var(--bg3);border:1px solid var(--border);border-left:2px solid var(--accent2);padding:24px 28px;margin:24px 0;overflow-x:auto;position:relative}
+  .code-block .code-label{position:absolute;top:0;right:0;font-family:'Space Mono',monospace;font-size:9px;color:var(--text-dim);background:var(--border);padding:3px 10px;letter-spacing:0.1em;text-transform:uppercase}
+  pre{font-family:'Space Mono',monospace;font-size:12px;line-height:1.8;color:var(--text-muted)}
+  .kw{color:#c792ea}.cm{color:var(--text-dim);font-style:italic}.num{color:var(--accent2)}.fn{color:var(--accent)}.str{color:var(--accent3)}.def{color:#ffcb6b}
+  .diagram{background:var(--surface);border:1px solid var(--border-bright);padding:32px;margin:28px 0;position:relative;overflow:hidden}
+  .diagram::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,var(--accent2),transparent);opacity:0.5}
+  .diagram-title{font-family:'Space Mono',monospace;font-size:10px;color:var(--accent2);letter-spacing:0.15em;text-transform:uppercase;margin-bottom:20px}
+  .callout{border-left:2px solid var(--accent3);padding:16px 20px;background:rgba(127,255,107,0.04);margin:24px 0}
+  .callout-label{font-family:'Space Mono',monospace;font-size:9px;color:var(--accent3);letter-spacing:0.15em;text-transform:uppercase;margin-bottom:6px}
+  .callout p{color:var(--text-muted);font-size:14px;margin:0}
+  .warn{border-left:2px solid var(--accent2);padding:16px 20px;background:rgba(255,107,53,0.04);margin:24px 0}
+  .warn-label{font-family:'Space Mono',monospace;font-size:9px;color:var(--accent2);letter-spacing:0.15em;text-transform:uppercase;margin-bottom:6px}
+  .warn p{color:var(--text-muted);font-size:14px;margin:0}
+  .concept-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:24px 0}
+  .concept-card{background:var(--surface);border:1px solid var(--border);padding:20px;position:relative;overflow:hidden}
+  .concept-card::after{content:'';position:absolute;top:0;left:0;width:2px;height:100%;background:var(--accent2)}
+  .concept-card:nth-child(2)::after{background:var(--accent)}
+  .concept-card:nth-child(3)::after{background:var(--accent3)}
+  .concept-card:nth-child(4)::after{background:var(--accent2)}
+  .concept-label{font-family:'Space Mono',monospace;font-size:10px;color:var(--text-dim);letter-spacing:0.1em;text-transform:uppercase;margin-bottom:8px}
+  .concept-val{font-size:14px;color:var(--text-muted);line-height:1.6}
+  .concept-val code{font-family:'Space Mono',monospace;font-size:11px;color:var(--accent);background:var(--bg3);padding:1px 5px}
+
+  /* FILE TREE */
+  .file-tree{background:var(--bg3);border:1px solid var(--border);padding:24px 28px;font-family:'Space Mono',monospace;font-size:12px;line-height:2;margin:24px 0}
+  .ft-dir{color:var(--accent2);font-weight:700}
+  .ft-file{color:var(--text-muted)}
+  .ft-file.h{color:var(--accent)}
+  .ft-file.c{color:var(--accent3)}
+  .ft-comment{color:var(--text-dim);font-style:italic}
+  .ft-indent{margin-left:20px}
+  .ft-indent2{margin-left:40px}
+
+  /* LAYER DIAGRAM */
+  .layers{display:flex;flex-direction:column;gap:2px;margin:20px 0}
+  .layer{padding:16px 24px;border:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;position:relative;overflow:hidden}
+  .layer::before{content:'';position:absolute;left:0;top:0;bottom:0;width:4px}
+  .layer.app::before{background:var(--accent3)}
+  .layer.drv::before{background:var(--accent)}
+  .layer.hal::before{background:var(--accent2)}
+  .layer.hw::before{background:var(--text-dim)}
+  .layer-name{font-family:'Bebas Neue',sans-serif;font-size:20px;letter-spacing:0.06em}
+  .layer.app .layer-name{color:var(--accent3)}
+  .layer.drv .layer-name{color:var(--accent)}
+  .layer.hal .layer-name{color:var(--accent2)}
+  .layer.hw .layer-name{color:var(--text-dim)}
+  .layer-files{font-family:'Space Mono',monospace;font-size:10px;color:var(--text-dim);text-align:right}
+  .layer-desc{font-size:13px;color:var(--text-muted);max-width:400px}
+
+  /* DEPENDENCY ARROWS */
+  .dep-arrow{text-align:center;font-family:'Space Mono',monospace;font-size:12px;color:var(--text-dim);padding:4px 0}
+
+  ::-webkit-scrollbar{width:4px}::-webkit-scrollbar-track{background:var(--bg)}::-webkit-scrollbar-thumb{background:var(--border-bright)}
+  @media(max-width:640px){.article-wrap{padding:88px 20px 48px}.concept-grid{grid-template-columns:1fr}nav{padding:0 20px}}
+</style>
+</head>
+<body>
+
+<nav>
+  <a href="index.html" class="nav-logo">ES <span style="color:var(--text-dim)">·</span> Ressources</a>
+  <a href="index.html#resources" class="nav-back">← Retour aux ressources</a>
+</nav>
+
+<div class="article-wrap">
+
+  <div class="article-meta">
+    <span class="meta-tag">Guide</span>
+    <span class="meta-tag blue">Architecture</span>
+    <span class="meta-info">Session 6 · 12 min de lecture</span>
+  </div>
+
+  <h1>Architecture <em>Multi-Fichiers</em><br>Embarquée</h1>
+  <p class="subtitle">Comment organiser un projet firmware qui scale — séparation HAL / drivers / application, règles de dépendance, et conventions de nommage industrielles.</p>
+
+  <!-- ── SECTION 1 ── -->
+  <h2>Le problème du fichier unique</h2>
+  <p>Un projet embarqué qui démarre dans un seul <code style="font-family:'Space Mono',monospace;color:var(--accent);font-size:13px">main.c</code> de 2000 lignes, c'est un projet difficile à maintenir, à tester, et à faire évoluer. Dès qu'un deuxième développeur touche au code — ou que vous revenez dessus 6 mois plus tard — c'est la confusion.</p>
+
+  <p>La solution : <strong>séparer les responsabilités</strong> en couches logiques claires, avec des règles de dépendance strictes entre elles.</p>
+
+  <!-- ── SECTION 2 ── -->
+  <h2>Les 3 couches fondamentales</h2>
+
+  <div class="diagram">
+    <div class="diagram-title">// architecture.layers — du matériel à l'applicatif</div>
+    <div class="layers">
+      <div class="layer app">
+        <div>
+          <div class="layer-name">Application</div>
+          <div class="layer-desc">Logique métier, machine à états, orchestration des drivers</div>
+        </div>
+        <div class="layer-files">app.c / app.h<br>main.c</div>
+      </div>
+      <div class="dep-arrow">↕ appelle uniquement vers le bas (jamais vers le haut)</div>
+      <div class="layer drv">
+        <div>
+          <div class="layer-name">Drivers</div>
+          <div class="layer-desc">GPIO, UART, SPI — logique de périphérique, indépendante du HAL</div>
+        </div>
+        <div class="layer-files">gpio_driver.c/.h<br>uart_driver.c/.h<br>scheduler.c/.h</div>
+      </div>
+      <div class="dep-arrow">↕</div>
+      <div class="layer hal">
+        <div>
+          <div class="layer-name">HAL / BSP</div>
+          <div class="layer-desc">Accès registres, CMSIS, abstraction matérielle minimale</div>
+        </div>
+        <div class="layer-files">stm32f4xx.h<br>system_stm32f4xx.c</div>
+      </div>
+      <div class="dep-arrow">↕</div>
+      <div class="layer hw">
+        <div>
+          <div class="layer-name">Hardware</div>
+          <div class="layer-desc">STM32, périphériques physiques, signaux électriques</div>
+        </div>
+        <div class="layer-files">MCU · PCB</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="callout">
+    <div class="callout-label">// règle d'or</div>
+    <p>Une couche ne connaît que la couche directement en dessous. L'application ne touche jamais les registres. Les drivers ne connaissent pas la logique métier.</p>
+  </div>
+
+  <!-- ── SECTION 3 ── -->
+  <h2>Structure de fichiers type</h2>
+
+  <div class="file-tree">
+    <div class="ft-dir">projet_stm32/</div>
+    <div class="ft-indent">
+      <div class="ft-dir">├── Core/</div>
+      <div class="ft-indent">
+        <div class="ft-dir">├── Inc/                          <span class="ft-comment">// headers uniquement</span></div>
+        <div class="ft-indent">
+          <div class="ft-file h">├── gpio_driver.h</div>
+          <div class="ft-file h">├── uart_driver.h</div>
+          <div class="ft-file h">├── scheduler.h</div>
+          <div class="ft-file h">└── app.h</div>
+        </div>
+        <div class="ft-dir">└── Src/                          <span class="ft-comment">// implémentations</span></div>
+        <div class="ft-indent">
+          <div class="ft-file c">├── gpio_driver.c</div>
+          <div class="ft-file c">├── uart_driver.c</div>
+          <div class="ft-file c">├── scheduler.c</div>
+          <div class="ft-file c">├── app.c</div>
+          <div class="ft-file c">└── main.c</div>
+        </div>
+      </div>
+      <div class="ft-dir">├── Drivers/                      <span class="ft-comment">// CMSIS + HAL ST (ne pas modifier)</span></div>
+      <div class="ft-indent">
+        <div class="ft-file h">├── CMSIS/</div>
+        <div class="ft-file h">└── STM32F4xx_HAL_Driver/</div>
+      </div>
+      <div class="ft-dir">└── Makefile / .cproject</div>
+    </div>
+  </div>
+
+  <!-- ── SECTION 4 ── -->
+  <h2>Anatomie d'un fichier .h correct</h2>
+  <p>Le header est le <strong>contrat public</strong> d'un module. Il expose uniquement ce dont les autres modules ont besoin — rien de plus.</p>
+
+  <div class="code-block">
+    <span class="code-label">C · gpio_driver.h</span>
+    <pre><span class="cm">// ── INCLUDE GUARD ── obligatoire pour éviter les inclusions multiples</span>
+<span class="def">#ifndef GPIO_DRIVER_H</span>
+<span class="def">#define GPIO_DRIVER_H</span>
+
+<span class="def">#include</span> <span class="str">"stm32f4xx.h"</span>
+<span class="def">#include</span> <span class="str">&lt;stdint.h&gt;</span>
+
+<span class="cm">// ── CONSTANTES PUBLIQUES ──</span>
+<span class="def">#define GPIO_MODE_INPUT    0x00U</span>
+<span class="def">#define GPIO_MODE_OUTPUT   0x01U</span>
+<span class="def">#define GPIO_MODE_AF       0x02U</span>
+<span class="def">#define GPIO_PULL_NONE     0x00U</span>
+<span class="def">#define GPIO_PULL_UP       0x01U</span>
+
+<span class="cm">// ── TYPES PUBLICS ──</span>
+<span class="kw">typedef struct</span> {
+    GPIO_TypeDef *port;
+    <span class="kw">uint8_t</span>       pin;
+    <span class="kw">uint8_t</span>       mode;
+    <span class="kw">uint8_t</span>       pull;
+} GPIO_Config_t;
+
+<span class="cm">// ── API PUBLIQUE ── (les seules fonctions que les autres modules voient)</span>
+<span class="kw">void</span> <span class="fn">GPIO_Init</span>  (<span class="kw">const</span> GPIO_Config_t *cfg);
+<span class="kw">void</span> <span class="fn">GPIO_Write</span> (<span class="kw">const</span> GPIO_Config_t *cfg, <span class="kw">uint8_t</span> state);
+<span class="kw">uint8_t</span> <span class="fn">GPIO_Read</span>(<span class="kw">const</span> GPIO_Config_t *cfg);
+<span class="kw">void</span> <span class="fn">GPIO_Toggle</span>(<span class="kw">const</span> GPIO_Config_t *cfg);
+
+<span class="def">#endif</span> <span class="cm">/* GPIO_DRIVER_H */</span></pre>
+  </div>
+
+  <!-- ── SECTION 5 ── -->
+  <h2>Anatomie d'un fichier .c correct</h2>
+
+  <div class="code-block">
+    <span class="code-label">C · gpio_driver.c</span>
+    <pre><span class="def">#include</span> <span class="str">"gpio_driver.h"</span>   <span class="cm">// son propre header EN PREMIER</span>
+
+<span class="cm">// ── VARIABLES PRIVÉES ── (static = invisible hors de ce .c)</span>
+<span class="kw">static uint32_t</span> s_init_count = <span class="num">0</span>;
+
+<span class="cm">// ── FONCTIONS PRIVÉES ── (static = non exportées)</span>
+<span class="kw">static void</span> <span class="fn">enable_gpio_clock</span>(GPIO_TypeDef *port) {
+    <span class="kw">if</span>      (port == GPIOA) RCC-&gt;AHB1ENR |= RCC_AHB1ENR_GPIOAEN;
+    <span class="kw">else if</span> (port == GPIOB) RCC-&gt;AHB1ENR |= RCC_AHB1ENR_GPIOBEN;
+    <span class="kw">else if</span> (port == GPIOC) RCC-&gt;AHB1ENR |= RCC_AHB1ENR_GPIOCEN;
+    <span class="cm">/* ... */</span>
+}
+
+<span class="cm">// ── API PUBLIQUE ──</span>
+<span class="kw">void</span> <span class="fn">GPIO_Init</span>(<span class="kw">const</span> GPIO_Config_t *cfg) {
+    <span class="fn">enable_gpio_clock</span>(cfg-&gt;port);
+
+    cfg-&gt;port-&gt;MODER &amp;= ~(<span class="num">0x3U</span> &lt;&lt; (cfg-&gt;pin * <span class="num">2</span>));
+    cfg-&gt;port-&gt;MODER |=  (cfg-&gt;mode &lt;&lt; (cfg-&gt;pin * <span class="num">2</span>));
+
+    cfg-&gt;port-&gt;PUPDR &amp;= ~(<span class="num">0x3U</span> &lt;&lt; (cfg-&gt;pin * <span class="num">2</span>));
+    cfg-&gt;port-&gt;PUPDR |=  (cfg-&gt;pull &lt;&lt; (cfg-&gt;pin * <span class="num">2</span>));
+
+    s_init_count++;
+}
+
+<span class="kw">void</span> <span class="fn">GPIO_Toggle</span>(<span class="kw">const</span> GPIO_Config_t *cfg) {
+    cfg-&gt;port-&gt;ODR ^= (<span class="num">1U</span> &lt;&lt; cfg-&gt;pin);
+}</pre>
+  </div>
+
+  <div class="warn">
+    <div class="warn-label">⚠ règle static</div>
+    <p>Toute variable et toute fonction qui ne fait pas partie de l'API publique doit être déclarée <code style="font-family:'Space Mono',monospace;color:var(--accent2);font-size:12px">static</code>. Ça évite les collisions de noms et ça documente l'intention.</p>
+  </div>
+
+  <!-- ── SECTION 6 ── -->
+  <h2>main.c : chef d'orchestre, pas artisan</h2>
+  <p><code style="font-family:'Space Mono',monospace;color:var(--accent);font-size:13px">main.c</code> ne doit contenir <strong>aucune logique matérielle directe</strong>. Il initialise les modules et lance la boucle principale — point.</p>
+
+  <div class="code-block">
+    <span class="code-label">C · main.c — structure idéale</span>
+    <pre><span class="def">#include</span> <span class="str">"gpio_driver.h"</span>
+<span class="def">#include</span> <span class="str">"uart_driver.h"</span>
+<span class="def">#include</span> <span class="str">"scheduler.h"</span>
+<span class="def">#include</span> <span class="str">"app.h"</span>
+
+<span class="kw">int</span> <span class="fn">main</span>(<span class="kw">void</span>) {
+    <span class="cm">// 1. Init système</span>
+    <span class="fn">SystemClock_Config</span>();
+
+    <span class="cm">// 2. Init drivers</span>
+    <span class="fn">GPIO_Init</span>(&amp;led_config);
+    <span class="fn">UART_Init</span>(&amp;uart_config);
+
+    <span class="cm">// 3. Init application</span>
+    <span class="fn">App_Init</span>();
+
+    <span class="cm">// 4. Boucle principale</span>
+    <span class="kw">while</span> (<span class="num">1</span>) {
+        <span class="fn">Scheduler_Run</span>();
+    }
+}</pre>
+  </div>
+
+  <!-- ── SECTION 7 ── -->
+  <h2>Conventions de nommage</h2>
+
+  <div class="concept-grid">
+    <div class="concept-card">
+      <div class="concept-label">Modules (fichiers)</div>
+      <div class="concept-val"><code>gpio_driver</code>, <code>uart_driver</code>, <code>scheduler</code> — snake_case, nom explicite du rôle</div>
+    </div>
+    <div class="concept-card">
+      <div class="concept-label">Fonctions publiques</div>
+      <div class="concept-val"><code>GPIO_Init()</code>, <code>UART_Send()</code> — préfixe MODULE_ + PascalCase de l'action</div>
+    </div>
+    <div class="concept-card">
+      <div class="concept-label">Fonctions privées</div>
+      <div class="concept-val"><code>static void enable_clock()</code> — snake_case, pas de préfixe, toujours static</div>
+    </div>
+    <div class="concept-card">
+      <div class="concept-label">Variables globales</div>
+      <div class="concept-val"><code>static uint32_t s_tick_count</code> — préfixe <code>s_</code> pour static, <code>g_</code> si vraiment global (à éviter)</div>
+    </div>
+  </div>
+
+  <div class="callout" style="margin-top:40px">
+    <div class="callout-label">// session suivante</div>
+    <p>Avec cette architecture en place, on peut ajouter un <strong>ring buffer UART</strong> comme module autonome — c'est exactement l'exercice de la session 7.</p>
+  </div>
+
+</div>
+
+<footer style="max-width:860px;margin:0 auto;padding:32px 48px;border-top:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;position:relative;z-index:1">
+  <div style="font-family:'Space Mono',monospace;font-size:11px;color:var(--text-dim)">Elie SASPORTES · 2026</div>
+  <div style="display:flex;gap:24px">
+    <a href="article-gpio.html" style="font-family:'Space Mono',monospace;font-size:10px;color:var(--text-dim);text-decoration:none;letter-spacing:0.08em;text-transform:uppercase" onmouseover="this.style.color='var(--accent)'" onmouseout="this.style.color='var(--text-dim)'">← Article précédent</a>
+    <a href="article-uart.html" style="font-family:'Space Mono',monospace;font-size:10px;color:var(--text-dim);text-decoration:none;letter-spacing:0.08em;text-transform:uppercase" onmouseover="this.style.color='var(--accent)'" onmouseout="this.style.color='var(--text-dim)'">Article suivant →</a>
+  </div>
+</footer>
+
+</body>
+</html>

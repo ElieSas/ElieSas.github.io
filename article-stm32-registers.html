@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Registres STM32 — Elie SASPORTES</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500&family=Bebas+Neue&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="article-style.css">
+<style>
+  /* REGISTER VIEW */
+  .reg-block { background: var(--surface); border: 1px solid var(--border-bright); margin: 24px 0; }
+  .reg-header { background: var(--bg3); padding: 14px 20px; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; }
+  .reg-name { font-family: 'Bebas Neue', sans-serif; font-size: 22px; color: var(--text); letter-spacing: 0.05em; }
+  .reg-name span { color: var(--accent); }
+  .reg-addr { font-family: 'Space Mono', monospace; font-size: 11px; color: var(--text-dim); letter-spacing: 0.04em; }
+  .reg-body { padding: 20px; }
+  .reg-bits { display: flex; gap: 2px; margin: 12px 0; flex-wrap: wrap; }
+  .reg-bit { min-height: 36px; flex: 1; min-width: 36px; display: flex; flex-direction: column; align-items: center; justify-content: center; font-family: 'Space Mono', monospace; font-size: 9px; border: 1px solid var(--border); color: var(--text-dim); padding: 4px 2px; }
+  .reg-bit.on    { background: rgba(0,212,255,0.12);  border-color: var(--accent);  color: var(--accent); }
+  .reg-bit.red   { background: rgba(255,107,53,0.12); border-color: var(--accent2); color: var(--accent2); }
+  .reg-bit.green { background: rgba(127,255,107,0.12);border-color: var(--accent3); color: var(--accent3); }
+  .reg-bit.purp  { background: rgba(199,146,234,0.12);border-color: var(--accent4); color: var(--accent4); }
+  .reg-bit.x2    { flex: 2; }
+  .reg-bit.x3    { flex: 3; }
+  .reg-bit.x4    { flex: 4; }
+  .reg-bit b     { color: var(--text); font-size: 11px; }
+  .reg-desc { font-family: 'Space Mono', monospace; font-size: 11px; color: var(--text-muted); line-height: 1.7; }
+  .reg-desc code { color: var(--accent); }
+</style>
+</head>
+<body>
+<nav>
+  <a href="index.html" class="nav-logo">ES · Ressources</a>
+  <a href="index.html#resources" class="nav-back">← Retour aux ressources</a>
+</nav>
+<div class="article-wrap">
+  <div class="article-meta">
+    <span class="meta-tag mt-blue">STM32</span>
+    <span class="meta-tag mt-red">Bare-Metal</span>
+    <span class="meta-info">Registres clés · Configuration · 16 min</span>
+  </div>
+  <h1>Registres <em class="blue">STM32</em><br>&amp; Configuration</h1>
+  <p class="subtitle">Vue d'ensemble des registres essentiels du STM32 — RCC, GPIO, USART, SPI, I2C, NVIC, SysTick, TIM. Mappings mémoire, bits clés, et séquences d'initialisation type. Références basées sur la famille STM32F4 (Cortex-M4).</p>
+
+  <!-- ── MEMORY MAP ── -->
+  <h2 class="h-blue">Carte mémoire STM32F4</h2>
+  <p>Tous les périphériques sont mappés à des adresses fixes. Le header CMSIS définit les pointeurs (<code>RCC</code>, <code>GPIOA</code>, <code>USART1</code>...) qui pointent directement vers ces zones.</p>
+
+  <div class="diagram d-blue">
+    <div class="diagram-title">// memory_map — adresses de base STM32F4</div>
+    <table class="t-data">
+      <tr><th>Adresse</th><th>Bus</th><th>Périphérique</th></tr>
+      <tr><td class="acc">0xE000E000</td><td>Cortex-M</td><td>NVIC, SysTick, SCB (Cortex-M Core)</td></tr>
+      <tr><td class="acc2">0x40023800</td><td>AHB1</td><td>RCC — Reset &amp; Clock Control</td></tr>
+      <tr><td class="acc2">0x40023C00</td><td>AHB1</td><td>FLASH interface (latence, prefetch)</td></tr>
+      <tr><td class="acc3">0x40020000</td><td>AHB1</td><td>GPIOA</td></tr>
+      <tr><td class="acc3">0x40020400</td><td>AHB1</td><td>GPIOB</td></tr>
+      <tr><td class="acc3">0x40020800</td><td>AHB1</td><td>GPIOC</td></tr>
+      <tr><td class="acc4">0x40026000</td><td>AHB1</td><td>DMA1</td></tr>
+      <tr><td class="acc4">0x40026400</td><td>AHB1</td><td>DMA2</td></tr>
+      <tr><td class="acc5">0x40011000</td><td>APB2</td><td>USART1</td></tr>
+      <tr><td class="acc5">0x40004400</td><td>APB1</td><td>USART2</td></tr>
+      <tr><td class="acc">0x40013000</td><td>APB2</td><td>SPI1</td></tr>
+      <tr><td class="acc">0x40005400</td><td>APB1</td><td>I2C1</td></tr>
+      <tr><td class="dim">0x20000000</td><td>SRAM</td><td>RAM interne</td></tr>
+      <tr><td class="dim">0x08000000</td><td>Flash</td><td>Code firmware</td></tr>
+    </table>
+  </div>
+
+  <!-- ── RCC ── -->
+  <h2 class="h-red">RCC — Horloges</h2>
+  <p>Le RCC contrôle <strong>toutes les horloges</strong> de la puce. <em>Tout périphérique nécessite l'activation préalable de son horloge dans RCC, sinon les écritures dans ses registres sont ignorées silencieusement.</em></p>
+
+  <div class="reg-block">
+    <div class="reg-header">
+      <div class="reg-name">RCC_<span>AHB1ENR</span></div>
+      <div class="reg-addr">0x40023830 — AHB1 Peripheral Clock Enable</div>
+    </div>
+    <div class="reg-body">
+      <div class="reg-bits">
+        <div class="reg-bit"><b>31</b>res.</div>
+        <div class="reg-bit x4"><b>...</b>reserved [30:23]</div>
+        <div class="reg-bit on"><b>22</b>DMA2EN</div>
+        <div class="reg-bit on"><b>21</b>DMA1EN</div>
+        <div class="reg-bit"><b>...</b></div>
+        <div class="reg-bit purp"><b>3</b>GPIODEN</div>
+        <div class="reg-bit purp"><b>2</b>GPIOCEN</div>
+        <div class="reg-bit purp"><b>1</b>GPIOBEN</div>
+        <div class="reg-bit purp"><b>0</b>GPIOAEN</div>
+      </div>
+      <div class="reg-desc">Chaque bit active l'horloge d'un périphérique du bus AHB1. <code>RCC-&gt;AHB1ENR |= (1U &lt;&lt; 0)</code> active GPIOA.</div>
+    </div>
+  </div>
+
+  <div class="reg-block">
+    <div class="reg-header">
+      <div class="reg-name">RCC_<span>APB2ENR</span></div>
+      <div class="reg-addr">0x40023844 — APB2 (bus rapide)</div>
+    </div>
+    <div class="reg-body">
+      <div class="reg-bits">
+        <div class="reg-bit"><b>...</b></div>
+        <div class="reg-bit on"><b>14</b>SYSCFG</div>
+        <div class="reg-bit"><b>...</b></div>
+        <div class="reg-bit green"><b>12</b>SPI1EN</div>
+        <div class="reg-bit"><b>...</b></div>
+        <div class="reg-bit red"><b>5</b>USART6</div>
+        <div class="reg-bit red"><b>4</b>USART1EN</div>
+      </div>
+      <div class="reg-desc">Active USART1, SPI1, ADC1 et autres périphériques rapides. Pour USART2 (sur APB1) : voir <code>APB1ENR</code> bit 17.</div>
+    </div>
+  </div>
+
+  <div class="code-block cb-red">
+    <span class="code-label">C · rcc_init.c</span>
+    <pre><span class="cm">// Activer GPIOA, GPIOB, USART2 (sur APB1) et SPI1 (sur APB2)</span>
+RCC-&gt;AHB1ENR |= RCC_AHB1ENR_GPIOAEN | RCC_AHB1ENR_GPIOBEN;
+RCC-&gt;APB1ENR |= RCC_APB1ENR_USART2EN;
+RCC-&gt;APB2ENR |= RCC_APB2ENR_SPI1EN;
+
+<span class="cm">// PLL pour horloge système à 168 MHz (cas typique STM32F407)</span>
+<span class="cm">// PLL : HSE 8 MHz → /M=8 → x N=336 → /P=2 = 168 MHz</span>
+RCC-&gt;CR    |= RCC_CR_HSEON;
+<span class="kw">while</span> (!(RCC-&gt;CR &amp; RCC_CR_HSERDY));   <span class="cm">// attendre stabilisation HSE</span>
+
+RCC-&gt;PLLCFGR = (<span class="num">8</span> &lt;&lt; <span class="num">0</span>) | (<span class="num">336</span> &lt;&lt; <span class="num">6</span>) | (<span class="num">0</span> &lt;&lt; <span class="num">16</span>) | RCC_PLLCFGR_PLLSRC_HSE;
+RCC-&gt;CR    |= RCC_CR_PLLON;
+<span class="kw">while</span> (!(RCC-&gt;CR &amp; RCC_CR_PLLRDY));
+
+<span class="cm">// FLASH : 5 wait states à 168 MHz</span>
+FLASH-&gt;ACR = FLASH_ACR_PRFTEN | FLASH_ACR_ICEN | FLASH_ACR_DCEN | <span class="num">5</span>;
+
+RCC-&gt;CFGR |= RCC_CFGR_SW_PLL;  <span class="cm">// SYSCLK = PLL</span>
+<span class="kw">while</span> ((RCC-&gt;CFGR &amp; RCC_CFGR_SWS) != RCC_CFGR_SWS_PLL);</pre>
+  </div>
+
+  <!-- ── GPIO ── -->
+  <h2 class="h-green">GPIO — Entrées/Sorties</h2>
+  <p>Chaque port GPIO (A à K) a son propre bloc de registres identique. Configuration en deux temps : mode + caractéristiques électriques.</p>
+
+  <div class="reg-block">
+    <div class="reg-header">
+      <div class="reg-name">GPIOx_<span>MODER</span></div>
+      <div class="reg-addr">offset 0x00 — Mode register (2 bits/pin)</div>
+    </div>
+    <div class="reg-body">
+      <div class="reg-bits">
+        <div class="reg-bit x2"><b>[31:30]</b>MODER15</div>
+        <div class="reg-bit x2 red"><b>[29:28]</b>MODER14</div>
+        <div class="reg-bit x2 green"><b>[...]</b></div>
+        <div class="reg-bit x2 on"><b>[11:10]</b>MODER5</div>
+        <div class="reg-bit x2"><b>[...]</b></div>
+        <div class="reg-bit x2"><b>[1:0]</b>MODER0</div>
+      </div>
+      <div class="reg-desc">
+        <code>00</code> = Input · <code>01</code> = Output · <code>10</code> = Alternate Function (UART, SPI...) · <code>11</code> = Analog (ADC)
+      </div>
+    </div>
+  </div>
+
+  <div class="reg-block">
+    <div class="reg-header">
+      <div class="reg-name">GPIOx_<span>BSRR</span></div>
+      <div class="reg-addr">offset 0x18 — Bit Set/Reset Register (atomique)</div>
+    </div>
+    <div class="reg-body">
+      <div class="reg-bits">
+        <div class="reg-bit red x4"><b>[31:16]</b>BR — Reset bits</div>
+        <div class="reg-bit green x4"><b>[15:0]</b>BS — Set bits</div>
+      </div>
+      <div class="reg-desc">Écrire <code>1</code> dans BSn (bits 0-15) met la broche à 1. Écrire <code>1</code> dans BRn (bits 16-31) la met à 0. <strong>Opération atomique</strong> — pas de risque entre lecture et écriture vs ODR.</div>
+    </div>
+  </div>
+
+  <div class="code-block cb-green">
+    <span class="code-label">C · gpio_init.c — séquence complète</span>
+    <pre><span class="cm">// 1. Activer l'horloge GPIOA (cf. RCC ci-dessus)</span>
+<span class="cm">// 2. Configurer PA5 en sortie push-pull</span>
+GPIOA-&gt;MODER  &amp;= ~(<span class="num">0x3</span> &lt;&lt; (<span class="num">5</span> * <span class="num">2</span>));   <span class="cm">// effacer bits 11:10</span>
+GPIOA-&gt;MODER  |=  (<span class="num">0x1</span> &lt;&lt; (<span class="num">5</span> * <span class="num">2</span>));   <span class="cm">// 01 = output</span>
+
+GPIOA-&gt;OTYPER &amp;= ~(<span class="num">1</span> &lt;&lt; <span class="num">5</span>);            <span class="cm">// 0 = push-pull (1 = open-drain)</span>
+GPIOA-&gt;OSPEEDR |= (<span class="num">0x2</span> &lt;&lt; (<span class="num">5</span> * <span class="num">2</span>));   <span class="cm">// vitesse moyenne</span>
+GPIOA-&gt;PUPDR  &amp;= ~(<span class="num">0x3</span> &lt;&lt; (<span class="num">5</span> * <span class="num">2</span>));   <span class="cm">// pas de pull-up/down</span>
+
+<span class="cm">// Allumer / éteindre / toggle de manière atomique</span>
+GPIOA-&gt;BSRR = (<span class="num">1U</span> &lt;&lt; <span class="num">5</span>);          <span class="cm">// set PA5 à 1</span>
+GPIOA-&gt;BSRR = (<span class="num">1U</span> &lt;&lt; (<span class="num">5</span> + <span class="num">16</span>));     <span class="cm">// reset PA5 à 0</span>
+GPIOA-&gt;ODR  ^= (<span class="num">1U</span> &lt;&lt; <span class="num">5</span>);          <span class="cm">// toggle (non atomique !)</span></pre>
+  </div>
+
+  <!-- ── USART ── -->
+  <h2 class="h-purple">USART — Communication série</h2>
+
+  <div class="reg-block">
+    <div class="reg-header">
+      <div class="reg-name">USARTx_<span>CR1</span></div>
+      <div class="reg-addr">offset 0x0C — Control Register 1</div>
+    </div>
+    <div class="reg-body">
+      <div class="reg-bits">
+        <div class="reg-bit purp"><b>13</b>UE</div>
+        <div class="reg-bit"><b>12</b>M</div>
+        <div class="reg-bit"><b>10</b>PCE</div>
+        <div class="reg-bit"><b>9</b>PS</div>
+        <div class="reg-bit on"><b>8</b>PEIE</div>
+        <div class="reg-bit on"><b>7</b>TXEIE</div>
+        <div class="reg-bit green"><b>6</b>TCIE</div>
+        <div class="reg-bit on"><b>5</b>RXNEIE</div>
+        <div class="reg-bit green"><b>3</b>TE</div>
+        <div class="reg-bit green"><b>2</b>RE</div>
+      </div>
+      <div class="reg-desc">
+        <code>UE</code>=Enable UART · <code>TE</code>=Transmit Enable · <code>RE</code>=Receive Enable · <code>RXNEIE</code>=interruption sur octet reçu · <code>TXEIE</code>=interruption sur buffer TX vide
+      </div>
+    </div>
+  </div>
+
+  <div class="reg-block">
+    <div class="reg-header">
+      <div class="reg-name">USARTx_<span>BRR</span></div>
+      <div class="reg-addr">offset 0x08 — Baud Rate Register</div>
+    </div>
+    <div class="reg-body">
+      <div class="reg-bits">
+        <div class="reg-bit x4 on"><b>[15:4]</b>MANTISSA</div>
+        <div class="reg-bit x2 red"><b>[3:0]</b>FRACTION</div>
+      </div>
+      <div class="reg-desc">USARTDIV = f_PCLK / (8 × (2-OVER8) × baud). Pour 115200 bauds à PCLK=42MHz : BRR = 0x16C.</div>
+    </div>
+  </div>
+
+  <div class="code-block cb-purple">
+    <span class="code-label">C · usart_init.c</span>
+    <pre><span class="cm">// Configuration USART2 à 115200 bauds, 8N1, sur PA2/PA3</span>
+<span class="cm">// 1. Configurer PA2 (TX) et PA3 (RX) en Alternate Function 7</span>
+GPIOA-&gt;MODER  |= (<span class="num">0x2</span> &lt;&lt; <span class="num">4</span>) | (<span class="num">0x2</span> &lt;&lt; <span class="num">6</span>);  <span class="cm">// 10 = AF</span>
+GPIOA-&gt;AFR[<span class="num">0</span>] |= (<span class="num">7</span> &lt;&lt; <span class="num">8</span>) | (<span class="num">7</span> &lt;&lt; <span class="num">12</span>);   <span class="cm">// AF7 = USART2</span>
+
+<span class="cm">// 2. Baud rate</span>
+USART2-&gt;BRR = <span class="num">0x16C</span>;  <span class="cm">// 115200 @ PCLK1=42MHz</span>
+
+<span class="cm">// 3. Activer TX, RX, UART + interruption RX</span>
+USART2-&gt;CR1 = USART_CR1_UE | USART_CR1_TE | USART_CR1_RE | USART_CR1_RXNEIE;
+
+<span class="cm">// 4. Envoi d'un octet bloquant</span>
+<span class="kw">while</span> (!(USART2-&gt;SR &amp; USART_SR_TXE));  <span class="cm">// attendre buffer TX vide</span>
+USART2-&gt;DR = <span class="str">'A'</span>;
+
+<span class="cm">// 5. ISR — déclenchée par NVIC sur réception</span>
+<span class="kw">void</span> <span class="fn">USART2_IRQHandler</span>(<span class="kw">void</span>) {
+    <span class="kw">if</span> (USART2-&gt;SR &amp; USART_SR_RXNE) {
+        <span class="kw">uint8_t</span> b = USART2-&gt;DR;     <span class="cm">// lecture acquitte le flag</span>
+        ring_push(&amp;rx_buf, b);
+    }
+}</pre>
+  </div>
+
+  <!-- ── NVIC ── -->
+  <h2 class="h-yellow">NVIC — Interruptions</h2>
+  <p>Le NVIC est le contrôleur d'interruptions intégré au Cortex-M. Chaque IRQ a un numéro fixe (IRQn) et une priorité configurable (0 = plus haute).</p>
+
+  <div class="code-block cb-yellow">
+    <span class="code-label">C · nvic_setup.c</span>
+    <pre><span class="cm">// Activer l'IRQ USART2 dans le NVIC</span>
+<span class="fn">NVIC_SetPriority</span>(USART2_IRQn, <span class="num">5</span>);  <span class="cm">// 0..15, 0 = max</span>
+<span class="fn">NVIC_EnableIRQ</span>(USART2_IRQn);
+
+<span class="cm">// Configurer les groupes de priorité (preemption / sub)</span>
+<span class="fn">NVIC_SetPriorityGrouping</span>(<span class="num">3</span>);  <span class="cm">// 4 bits preempt, 0 bits sub</span>
+
+<span class="cm">// IRQn typiques (CMSIS) :</span>
+<span class="cm">//   SysTick_IRQn = -1   (Cortex-M core)</span>
+<span class="cm">//   EXTI0_IRQn   = 6    (GPIO externe ligne 0)</span>
+<span class="cm">//   USART2_IRQn  = 38   (USART2)</span>
+<span class="cm">//   TIM2_IRQn    = 28   (Timer 2)</span></pre>
+  </div>
+
+  <div class="warn">
+    <div class="warn-label">⚠ priorité NVIC vs FreeRTOS</div>
+    <p>Sur FreeRTOS, seules les IRQ de priorité ≥ <code>configMAX_SYSCALL_INTERRUPT_PRIORITY</code> peuvent appeler les API <code>...FromISR</code>. Une IRQ trop prioritaire qui appelle <code>xQueueSendFromISR</code> = comportement indéfini.</p>
+  </div>
+
+  <!-- ── SYSTICK ── -->
+  <h2 class="h-blue">SysTick — Tick système</h2>
+
+  <div class="code-block cb-blue">
+    <span class="code-label">C · systick_init.c</span>
+    <pre><span class="cm">// Timer 24 bits intégré au Cortex-M — base de temps universelle</span>
+<span class="kw">void</span> <span class="fn">SysTick_Init_1ms</span>(<span class="kw">void</span>) {
+    <span class="cm">// SystemCoreClock = 168 000 000 (Hz) → 168 000 cycles = 1 ms</span>
+    SysTick-&gt;LOAD = (SystemCoreClock / <span class="num">1000U</span>) - <span class="num">1U</span>;
+    SysTick-&gt;VAL  = <span class="num">0</span>;
+    SysTick-&gt;CTRL = SysTick_CTRL_CLKSOURCE_Msk    <span class="cm">// horloge CPU directe</span>
+                  | SysTick_CTRL_TICKINT_Msk     <span class="cm">// IRQ activée</span>
+                  | SysTick_CTRL_ENABLE_Msk;     <span class="cm">// démarrer</span>
+}
+
+<span class="kw">volatile uint32_t</span> ms_count = <span class="num">0</span>;
+
+<span class="kw">void</span> <span class="fn">SysTick_Handler</span>(<span class="kw">void</span>) {
+    ms_count++;     <span class="cm">// appelé toutes les 1 ms — base de temps globale</span>
+}</pre>
+  </div>
+
+  <!-- ── TIM ── -->
+  <h2 class="h-red">TIM — Timers généraux</h2>
+  <p>Les timers STM32 sont extrêmement flexibles : génération PWM, capture d'événements, base de temps précise, IRQ périodique.</p>
+
+  <div class="code-block cb-red">
+    <span class="code-label">C · tim_pwm.c — PWM 1 kHz sur TIM2_CH1 (PA0)</span>
+    <pre><span class="cm">// Activer l'horloge timer</span>
+RCC-&gt;APB1ENR |= RCC_APB1ENR_TIM2EN;
+
+<span class="cm">// Configurer PA0 en AF1 = TIM2_CH1</span>
+GPIOA-&gt;MODER  |= (<span class="num">0x2</span> &lt;&lt; <span class="num">0</span>);
+GPIOA-&gt;AFR[<span class="num">0</span>] |= (<span class="num">1</span> &lt;&lt; <span class="num">0</span>);
+
+<span class="cm">// Diviseur d'horloge : 84MHz → 84 kHz tick interne</span>
+TIM2-&gt;PSC = <span class="num">84</span> - <span class="num">1</span>;
+<span class="cm">// Period = 84 → fréquence PWM = 84kHz / 84 = 1 kHz</span>
+TIM2-&gt;ARR = <span class="num">84</span> - <span class="num">1</span>;
+
+<span class="cm">// Rapport cyclique 50%</span>
+TIM2-&gt;CCR1 = <span class="num">42</span>;
+
+<span class="cm">// Mode PWM 1 sur Channel 1</span>
+TIM2-&gt;CCMR1 = (<span class="num">6</span> &lt;&lt; <span class="num">4</span>) | TIM_CCMR1_OC1PE;  <span class="cm">// PWM mode 1 + preload</span>
+TIM2-&gt;CCER  = TIM_CCER_CC1E;                  <span class="cm">// activer sortie</span>
+TIM2-&gt;CR1   = TIM_CR1_CEN;                    <span class="cm">// démarrer</span></pre>
+  </div>
+
+  <!-- ── SPI/I2C QUICK REF ── -->
+  <h2 class="h-purple">SPI &amp; I2C — Référence rapide</h2>
+  <div class="concept-grid">
+    <div class="concept-card">
+      <div class="concept-label">SPI_CR1 — bits clés</div>
+      <div class="concept-val">
+        <code>MSTR</code> mode maître · <code>BR[2:0]</code> diviseur d'horloge · <code>CPOL/CPHA</code> mode (0–3) · <code>SSI/SSM</code> NSS software · <code>SPE</code> enable
+      </div>
+    </div>
+    <div class="concept-card">
+      <div class="concept-label">SPI_SR — flags status</div>
+      <div class="concept-val">
+        <code>TXE</code> buffer TX vide · <code>RXNE</code> octet reçu · <code>BSY</code> transfert en cours · <code>OVR</code> overrun
+      </div>
+    </div>
+    <div class="concept-card">
+      <div class="concept-label">I2C_CR1 — bits clés</div>
+      <div class="concept-val">
+        <code>PE</code> Peripheral Enable · <code>START</code> condition START · <code>STOP</code> condition STOP · <code>ACK</code> acquittement · <code>SWRST</code> reset logiciel
+      </div>
+    </div>
+    <div class="concept-card">
+      <div class="concept-label">I2C_SR1 / SR2</div>
+      <div class="concept-val">
+        <code>SB</code> Start bit envoyé · <code>ADDR</code> adresse envoyée · <code>BTF</code> octet transféré · <code>RXNE/TXE</code> · <code>AF</code> NACK · <code>MSL</code> master mode
+      </div>
+    </div>
+  </div>
+
+  <div class="callout">
+    <div class="callout-label">// règle générale STM32</div>
+    <p>
+      <strong>Toujours dans cet ordre :</strong> 1) activer l'horloge RCC du périphérique, 2) configurer les GPIO en mode Alternate Function (AFR), 3) configurer le périphérique (CR/BRR/etc.), 4) activer enfin via le bit Enable. <strong>Sauter une étape = silence radio garanti.</strong>
+    </p>
+  </div>
+
+</div>
+
+<footer class="page-footer">
+  <div class="pf-left">Elie SASPORTES · 2026</div>
+  <div class="pf-nav">
+    <a href="article-gpio.html">← GPIO bare-metal</a>
+    <a href="article-protocols.html">Protocoles →</a>
+  </div>
+</footer>
+
+</body>
+</html>

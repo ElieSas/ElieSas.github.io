@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Linux Embarqué — Commandes &amp; Filesystem — Elie SASPORTES</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500&family=Bebas+Neue&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="article-style.css">
+<style>
+  .cmd-list { display: grid; grid-template-columns: 1fr; gap: 2px; margin: 20px 0; }
+  .cmd-row { display: grid; grid-template-columns: 220px 1fr; background: var(--surface); border: 1px solid var(--border); }
+  .cmd-row.blue   { border-left: 2px solid var(--accent); }
+  .cmd-row.red    { border-left: 2px solid var(--accent2); }
+  .cmd-row.green  { border-left: 2px solid var(--accent3); }
+  .cmd-row.purple { border-left: 2px solid var(--accent4); }
+  .cmd-row.yellow { border-left: 2px solid var(--accent5); }
+  .cmd-name { font-family: 'Space Mono', monospace; font-size: 11px; padding: 12px 16px; border-right: 1px solid var(--border); display: flex; align-items: center; }
+  .cmd-row.blue   .cmd-name { color: var(--accent); }
+  .cmd-row.red    .cmd-name { color: var(--accent2); }
+  .cmd-row.green  .cmd-name { color: var(--accent3); }
+  .cmd-row.purple .cmd-name { color: var(--accent4); }
+  .cmd-row.yellow .cmd-name { color: var(--accent5); }
+  .cmd-desc { padding: 12px 18px; font-size: 13px; color: var(--text-muted); line-height: 1.55; }
+  .cmd-desc code { font-family: 'Space Mono', monospace; font-size: 11px; color: var(--text); background: var(--bg3); padding: 1px 5px; }
+
+  /* FS TREE */
+  .fs-tree { background: var(--bg3); border: 1px solid var(--border); padding: 24px; font-family: 'Space Mono', monospace; font-size: 12px; line-height: 2; margin: 20px 0; overflow-x: auto; }
+  .fs-line { display: flex; gap: 12px; align-items: baseline; }
+  .fs-path { color: var(--accent); min-width: 110px; flex-shrink: 0; font-weight: 700; }
+  .fs-path.red    { color: var(--accent2); }
+  .fs-path.green  { color: var(--accent3); }
+  .fs-path.purple { color: var(--accent4); }
+  .fs-path.yellow { color: var(--accent5); }
+  .fs-path.dim    { color: var(--text-dim); }
+  .fs-desc { color: var(--text-muted); font-size: 11px; }
+</style>
+</head>
+<body>
+<nav>
+  <a href="index.html" class="nav-logo">ES · Ressources</a>
+  <a href="index.html#resources" class="nav-back">← Retour aux ressources</a>
+</nav>
+<div class="article-wrap">
+  <div class="article-meta">
+    <span class="meta-tag mt-yellow">Linux Embarqué</span>
+    <span class="meta-tag mt-blue">Cheatsheet</span>
+    <span class="meta-info">Référence terrain · Aide-mémoire</span>
+  </div>
+  <h1>Linux Embarqué —<br>Commandes &amp; <em class="yellow">Filesystem</em></h1>
+  <p class="subtitle">Les commandes Linux indispensables pour l'embarqué et l'arborescence du filesystem POSIX — tout ce qu'on lance quotidiennement sur une cible Raspberry Pi, STM32MP1 ou un BSP Yocto.</p>
+
+  <!-- ── FILESYSTEM TREE ── -->
+  <h2 class="h-yellow">Arborescence du filesystem Linux</h2>
+  <p>Le filesystem Linux suit la norme <strong>FHS (Filesystem Hierarchy Standard)</strong>. Connaître les répertoires clés est indispensable pour naviguer, debugger et déployer sur une cible embarquée.</p>
+
+  <div class="fs-tree">
+<div class="fs-line"><span class="fs-path">/</span><span class="fs-desc">racine du système — point d'entrée de toute l'arborescence</span></div>
+<div class="fs-line"><span class="fs-path green">/bin</span><span class="fs-desc">exécutables essentiels (ls, cp, mv, cat...) accessibles à tous</span></div>
+<div class="fs-line"><span class="fs-path green">/sbin</span><span class="fs-desc">exécutables système réservés à root (mount, ifconfig, init)</span></div>
+<div class="fs-line"><span class="fs-path green">/usr/bin</span><span class="fs-desc">applications utilisateur non essentielles au boot</span></div>
+<div class="fs-line"><span class="fs-path green">/usr/sbin</span><span class="fs-desc">outils admin non essentiels au boot</span></div>
+<div class="fs-line"><span class="fs-path green">/usr/lib</span><span class="fs-desc">bibliothèques partagées (.so) pour /usr/bin et /usr/sbin</span></div>
+<div class="fs-line"><span class="fs-path purple">/etc</span><span class="fs-desc">fichiers de configuration système (fstab, hostname, network)</span></div>
+<div class="fs-line"><span class="fs-path purple">/etc/init.d/</span><span class="fs-desc">scripts SysV de démarrage des services (legacy)</span></div>
+<div class="fs-line"><span class="fs-path purple">/etc/systemd/</span><span class="fs-desc">configuration systemd (services, units, targets)</span></div>
+<div class="fs-line"><span class="fs-path red">/dev</span><span class="fs-desc">fichiers de périphériques — c'est ici qu'apparaissent vos drivers !</span></div>
+<div class="fs-line"><span class="fs-path red">/dev/ttyS0</span><span class="fs-desc">port série UART (souvent la console debug)</span></div>
+<div class="fs-line"><span class="fs-path red">/dev/i2c-1</span><span class="fs-desc">bus I2C numéro 1, accessible via ioctl</span></div>
+<div class="fs-line"><span class="fs-path red">/dev/spidev0.0</span><span class="fs-desc">bus SPI 0 chip-select 0</span></div>
+<div class="fs-line"><span class="fs-path red">/dev/mtd0</span><span class="fs-desc">partition Flash NOR/NAND brute</span></div>
+<div class="fs-line"><span class="fs-path yellow">/proc</span><span class="fs-desc">filesystem virtuel — état du kernel et des processus en lecture</span></div>
+<div class="fs-line"><span class="fs-path yellow">/proc/cpuinfo</span><span class="fs-desc">infos CPU (modèle, cœurs, features)</span></div>
+<div class="fs-line"><span class="fs-path yellow">/proc/meminfo</span><span class="fs-desc">état détaillé de la RAM</span></div>
+<div class="fs-line"><span class="fs-path yellow">/proc/devices</span><span class="fs-desc">drivers chargés et leurs numéros majeurs</span></div>
+<div class="fs-line"><span class="fs-path yellow">/proc/interrupts</span><span class="fs-desc">compteur d'IRQ par CPU et par périphérique</span></div>
+<div class="fs-line"><span class="fs-path yellow">/proc/kmsg</span><span class="fs-desc">flux des messages kernel (dmesg lit ici)</span></div>
+<div class="fs-line"><span class="fs-path">/sys</span><span class="fs-desc">filesystem virtuel — interface kernel ↔ userspace pour drivers</span></div>
+<div class="fs-line"><span class="fs-path">/sys/class/gpio</span><span class="fs-desc">contrôle des GPIO depuis userspace (legacy)</span></div>
+<div class="fs-line"><span class="fs-path">/sys/bus/i2c/devices</span><span class="fs-desc">périphériques I2C détectés et leurs attributs sysfs</span></div>
+<div class="fs-line"><span class="fs-path">/sys/firmware/devicetree</span><span class="fs-desc">device tree actif vu par le kernel</span></div>
+<div class="fs-line"><span class="fs-path blue">/lib</span><span class="fs-desc">bibliothèques partagées essentielles au boot (libc.so, ld-linux)</span></div>
+<div class="fs-line"><span class="fs-path blue">/lib/modules</span><span class="fs-desc">modules kernel chargeables (.ko), un dossier par version kernel</span></div>
+<div class="fs-line"><span class="fs-path blue">/lib/firmware</span><span class="fs-desc">firmwares chargés à la volée par les drivers (WiFi, GPU...)</span></div>
+<div class="fs-line"><span class="fs-path">/boot</span><span class="fs-desc">bootloader, image kernel (zImage), device tree binary (.dtb)</span></div>
+<div class="fs-line"><span class="fs-path">/home</span><span class="fs-desc">répertoires personnels des utilisateurs (rarement utilisé en embarqué)</span></div>
+<div class="fs-line"><span class="fs-path">/root</span><span class="fs-desc">home de l'utilisateur root</span></div>
+<div class="fs-line"><span class="fs-path dim">/tmp</span><span class="fs-desc">fichiers temporaires (souvent en RAM via tmpfs)</span></div>
+<div class="fs-line"><span class="fs-path dim">/var</span><span class="fs-desc">données variables (logs, caches, spools)</span></div>
+<div class="fs-line"><span class="fs-path dim">/var/log</span><span class="fs-desc">tous les logs système (messages, syslog, journal)</span></div>
+<div class="fs-line"><span class="fs-path dim">/mnt</span><span class="fs-desc">points de montage temporaires (USB, SD externes)</span></div>
+<div class="fs-line"><span class="fs-path dim">/opt</span><span class="fs-desc">applications tierces installées hors du gestionnaire de paquets</span></div>
+  </div>
+
+  <!-- ── BASIC COMMANDS ── -->
+  <h2 class="h-blue">Navigation &amp; Fichiers</h2>
+  <div class="cmd-list">
+    <div class="cmd-row blue"><div class="cmd-name">ls -la</div><div class="cmd-desc">Liste détaillée (permissions, propriétaire, taille, date) — l'option <code>-h</code> ajoute des tailles lisibles.</div></div>
+    <div class="cmd-row blue"><div class="cmd-name">cd /chemin</div><div class="cmd-desc">Change de répertoire. <code>cd -</code> revient au précédent, <code>cd ~</code> retourne au home.</div></div>
+    <div class="cmd-row blue"><div class="cmd-name">pwd</div><div class="cmd-desc">Affiche le répertoire courant en chemin absolu.</div></div>
+    <div class="cmd-row blue"><div class="cmd-name">find / -name "*.ko"</div><div class="cmd-desc">Recherche récursive — ici tous les modules kernel sur le système.</div></div>
+    <div class="cmd-row blue"><div class="cmd-name">grep -r "term" /etc</div><div class="cmd-desc">Recherche récursive dans le contenu des fichiers. <code>-i</code> insensible à la casse, <code>-n</code> avec numéro de ligne.</div></div>
+    <div class="cmd-row blue"><div class="cmd-name">cat /proc/cpuinfo</div><div class="cmd-desc">Affiche le contenu d'un fichier — indispensable pour les fichiers virtuels de /proc et /sys.</div></div>
+    <div class="cmd-row blue"><div class="cmd-name">tail -f /var/log/messages</div><div class="cmd-desc">Suit en temps réel la fin d'un fichier — idéal pour observer des logs qui s'écrivent.</div></div>
+    <div class="cmd-row blue"><div class="cmd-name">df -h</div><div class="cmd-desc">Espace disque libre par filesystem monté, lisible (-h).</div></div>
+    <div class="cmd-row blue"><div class="cmd-name">du -sh *</div><div class="cmd-desc">Taille des fichiers/dossiers du répertoire courant.</div></div>
+  </div>
+
+  <!-- ── KERNEL & MODULES ── -->
+  <h2 class="h-red">Kernel &amp; Modules</h2>
+  <div class="cmd-list">
+    <div class="cmd-row red"><div class="cmd-name">uname -a</div><div class="cmd-desc">Toutes les infos kernel : version, architecture, hostname.</div></div>
+    <div class="cmd-row red"><div class="cmd-name">dmesg</div><div class="cmd-desc">Affiche le ring buffer kernel — tous les <code>printk</code> et messages drivers depuis le boot.</div></div>
+    <div class="cmd-row red"><div class="cmd-name">dmesg -w</div><div class="cmd-desc">Suit dmesg en temps réel — précieux pour debugger un driver qui s'enregistre.</div></div>
+    <div class="cmd-row red"><div class="cmd-name">dmesg -c</div><div class="cmd-desc">Affiche puis vide le ring buffer — utile avant d'insérer un module.</div></div>
+    <div class="cmd-row red"><div class="cmd-name">lsmod</div><div class="cmd-desc">Liste tous les modules kernel chargés avec leur taille et dépendances.</div></div>
+    <div class="cmd-row red"><div class="cmd-name">insmod module.ko</div><div class="cmd-desc">Charge un module kernel (.ko) dans le kernel courant. Nécessite root.</div></div>
+    <div class="cmd-row red"><div class="cmd-name">rmmod module</div><div class="cmd-desc">Décharge un module kernel (sans l'extension .ko). Échoue s'il est utilisé.</div></div>
+    <div class="cmd-row red"><div class="cmd-name">modprobe wifi</div><div class="cmd-desc">Charge un module et toutes ses dépendances automatiquement (preferred over insmod).</div></div>
+    <div class="cmd-row red"><div class="cmd-name">modinfo module.ko</div><div class="cmd-desc">Affiche les métadonnées d'un module : auteur, licence, paramètres, dépendances.</div></div>
+    <div class="cmd-row red"><div class="cmd-name">cat /proc/devices</div><div class="cmd-desc">Liste les drivers chargés et leur numéro majeur — indispensable avant <code>mknod</code>.</div></div>
+  </div>
+
+  <!-- ── PROCESSUS ── -->
+  <h2 class="h-green">Processus &amp; Ressources</h2>
+  <div class="cmd-list">
+    <div class="cmd-row green"><div class="cmd-name">ps aux</div><div class="cmd-desc">Liste tous les processus avec PID, CPU%, mémoire, commande.</div></div>
+    <div class="cmd-row green"><div class="cmd-name">top</div><div class="cmd-desc">Moniteur interactif temps-réel des processus et ressources. <code>htop</code> en version améliorée.</div></div>
+    <div class="cmd-row green"><div class="cmd-name">kill -9 PID</div><div class="cmd-desc">Tue un processus brutalement (SIGKILL). Préférer <code>kill -15</code> (SIGTERM) si possible.</div></div>
+    <div class="cmd-row green"><div class="cmd-name">pgrep / pkill</div><div class="cmd-desc">Trouve / tue par nom de processus. <code>pkill firefox</code> tue tous les firefox.</div></div>
+    <div class="cmd-row green"><div class="cmd-name">free -h</div><div class="cmd-desc">Mémoire RAM et swap utilisées/libres en format lisible.</div></div>
+    <div class="cmd-row green"><div class="cmd-name">uptime</div><div class="cmd-desc">Temps depuis le boot et load average (charge moyenne 1/5/15 min).</div></div>
+    <div class="cmd-row green"><div class="cmd-name">strace -p PID</div><div class="cmd-desc">Trace tous les syscalls d'un processus. Indispensable pour debugger sans source.</div></div>
+    <div class="cmd-row green"><div class="cmd-name">lsof -i :8080</div><div class="cmd-desc">Quel processus écoute sur le port 8080 ? Aussi pour les fichiers ouverts.</div></div>
+  </div>
+
+  <!-- ── RÉSEAU ── -->
+  <h2 class="h-purple">Réseau</h2>
+  <div class="cmd-list">
+    <div class="cmd-row purple"><div class="cmd-name">ip a</div><div class="cmd-desc">Interfaces réseau et adresses IP (remplace l'ancien <code>ifconfig</code>).</div></div>
+    <div class="cmd-row purple"><div class="cmd-name">ip r</div><div class="cmd-desc">Table de routage IP.</div></div>
+    <div class="cmd-row purple"><div class="cmd-name">ping -c 4 8.8.8.8</div><div class="cmd-desc">Teste la connectivité avec un hôte. <code>-c</code> limite le nombre de paquets.</div></div>
+    <div class="cmd-row purple"><div class="cmd-name">ss -tunlp</div><div class="cmd-desc">Sockets TCP/UDP en écoute, processus associés (remplace <code>netstat</code>).</div></div>
+    <div class="cmd-row purple"><div class="cmd-name">nmap -p 1-1000 IP</div><div class="cmd-desc">Scan de ports d'un hôte distant. Utile pour debug serveur embarqué.</div></div>
+    <div class="cmd-row purple"><div class="cmd-name">curl -v http://IP/api</div><div class="cmd-desc">Requête HTTP verbeuse — pour tester un serveur REST embarqué.</div></div>
+    <div class="cmd-row purple"><div class="cmd-name">wget URL</div><div class="cmd-desc">Télécharge un fichier en ligne de commande.</div></div>
+    <div class="cmd-row purple"><div class="cmd-name">scp file user@IP:/path</div><div class="cmd-desc">Copie sécurisée vers/depuis une cible SSH — pour déployer un binaire.</div></div>
+  </div>
+
+  <!-- ── PERMISSIONS ── -->
+  <h2 class="h-yellow">Permissions &amp; Sécurité</h2>
+  <div class="cmd-list">
+    <div class="cmd-row yellow"><div class="cmd-name">chmod 755 file</div><div class="cmd-desc">Permissions : 7=rwx propriétaire, 5=r-x groupe, 5=r-x autres. <code>+x</code> ajoute exécution.</div></div>
+    <div class="cmd-row yellow"><div class="cmd-name">chown user:group file</div><div class="cmd-desc">Change le propriétaire et le groupe d'un fichier.</div></div>
+    <div class="cmd-row yellow"><div class="cmd-name">sudo command</div><div class="cmd-desc">Exécute en tant que root. Configuration dans <code>/etc/sudoers</code>.</div></div>
+    <div class="cmd-row yellow"><div class="cmd-name">su -</div><div class="cmd-desc">Devient root avec environnement complet. Préférer sudo en pratique.</div></div>
+    <div class="cmd-row yellow"><div class="cmd-name">passwd</div><div class="cmd-desc">Change le mot de passe de l'utilisateur courant. <code>passwd user</code> pour un autre user (root only).</div></div>
+    <div class="cmd-row yellow"><div class="cmd-name">ls -l /dev/i2c-1</div><div class="cmd-desc">Vérifie les permissions d'un device. Sortie typique : <code>crw-rw---- root i2c</code>.</div></div>
+  </div>
+
+  <!-- ── EMBARQUÉ SPÉCIFIQUE ── -->
+  <h2 class="h-red">Spécifique Embarqué</h2>
+  <div class="cmd-list">
+    <div class="cmd-row red"><div class="cmd-name">i2cdetect -y 1</div><div class="cmd-desc">Scan du bus I2C-1 — affiche les adresses des périphériques détectés.</div></div>
+    <div class="cmd-row red"><div class="cmd-name">i2cget -y 1 0x48 0x00</div><div class="cmd-desc">Lit un registre I2C. Bus 1, adresse 0x48, registre 0x00.</div></div>
+    <div class="cmd-row red"><div class="cmd-name">i2cset -y 1 0x48 0x01 0xFF</div><div class="cmd-desc">Écrit dans un registre I2C. À utiliser avec précaution sur du matériel actif.</div></div>
+    <div class="cmd-row red"><div class="cmd-name">spi-tools / spidev_test</div><div class="cmd-desc">Outils pour tester un bus SPI depuis userspace.</div></div>
+    <div class="cmd-row red"><div class="cmd-name">stty -F /dev/ttyS0 115200</div><div class="cmd-desc">Configure un port série (baudrate, parité, stop bits).</div></div>
+    <div class="cmd-row red"><div class="cmd-name">minicom -D /dev/ttyUSB0</div><div class="cmd-desc">Terminal série interactif. Alternative : <code>screen</code>, <code>picocom</code>, <code>tio</code>.</div></div>
+    <div class="cmd-row red"><div class="cmd-name">mount -t devtmpfs /dev /dev</div><div class="cmd-desc">Monte le filesystem devtmpfs. Pour un rootfs minimal Buildroot/Yocto.</div></div>
+    <div class="cmd-row red"><div class="cmd-name">mknod /dev/hello c 240 0</div><div class="cmd-desc">Crée manuellement un fichier device. <code>c</code> = character, 240 = major, 0 = minor.</div></div>
+    <div class="cmd-row red"><div class="cmd-name">fdtdump arch/.../dtb</div><div class="cmd-desc">Décompile un Device Tree Blob (.dtb) en format lisible.</div></div>
+    <div class="cmd-row red"><div class="cmd-name">devmem 0x40020000</div><div class="cmd-desc">Lit/écrit directement à une adresse physique. Pour debug bas niveau.</div></div>
+  </div>
+
+  <div class="callout">
+    <div class="callout-label">// astuces de productivité</div>
+    <p>
+      <strong>!!</strong> rejoue la dernière commande — <code>sudo !!</code> en root<br>
+      <strong>Ctrl+R</strong> recherche dans l'historique<br>
+      <strong>|</strong> chaîne des commandes : <code>dmesg | grep i2c | tail -5</code><br>
+      <strong>&gt;</strong> et <strong>&gt;&gt;</strong> redirigent vers fichier (écrase / ajoute)<br>
+      <strong>&amp;</strong> en fin de commande la lance en arrière-plan<br>
+      <strong>nohup cmd &amp;</strong> survit à la déconnexion SSH
+    </p>
+  </div>
+
+</div>
+
+<footer class="page-footer">
+  <div class="pf-left">Elie SASPORTES · 2026</div>
+  <div class="pf-nav">
+    <a href="article-linux-driver.html">← Drivers Linux</a>
+    <a href="index.html#resources">Toutes les ressources</a>
+  </div>
+</footer>
+
+</body>
+</html>
