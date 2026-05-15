@@ -122,6 +122,10 @@
   ::-webkit-scrollbar-thumb{background:var(--border-bright)}
 
   @media(max-width:640px){.article-wrap{padding:88px 20px 48px}.concept-grid{grid-template-columns:1fr}nav{padding:0 20px}}
+  .art-lang-switcher{display:flex;gap:4px;align-items:center}
+  .art-lang-btn{font-family:'Space Mono',monospace;font-size:10px;padding:4px 8px;background:transparent;border:1px solid var(--border);color:var(--text-dim);cursor:pointer;letter-spacing:.08em;transition:all .2s}
+  .art-lang-btn:hover{border-color:var(--accent);color:var(--accent)}
+  .art-lang-btn.active{border-color:var(--accent);color:var(--accent);background:rgba(0,212,255,0.08)}
 </style>
 </head>
 <body>
@@ -362,10 +366,11 @@ GPIO_Config_t led = {
 <footer style="max-width:860px;margin:0 auto;padding:32px 48px;border-top:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;position:relative;z-index:1">
   <div style="font-family:'Space Mono',monospace;font-size:11px;color:var(--text-dim)">Elie SASPORTES · 2026</div>
   <div style="display:flex;gap:24px">
-    <a href="article-architecture.html" style="font-family:'Space Mono',monospace;font-size:10px;color:var(--text-dim);text-decoration:none;letter-spacing:0.08em;text-transform:uppercase;transition:color 0.2s" onmouseover="this.style.color='var(--accent)'" onmouseout="this.style.color='var(--text-dim)'">Article suivant →</a>
-    <a href="index.html" style="font-family:'Space Mono',monospace;font-size:10px;color:var(--text-dim);text-decoration:none;letter-spacing:0.08em;text-transform:uppercase;transition:color 0.2s" onmouseover="this.style.color='var(--accent)'" onmouseout="this.style.color='var(--text-dim)'">Accueil</a>
+    <a href="index.html#resources" style="font-family:'Space Mono',monospace;font-size:10px;color:var(--text-dim);text-decoration:none;letter-spacing:0.08em;text-transform:uppercase;transition:color 0.2s" onmouseover="this.style.color='var(--accent)'" onmouseout="this.style.color='var(--text-dim)'">Ressources</a>
+    <a href="article-architecture.html" style="font-family:'Space Mono',monospace;font-size:10px;color:var(--text-dim);text-decoration:none;letter-spacing:0.08em;text-transform:uppercase;transition:color 0.2s" onmouseover="this.style.color='var(--accent)'" onmouseout="this.style.color='var(--text-dim)'">Architecture →</a>
   </div>
 </footer>
 
+<script src="article-lang.js"></script>
 </body>
 </html>

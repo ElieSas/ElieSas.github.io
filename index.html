@@ -169,11 +169,7 @@
   .res-arrow { color: var(--text-dim); transition: all 0.2s; font-size: 18px; flex-shrink: 0; align-self: center; }
   .sidebar-widget { background: var(--surface); border: 1px solid var(--border); padding: 28px; margin-bottom: 16px; }
   .widget-title { font-family: 'Space Mono', monospace; font-size: 10px; color: var(--text-dim); letter-spacing: 0.15em; text-transform: uppercase; margin-bottom: 20px; padding-bottom: 12px; border-bottom: 1px solid var(--border); }
-  .newsletter-input { width: 100%; background: var(--bg); border: 1px solid var(--border); color: var(--text); padding: 10px 14px; font-family: 'Space Mono', monospace; font-size: 11px; margin-bottom: 8px; outline: none; transition: border-color 0.2s; }
-  .newsletter-input:focus { border-color: var(--accent); }
-  .newsletter-input::placeholder { color: var(--text-dim); }
-  .btn-full { width: 100%; font-family: 'Space Mono', monospace; font-size: 11px; color: var(--bg); background: var(--accent); padding: 10px; border: none; cursor: pointer; letter-spacing: 0.1em; text-transform: uppercase; transition: all 0.2s; }
-  .btn-full:hover { background: #fff; }
+
   .topic-list { display: flex; flex-wrap: wrap; gap: 6px; }
 
   /* CONTACT */
@@ -273,7 +269,7 @@
     <div class="hero-fullname">ELIE SASPORTES</div>
     <h1 class="hero-name" data-i18n-html="hero.name">Systèmes<br><em>Embarqués</em><br>&amp; Automatisme</h1>
     <div class="hero-title">// Firmware · STM32 · Industrie 4.0 · IoT</div>
-    <p class="hero-desc" data-i18n="hero.desc">Ingénieur en électronique embarquée industrielle — conception de drivers bas-niveau, architectures temps-réel, et automatisation de systèmes critiques. 5 ans d'expérience terrain, disponible en mission à partir de septembre 2026.</p>
+    <p class="hero-desc" data-i18n="hero.desc">Expert en électronique embarquée industrielle — conception de drivers bas-niveau, architectures temps-réel, et automatisation de systèmes critiques. 5 ans d'expérience terrain, disponible en mission à partir de septembre 2026.</p>
     <div class="hero-actions">
       <a href="#contact" class="btn-primary" data-i18n="hero.cta1">Discutons de votre projet</a>
       <a href="#resources" class="btn-ghost" data-i18n="hero.cta2">Ressources →</a>
@@ -300,7 +296,6 @@
         <div class="stats-grid">
           <div class="stat-block"><div class="stat-val">5+</div><div class="stat-label" data-i18n="hero.stat1">ans terrain</div></div>
           <div class="stat-block"><div class="stat-val">32</div><div class="stat-label">bits / bare-metal</div></div>
-          <div class="stat-block"><div class="stat-val">APE</div><div class="stat-label">7112B SASU</div></div>
           <div class="stat-block"><div class="stat-val">IL</div><div class="stat-label" data-i18n="hero.stat4">Tech market</div></div>
         </div>
       </div>
@@ -338,7 +333,6 @@
         <div>📍 Alsace, France</div>
         <div>📍 Jérusalem, Israël</div>
         <div style="margin-top:8px;color:var(--accent3)">✓ <span data-i18n="about.hebrew">Hebrew speaker</span></div>
-        <div style="color:var(--accent3)">✓ SASU – APE 7112B</div>
       </div>
     </div>
     <div class="about-content">
@@ -547,12 +541,6 @@
     </div>
     <div>
       <div class="sidebar-widget reveal">
-        <div class="widget-title">// newsletter.subscribe()</div>
-        <p style="font-size:13px;color:var(--text-muted);line-height:1.7;margin-bottom:16px" data-i18n="newsletter.desc">Nouvelles ressources techniques, retours d'expérience terrain et veille embarquée — une fois par mois.</p>
-        <input type="email" class="newsletter-input" data-i18n-placeholder="newsletter.placeholder" placeholder="votre@email.com">
-        <button class="btn-full" data-i18n="newsletter.btn">S'abonner</button>
-      </div>
-      <div class="sidebar-widget reveal">
         <div class="widget-title">// topics[]</div>
         <div class="topic-list">
           <span class="tag accent">STM32</span><span class="tag">RTOS</span><span class="tag">C Embarqué</span>
@@ -589,7 +577,6 @@
         <div class="contact-line"><div class="icon">📧</div><span>elie.sasportes@gmail.com</span></div>
         <div class="contact-line"><div class="icon">📍</div><span>Alsace, France · Jérusalem, Israël</span></div>
         <div class="contact-line"><div class="icon">🕐</div><span data-i18n="contact.response">Réponse sous 24h ouvrées</span></div>
-        <div class="contact-line"><div class="icon">💼</div><span>SASU · APE 7112B · <span data-i18n="hero.status">Disponible sept. 2026</span></span></div>
       </div>
       <div style="margin-top:40px" class="reveal">
         <div style="font-family:'Space Mono',monospace;font-size:10px;color:var(--text-dim);margin-bottom:12px;letter-spacing:0.1em;text-transform:uppercase" data-i18n="contact.social">Retrouvez-moi</div>
@@ -689,7 +676,7 @@
     <li><a href="#resources" data-i18n="nav.resources">Ressources</a></li>
     <li><a href="#contact"   data-i18n="nav.contact">Contact</a></li>
   </ul>
-  <div class="footer-copy">SASU · APE 7112B · Alsace, France</div>
+  <div class="footer-copy">Alsace, France · Jérusalem, Israël</div>
 </footer>
 
 <script>
@@ -717,7 +704,7 @@ const i18n = {
     "res2.title":"Architecture multi-fichiers pour projets embarqués","res2.desc":"Structure de projet scalable : séparation HAL / drivers / application, gestion des dépendances et conventions de nommage industrielles.",
     "res3.title":"Ring buffer UART — implémentation robuste en C","res3.desc":"Implémentation complète d'un anneau circulaire pour la communication série, avec gestion des interruptions et protection contre les conditions de course.",
     "res4.title":"Scheduler coopératif léger : principes et implémentation","res4.desc":"Construire un ordonnanceur tâches sans OS, avec priorités, timers logiciels et gestion de l'énergie.",
-    "newsletter.desc":"Nouvelles ressources techniques, retours d'expérience terrain et veille embarquée — une fois par mois.","newsletter.placeholder":"votre@email.com","newsletter.btn":"S'abonner",
+    
     "contact.heading":"Démarrons<br><em>votre projet</em>","contact.desc":"Vous avez un projet en électronique embarquée ou en automatisation industrielle ? Prenez rendez-vous pour un premier échange gratuit de 30 minutes.",
     "contact.response":"Réponse sous 24h ouvrées","contact.social":"Retrouvez-moi",
     "form.name":"Nom complet *","form.namePh":"Jean Dupont","form.phone":"Téléphone","form.mission":"Type de mission","form.select":"Sélectionner...","form.opt1":"Développement Firmware","form.opt2":"Audit & Conseil Technique","form.opt3":"Automatisation Industrielle","form.opt4":"Formation / Transfert de compétences","form.opt5":"Autre",
@@ -745,7 +732,7 @@ const i18n = {
     "res2.title":"Multi-file architecture for embedded projects","res2.desc":"Scalable project structure: HAL / drivers / application separation, dependency management, and industrial naming conventions.",
     "res3.title":"UART ring buffer — robust C implementation","res3.desc":"Complete circular buffer for serial communication, with interrupt handling and race condition protection.",
     "res4.title":"Lightweight cooperative scheduler: principles and implementation","res4.desc":"Building an OS-free task scheduler with priorities, software timers, and power management.",
-    "newsletter.desc":"New technical resources, field feedback, and embedded systems news — once a month.","newsletter.placeholder":"your@email.com","newsletter.btn":"Subscribe",
+    
     "contact.heading":"Let's start<br><em>your project</em>","contact.desc":"Do you have a project in embedded electronics or industrial automation? Book a free 30-minute introductory call.",
     "contact.response":"Response within 24 business hours","contact.social":"Find me on",
     "form.name":"Full name *","form.namePh":"John Smith","form.phone":"Phone","form.mission":"Mission type","form.select":"Select...","form.opt1":"Firmware Development","form.opt2":"Technical Audit & Advisory","form.opt3":"Industrial Automation","form.opt4":"Training / Knowledge Transfer","form.opt5":"Other",
@@ -773,7 +760,7 @@ const i18n = {
     "res2.title":"ארכיטקטורת ריבוי קבצים לפרויקטים משובצים","res2.desc":"מבנה פרויקט גמיש: הפרדת HAL / drivers / application, ניהול תלויות ומוסכמות שמות תעשייתיות.",
     "res3.title":"Ring buffer ל-UART — מימוש איתן ב-C","res3.desc":"מימוש מלא של חוצץ מעגלי לתקשורת סידרתית, עם טיפול בהפרעות והגנה מפני race conditions.",
     "res4.title":"סקדולר קואופרטיבי קל: עקרונות ומימוש","res4.desc":"בניית מתזמן משימות ללא מערכת הפעלה, עם עדיפויות, טיימרים תוכנתיים וניהול צריכת חשמל.",
-    "newsletter.desc":"משאבים טכניים חדשים, ניסיון שטח וחדשות מערכות משובצות — פעם בחודש.","newsletter.placeholder":"your@email.com","newsletter.btn":"הרשמה",
+    
     "contact.heading":"נתחיל<br><em>את הפרויקט שלכם</em>","contact.desc":"יש לכם פרויקט באלקטרוניקה משובצת או באוטומציה תעשייתית? קבעו שיחת היכרות חינמית של 30 דקות.",
     "contact.response":"תגובה תוך 24 שעות עסקיות","contact.social":"מצאו אותי ב",
     "form.name":"שם מלא *","form.namePh":"ישראל ישראלי","form.phone":"טלפון","form.mission":"סוג משימה","form.select":"בחר...","form.opt1":"פיתוח פירמוור","form.opt2":"ביקורת ויעוץ טכני","form.opt3":"אוטומציה תעשייתית","form.opt4":"הדרכה / העברת ידע","form.opt5":"אחר",

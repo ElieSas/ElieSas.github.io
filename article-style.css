@@ -112,6 +112,12 @@ pre { font-family: 'Space Mono', monospace; font-size: 12px; line-height: 1.8; c
 ::-webkit-scrollbar-track { background: var(--bg); }
 ::-webkit-scrollbar-thumb { background: var(--border-bright); }
 
+/* ── LANGUAGE SWITCHER (injected by article-lang.js) ── */
+.art-lang-switcher { display: flex; gap: 4px; align-items: center; }
+.art-lang-btn { font-family: 'Space Mono', monospace; font-size: 10px; padding: 4px 8px; background: transparent; border: 1px solid var(--border); color: var(--text-dim); cursor: pointer; letter-spacing: 0.08em; transition: all 0.2s; }
+.art-lang-btn:hover { border-color: var(--accent); color: var(--accent); }
+.art-lang-btn.active { border-color: var(--accent); color: var(--accent); background: rgba(0,212,255,0.08); }
+
 @media (max-width: 640px) {
   .article-wrap { padding: 88px 20px 48px; }
   .concept-grid { grid-template-columns: 1fr; }
