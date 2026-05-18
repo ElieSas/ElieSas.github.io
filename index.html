@@ -216,10 +216,11 @@
   .form-select { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%236b7a99' fill='none' stroke-width='1.5'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 14px center; padding-right: 36px; cursor: pointer; }
   .form-select option { background: var(--bg2); }
   .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-  .time-slots { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; margin-bottom: 16px; }
-  .time-slot { font-family: 'Space Mono', monospace; font-size: 11px; color: var(--text-muted); border: 1px solid var(--border); padding: 8px 4px; text-align: center; cursor: pointer; transition: all 0.15s; background: transparent; }
-  .time-slot:hover { border-color: var(--accent); color: var(--accent); }
-  .time-slot.selected { background: var(--accent); color: var(--bg); border-color: var(--accent); }
+  .datetime-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 4px; }
+  .form-input[type="date"] { font-family: 'Space Mono', monospace; font-size: 12px; color: var(--text); color-scheme: dark; }
+  .form-input[type="date"]::-webkit-calendar-picker-indicator { filter: invert(0.6); cursor: pointer; }
+  .form-input[type="date"]:invalid { color: var(--text-dim); }
+  @media (max-width: 540px) { .datetime-row { grid-template-columns: 1fr; } }
 
   /* FORMSPREE STATUS */
   .fs-success-msg { display: none; background: rgba(127,255,107,0.08); border: 1px solid var(--accent3); padding: 24px; font-family: 'Space Mono', monospace; font-size: 12px; color: var(--accent3); letter-spacing: 0.06em; text-align: center; line-height: 1.8; }
@@ -842,16 +843,20 @@
           </div>
 
           <div class="form-group">
-            <label class="form-label" data-i18n="form.slot">Créneau préféré</label>
-            <div class="time-slots">
-              <button type="button" class="time-slot" onclick="selectSlot(this,'09:00')">09h00</button>
-              <button type="button" class="time-slot" onclick="selectSlot(this,'10:00')">10h00</button>
-              <button type="button" class="time-slot" onclick="selectSlot(this,'11:00')">11h00</button>
-              <button type="button" class="time-slot" onclick="selectSlot(this,'14:00')">14h00</button>
-              <button type="button" class="time-slot" onclick="selectSlot(this,'15:00')">15h00</button>
-              <button type="button" class="time-slot" onclick="selectSlot(this,'16:00')">16h00</button>
+            <label class="form-label" data-i18n="form.slot">Date &amp; créneau préféré</label>
+            <div class="datetime-row">
+              <input type="date" name="preferred_date" class="form-input" id="date-input" data-fs-field>
+              <select name="preferred_time" class="form-select" id="time-select" data-fs-field>
+                <option value="" data-i18n="form.slotChoose">— Choisir un créneau —</option>
+                <option value="09:00">09h00</option>
+                <option value="10:00">10h00</option>
+                <option value="11:00">11h00</option>
+                <option value="14:00">14h00</option>
+                <option value="15:00">15h00</option>
+                <option value="16:00">16h00</option>
+                <option value="17:00">17h00</option>
+              </select>
             </div>
-            <input type="hidden" name="preferred_slot" id="slot-value">
           </div>
 
           <div class="form-group">
@@ -917,7 +922,7 @@ const i18n = {
     "contact.heading":"Démarrons<br><em>votre projet</em>","contact.desc":"Vous avez un projet en électronique embarquée ou en automatisation industrielle ? Prenez rendez-vous pour un premier échange gratuit de 30 minutes.",
     "contact.response":"Réponse sous 24h ouvrées","contact.social":"Retrouvez-moi",
     "form.name":"Nom complet *","form.namePh":"Jean Dupont","form.phone":"Téléphone","form.mission":"Type de mission","form.select":"Sélectionner...","form.opt1":"Développement Firmware","form.opt2":"Audit & Conseil Technique","form.opt3":"Automatisation Industrielle","form.opt4":"Formation / Transfert de compétences","form.opt5":"Autre",
-    "form.slot":"Créneau préféré","form.project":"Décrivez votre projet","form.projectPh":"Contexte, contraintes techniques, délais...","form.submit":"Envoyer la demande","form.success":"Demande envoyée — je reviens vers vous sous 24h.","form.note":"Premier échange 30 min — offert & sans engagement"
+    "form.slot":"Date & créneau préféré","form.slotChoose":"— Choisir un créneau —","form.project":"Décrivez votre projet","form.projectPh":"Contexte, contraintes techniques, délais...","form.submit":"Envoyer la demande","form.success":"Demande envoyée — je reviens vers vous sous 24h.","form.note":"Premier échange 30 min — offert & sans engagement"
   },
   en: {
     "nav.about":"Profile","nav.parcours":"Experience","nav.services":"Services","nav.resources":"Resources","nav.contact":"Contact","nav.cta":"Book a Call",
@@ -945,7 +950,7 @@ const i18n = {
     "contact.heading":"Let's start<br><em>your project</em>","contact.desc":"Do you have a project in embedded electronics or industrial automation? Book a free 30-minute introductory call.",
     "contact.response":"Response within 24 business hours","contact.social":"Find me on",
     "form.name":"Full name *","form.namePh":"John Smith","form.phone":"Phone","form.mission":"Mission type","form.select":"Select...","form.opt1":"Firmware Development","form.opt2":"Technical Audit & Advisory","form.opt3":"Industrial Automation","form.opt4":"Training / Knowledge Transfer","form.opt5":"Other",
-    "form.slot":"Preferred time slot","form.project":"Describe your project","form.projectPh":"Context, technical constraints, timeline...","form.submit":"Send request","form.success":"Request sent — I'll get back to you within 24h.","form.note":"First 30-min call — free & no commitment"
+    "form.slot":"Preferred date & time","form.slotChoose":"— Choose a time slot —","form.project":"Describe your project","form.projectPh":"Context, technical constraints, timeline...","form.submit":"Send request","form.success":"Request sent — I'll get back to you within 24h.","form.note":"First 30-min call — free & no commitment"
   },
   he: {
     "nav.about":"פרופיל","nav.parcours":"ניסיון","nav.services":"שירותים","nav.resources":"משאבים","nav.contact":"צור קשר","nav.cta":"קביעת פגישה",
@@ -973,7 +978,7 @@ const i18n = {
     "contact.heading":"נתחיל<br><em>את הפרויקט שלכם</em>","contact.desc":"יש לכם פרויקט באלקטרוניקה משובצת או באוטומציה תעשייתית? קבעו שיחת היכרות חינמית של 30 דקות.",
     "contact.response":"תגובה תוך 24 שעות עסקיות","contact.social":"מצאו אותי ב",
     "form.name":"שם מלא *","form.namePh":"ישראל ישראלי","form.phone":"טלפון","form.mission":"סוג משימה","form.select":"בחר...","form.opt1":"פיתוח פירמוור","form.opt2":"ביקורת ויעוץ טכני","form.opt3":"אוטומציה תעשייתית","form.opt4":"הדרכה / העברת ידע","form.opt5":"אחר",
-    "form.slot":"חלון זמן מועדף","form.project":"תארו את הפרויקט שלכם","form.projectPh":"הקשר, אילוצים טכניים, לוחות זמנים...","form.submit":"שליחת הבקשה","form.success":"הבקשה נשלחה — אחזור אליכם תוך 24 שעות.","form.note":"שיחה ראשונה 30 דק׳ — ללא עלות וללא התחייבות"
+    "form.slot":"תאריך וחלון זמן מועדף","form.slotChoose":"— בחר חלון זמן —","form.project":"תארו את הפרויקט שלכם","form.projectPh":"הקשר, אילוצים טכניים, לוחות זמנים...","form.submit":"שליחת הבקשה","form.success":"הבקשה נשלחה — אחזור אליכם תוך 24 שעות.","form.note":"שיחה ראשונה 30 דק׳ — ללא עלות וללא התחייבות"
   }
 };
 
@@ -1019,12 +1024,16 @@ document.addEventListener('DOMContentLoaded', function() {
   formspree('initForm', { formElement: '#contact-form', formId: 'xaqvaqge' });
 });
 
-// ── TIME SLOT ─────────────────────────────────────────────────────────
-function selectSlot(el, val) {
-  document.querySelectorAll('.time-slot').forEach(s => s.classList.remove('selected'));
-  el.classList.add('selected');
-  document.getElementById('slot-value').value = val;
-}
+// ── DATE PICKER : empêche de sélectionner une date passée ──
+(function setDateMin() {
+  const di = document.getElementById('date-input');
+  if (!di) return;
+  const today = new Date();
+  const yyyy = today.getFullYear();
+  const mm = String(today.getMonth() + 1).padStart(2, '0');
+  const dd = String(today.getDate()).padStart(2, '0');
+  di.min = `${yyyy}-${mm}-${dd}`;
+})();
 
 // ── SCROLL REVEAL ─────────────────────────────────────────────────────
 const observer = new IntersectionObserver((entries) => {
