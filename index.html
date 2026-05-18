@@ -114,6 +114,28 @@
   /* ABOUT */
   #about { padding: 100px 80px; border-top: 1px solid var(--border); }
   .about-grid { display: grid; grid-template-columns: 1fr 1.5fr; gap: 80px; align-items: start; }
+
+  /* ── PARCOURS ── */
+  .parcours-layout { display: grid; grid-template-columns: 1fr 1fr; gap: 40px; align-items: start; }
+  .parcours-col-label { font-family: 'Space Mono', monospace; font-size: 10px; color: var(--accent); letter-spacing: 0.18em; text-transform: uppercase; margin-bottom: 20px; display: flex; align-items: center; gap: 8px; }
+  .parcours-col-icon { color: var(--accent); font-size: 14px; }
+  .xp-card { background: var(--surface); border: 1px solid var(--border); padding: 24px; margin-bottom: 8px; position: relative; overflow: hidden; transition: border-color 0.2s; }
+  .xp-card:hover { border-color: var(--border-bright); }
+  .xp-card::before { content: ''; position: absolute; top: 0; left: 0; width: 2px; height: 100%; background: var(--accent); opacity: 0.6; }
+  .xp-weizmann::before { background: var(--accent3); }
+  .xp-compact::before { background: var(--accent4); }
+  .xp-header { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; margin-bottom: 8px; }
+  .xp-company { font-family: 'Space Mono', monospace; font-size: 12px; color: var(--text); font-weight: 700; letter-spacing: 0.04em; }
+  .xp-via { font-size: 10px; color: var(--text-dim); font-weight: 400; }
+  .xp-role { font-size: 13px; color: var(--accent); margin-top: 4px; }
+  .xp-date { font-family: 'Space Mono', monospace; font-size: 10px; color: var(--text-dim); white-space: nowrap; letter-spacing: 0.06em; flex-shrink: 0; }
+  .xp-location { font-family: 'Space Mono', monospace; font-size: 10px; color: var(--text-dim); margin-bottom: 12px; letter-spacing: 0.04em; }
+  .xp-bullets { list-style: none; margin-bottom: 14px; }
+  .xp-bullets li { font-size: 13px; color: var(--text-muted); line-height: 1.7; padding-left: 14px; margin-bottom: 4px; position: relative; }
+  .xp-bullets li::before { content: '—'; position: absolute; left: 0; color: var(--text-dim); }
+  .xp-compact-desc { font-size: 13px; color: var(--text-muted); line-height: 1.7; margin-bottom: 14px; }
+  .xp-stack { display: flex; flex-wrap: wrap; gap: 6px; }
+  .xp-tag { font-family: 'Space Mono', monospace; font-size: 9px; color: var(--text-dim); background: var(--bg3); border: 1px solid var(--border); padding: 3px 8px; letter-spacing: 0.08em; text-transform: uppercase; }
   .about-aside { position: sticky; top: 80px; }
   .profile-frame { width: 100%; aspect-ratio: 3/4; background: var(--surface); border: 1px solid var(--border-bright); position: relative; overflow: hidden; margin-bottom: 24px; }
   .profile-frame-inner { position: absolute; inset: 16px; border: 1px solid var(--border); display: flex; align-items: center; justify-content: center; flex-direction: column; gap: 12px; }
@@ -228,7 +250,7 @@
     .hero-left { padding: 100px 24px 48px; }
     .hero-right { display: none; }
     #about,#services,#resources,#contact { padding: 72px 24px; }
-    .about-grid,.contact-grid,.resources-layout { grid-template-columns: 1fr; }
+    .about-grid,.contact-grid,.resources-layout,.parcours-layout { grid-template-columns: 1fr; }
     .services-grid { grid-template-columns: 1fr; }
     .about-aside { position: static; }
     .skills-matrix { grid-template-columns: 1fr; }
@@ -244,6 +266,7 @@
   <div class="nav-center">
     <ul class="nav-links">
       <li><a href="#about"     data-i18n="nav.about">Profil</a></li>
+      <li><a href="#parcours"  data-i18n="nav.parcours">Parcours</a></li>
       <li><a href="#services"  data-i18n="nav.services">Services</a></li>
       <li><a href="#resources" data-i18n="nav.resources">Ressources</a></li>
       <li><a href="#contact"   data-i18n="nav.contact">Contact</a></li>
@@ -354,10 +377,193 @@
 </section>
 <div class="scan-line"></div>
 
+<!-- PARCOURS -->
+<section id="parcours">
+  <div class="section-header reveal">
+    <span class="section-num">02</span>
+    <h2 class="section-title" data-i18n="nav.parcours">Parcours</h2>
+    <div class="section-line"></div>
+  </div>
+
+  <div class="parcours-layout">
+
+    <!-- ── EXPÉRIENCES PRO ── -->
+    <div class="parcours-col">
+      <div class="parcours-col-label reveal">
+        <span class="parcours-col-icon">◈</span> Expériences professionnelles
+      </div>
+
+      <!-- BDR Thermea -->
+      <div class="xp-card reveal">
+        <div class="xp-header">
+          <div>
+            <div class="xp-company">BDR Thermea</div>
+            <div class="xp-role">Ingénieur R&D Électronique</div>
+          </div>
+          <div class="xp-date">2022 — 2026</div>
+        </div>
+        <div class="xp-location">📍 Alsace, France</div>
+        <ul class="xp-bullets">
+          <li>Développement d'outils logiciels pour les workflows de validation et d'automatisation, en lien avec l'équipe thermodynamique</li>
+          <li>Implémentation d'interfaces microcontrôleurs pour setups Hardware-in-the-Loop (HiL), modèles FMU/FMI et équipements terrain via Modbus RTU et CAN</li>
+          <li>Développement et validation de stratégies de contrôle HVAC en IEC 61131 (Structured Text, FBD, SFC)</li>
+          <li>Activités de certification EMC / LVD</li>
+        </ul>
+        <div class="xp-stack">
+          <span class="xp-tag">C / C#</span><span class="xp-tag">Modbus RTU</span><span class="xp-tag">CAN</span>
+          <span class="xp-tag">FMU/FMI</span><span class="xp-tag">IEC 61131</span><span class="xp-tag">HiL</span>
+          <span class="xp-tag">Python</span><span class="xp-tag">Azure DevOps</span>
+        </div>
+      </div>
+
+      <!-- Alstom / Alten -->
+      <div class="xp-card reveal">
+        <div class="xp-header">
+          <div>
+            <div class="xp-company">Alstom <span class="xp-via">via Alten</span></div>
+            <div class="xp-role">Ingénieur R&D Électronique</div>
+          </div>
+          <div class="xp-date">2021 — 2022</div>
+        </div>
+        <div class="xp-location">📍 France</div>
+        <ul class="xp-bullets">
+          <li>Spécification, conception et validation du TCMS (Train Control Management System) d'Alstom</li>
+          <li>Interfaces électroniques (ICDs), mise à jour logiciel embarqué MPU et intégration des sous-systèmes électroniques ferroviaires</li>
+          <li>Conformité EN 50128 (norme ferroviaire logiciel critique)</li>
+        </ul>
+        <div class="xp-stack">
+          <span class="xp-tag">TCMS</span><span class="xp-tag">EN 50128</span><span class="xp-tag">ICD</span>
+          <span class="xp-tag">Embarqué ferroviaire</span><span class="xp-tag">V-Cycle</span>
+        </div>
+      </div>
+
+      <!-- STMicroelectronics -->
+      <div class="xp-card reveal">
+        <div class="xp-header">
+          <div>
+            <div class="xp-company">STMicroelectronics</div>
+            <div class="xp-role">Apprenti Ingénieur — Vérification SoC</div>
+          </div>
+          <div class="xp-date">2019 — 2020</div>
+        </div>
+        <div class="xp-location">📍 France</div>
+        <ul class="xp-bullets">
+          <li>Intégration de Synopsys Certitude (outil d'injection de fautes) dans les environnements de test IP et SoC pour évaluer objectivement la couverture de vérification</li>
+          <li>Développement de scripts Python pour automatiser setup, compilation, simulation et reporting HTML</li>
+          <li>Analyse de la couverture de fautes et de l'efficacité des régressions pour renforcer les mécanismes de sécurité</li>
+        </ul>
+        <div class="xp-stack">
+          <span class="xp-tag">UVM</span><span class="xp-tag">SystemVerilog</span><span class="xp-tag">Synopsys Certitude</span>
+          <span class="xp-tag">Python</span><span class="xp-tag">TCL</span><span class="xp-tag">Cadence</span>
+          <span class="xp-tag">Vérification SoC</span>
+        </div>
+      </div>
+
+      <!-- SoftBank Robotics -->
+      <div class="xp-card xp-compact reveal">
+        <div class="xp-header">
+          <div>
+            <div class="xp-company">SoftBank Robotics</div>
+            <div class="xp-role">Stagiaire Ingénieur</div>
+          </div>
+          <div class="xp-date">Jan. 2017</div>
+        </div>
+        <p class="xp-compact-desc">Conception et fabrication d'un banc de test dédié à l'automatisation des procédures de réparation du robot Pepper en service après-vente.</p>
+        <div class="xp-stack">
+          <span class="xp-tag">Banc de test</span><span class="xp-tag">Robotique</span><span class="xp-tag">Automatisation</span>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- ── FORMATION ── -->
+    <div class="parcours-col">
+      <div class="parcours-col-label reveal">
+        <span class="parcours-col-icon">◈</span> Formation académique
+      </div>
+
+      <!-- École des Mines -->
+      <div class="xp-card reveal">
+        <div class="xp-header">
+          <div>
+            <div class="xp-company">École des Mines de Saint-Étienne</div>
+            <div class="xp-role">Diplôme d'Ingénieur — Microélectronique &amp; Informatique</div>
+          </div>
+          <div class="xp-date">2020</div>
+        </div>
+        <div class="xp-location">📍 Saint-Étienne, France · GPA 3.2</div>
+        <ul class="xp-bullets">
+          <li>Architecture CPU, conception VLSI, systèmes embarqués, traitement du signal</li>
+          <li>Projets académiques : AES sur FPGA (VHDL), capteur capacitif, équilibrage réseau électrique (Java multi-agent), STM32 &amp; PIC</li>
+          <li>Hackathon Merck OneLife — stratégie de vaccination optimisée par théorie des graphes (Python)</li>
+        </ul>
+        <div class="xp-stack">
+          <span class="xp-tag">VHDL</span><span class="xp-tag">Verilog</span><span class="xp-tag">FPGA</span>
+          <span class="xp-tag">STM32</span><span class="xp-tag">C/C++</span><span class="xp-tag">Python</span>
+          <span class="xp-tag">Cadence</span><span class="xp-tag">ModelSim</span><span class="xp-tag">Vivado</span>
+        </div>
+      </div>
+
+      <!-- CQPM -->
+      <div class="xp-card xp-compact reveal">
+        <div class="xp-header">
+          <div>
+            <div class="xp-company">CQPM 142</div>
+            <div class="xp-role">Certification Chef de Projet Industriel</div>
+          </div>
+          <div class="xp-date">2020</div>
+        </div>
+        <p class="xp-compact-desc">Certification professionnelle en gestion de projet industriel — méthodes agiles, cycle en V, pilotage d'équipes pluridisciplinaires.</p>
+        <div class="xp-stack">
+          <span class="xp-tag">Gestion de projet</span><span class="xp-tag">Agile Scrum</span><span class="xp-tag">V-Cycle</span>
+        </div>
+      </div>
+
+      <!-- CPGE -->
+      <div class="xp-card xp-compact reveal">
+        <div class="xp-header">
+          <div>
+            <div class="xp-company">Lycée ORT Strasbourg</div>
+            <div class="xp-role">CPGE PSI — Physique &amp; Sciences de l'Ingénieur</div>
+          </div>
+          <div class="xp-date">2015 — 2016</div>
+        </div>
+        <p class="xp-compact-desc">Classes préparatoires aux grandes écoles, filière Physique-Sciences de l'Ingénieur. Formation intensive en mathématiques, physique, électronique et mécanique.</p>
+        <div class="xp-stack">
+          <span class="xp-tag">Mathématiques</span><span class="xp-tag">Physique</span><span class="xp-tag">Sciences de l'ingénieur</span>
+        </div>
+      </div>
+
+      <!-- Weizmann -->
+      <div class="xp-card xp-weizmann reveal">
+        <div class="xp-header">
+          <div>
+            <div class="xp-company">Institut Weizmann des Sciences <span class="xp-via">· ORT Summer Camp</span></div>
+            <div class="xp-role">Chercheur Stagiaire — Physique des particules</div>
+          </div>
+          <div class="xp-date">Août 2015</div>
+        </div>
+        <div class="xp-location">📍 Rehovot, Israël</div>
+        <ul class="xp-bullets">
+          <li>Caractérisation expérimentale d'un détecteur gazeux pour la détection de neutrinos et de matière noire</li>
+          <li>Optimisation de mélanges Argon/Méthane pour la multiplication électronique à haut gain</li>
+          <li>Mesures X et UV, analyse des courbes de gain, spectres de charge et stabilité des avalanches via MCA et traitement du signal</li>
+        </ul>
+        <div class="xp-stack">
+          <span class="xp-tag">Physique des particules</span><span class="xp-tag">Détecteur gazeux</span>
+          <span class="xp-tag">Traitement du signal</span><span class="xp-tag">MCA</span>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+<div class="scan-line"></div>
+
 <!-- SERVICES -->
 <section id="services">
   <div class="section-header reveal">
-    <span class="section-num">02</span>
+    <span class="section-num">03</span>
     <h2 class="section-title" data-i18n="nav.services">Services</h2>
     <div class="section-line"></div>
   </div>
@@ -402,7 +608,7 @@
 <!-- RESOURCES -->
 <section id="resources">
   <div class="section-header reveal">
-    <span class="section-num">03</span>
+    <span class="section-num">04</span>
     <h2 class="section-title" data-i18n="nav.resources">Ressources</h2>
     <div class="section-line"></div>
   </div>
@@ -565,7 +771,7 @@
 <!-- CONTACT -->
 <section id="contact">
   <div class="section-header reveal">
-    <span class="section-num">04</span>
+    <span class="section-num">05</span>
     <h2 class="section-title" data-i18n="nav.contact">Contact</h2>
     <div class="section-line"></div>
   </div>
@@ -672,6 +878,7 @@
   <div class="footer-logo">© 2026 Elie SASPORTES</div>
   <ul class="footer-links">
     <li><a href="#about"     data-i18n="nav.about">Profil</a></li>
+    <li><a href="#parcours"  data-i18n="nav.parcours">Parcours</a></li>
     <li><a href="#services"  data-i18n="nav.services">Services</a></li>
     <li><a href="#resources" data-i18n="nav.resources">Ressources</a></li>
     <li><a href="#contact"   data-i18n="nav.contact">Contact</a></li>
@@ -683,7 +890,7 @@
 // ── TRANSLATIONS ─────────────────────────────────────────────────────
 const i18n = {
   fr: {
-    "nav.about":"Profil","nav.services":"Services","nav.resources":"Ressources","nav.contact":"Contact","nav.cta":"Prendre RDV",
+    "nav.about":"Profil","nav.parcours":"Parcours","nav.services":"Services","nav.resources":"Ressources","nav.contact":"Contact","nav.cta":"Prendre RDV",
     "hero.status":"Disponible — Sept. 2026","hero.badge":"Ingénieur Conseil · Alsace / Israël",
     "hero.name":"Systèmes<br><em>Embarqués</em><br>&amp; Automatisme",
     "hero.desc":"Expert en électronique embarquée industrielle — conception de drivers bas-niveau, architectures temps-réel, et automatisation de systèmes critiques. 5 ans d'expérience terrain, disponible en mission à partir de septembre 2026.",
@@ -711,7 +918,7 @@ const i18n = {
     "form.slot":"Créneau préféré","form.project":"Décrivez votre projet","form.projectPh":"Contexte, contraintes techniques, délais...","form.submit":"Envoyer la demande","form.success":"Demande envoyée — je reviens vers vous sous 24h.","form.note":"Premier échange 30 min — offert & sans engagement"
   },
   en: {
-    "nav.about":"Profile","nav.services":"Services","nav.resources":"Resources","nav.contact":"Contact","nav.cta":"Book a Call",
+    "nav.about":"Profile","nav.parcours":"Experience","nav.services":"Services","nav.resources":"Resources","nav.contact":"Contact","nav.cta":"Book a Call",
     "hero.status":"Available — Sept. 2026","hero.badge":"Independent Consultant · Alsace / Israel",
     "hero.name":"Embedded<br><em>Systems</em><br>&amp; Automation",
     "hero.desc":"Expert in industrial embedded electronics — low-level driver design, real-time architectures, and critical system automation. 5+ years field experience, available from September 2026.",
@@ -739,7 +946,7 @@ const i18n = {
     "form.slot":"Preferred time slot","form.project":"Describe your project","form.projectPh":"Context, technical constraints, timeline...","form.submit":"Send request","form.success":"Request sent — I'll get back to you within 24h.","form.note":"First 30-min call — free & no commitment"
   },
   he: {
-    "nav.about":"פרופיל","nav.services":"שירותים","nav.resources":"משאבים","nav.contact":"צור קשר","nav.cta":"קביעת פגישה",
+    "nav.about":"פרופיל","nav.parcours":"ניסיון","nav.services":"שירותים","nav.resources":"משאבים","nav.contact":"צור קשר","nav.cta":"קביעת פגישה",
     "hero.status":"זמין — ספטמבר 2026","hero.badge":"יועץ הנדסי · אלזס / ישראל",
     "hero.name":"מערכות<br><em>משובצות</em><br>ואוטומציה",
     "hero.desc":"מומחה באלקטרוניקה משובצת תעשייתית — עיצוב דרייברים ברמה נמוכה, ארכיטקטורות זמן-אמת, ואוטומציה של מערכות קריטיות. ניסיון שטח של 5+ שנים, זמין למשימות מספטמבר 2026.",
