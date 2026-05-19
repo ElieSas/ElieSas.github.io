@@ -259,8 +259,142 @@
     .footer-links { display: none; }
   }
 </style>
+<!-- ── GOOGLE ANALYTICS 4 — Consent Mode ── -->
+<script>
+  // GA4 ne se charge que si le consentement a été donné
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+
+  // Consentement par défaut : refusé jusqu'à choix explicite
+  gtag('consent', 'default', {
+    analytics_storage: 'denied',
+    ad_storage:        'denied',
+    wait_for_update:   500
+  });
+
+  // Charger GA4 seulement si déjà accepté lors d'une visite précédente
+  if (localStorage.getItem('es-ga-consent') === 'granted') {
+    gtag('consent', 'update', { analytics_storage: 'granted' });
+    loadGA();
+  }
+
+  function loadGA() {
+    if (document.getElementById('ga4-script')) return;
+    const s = document.createElement('script');
+    s.id    = 'ga4-script';
+    s.async = true;
+    s.src   = 'https://www.googletagmanager.com/gtag/js?id=G-T5KH95GT5Q';
+    document.head.appendChild(s);
+    s.onload = function() {
+      gtag('js', new Date());
+      gtag('config', 'G-T5KH95GT5Q', { anonymize_ip: true });
+    };
+  }
+
+  function grantConsent() {
+    localStorage.setItem('es-ga-consent', 'granted');
+    gtag('consent', 'update', { analytics_storage: 'granted' });
+    loadGA();
+    hideBanner();
+  }
+
+  function denyConsent() {
+    localStorage.setItem('es-ga-consent', 'denied');
+    gtag('consent', 'update', { analytics_storage: 'denied' });
+    hideBanner();
+  }
+
+  function hideBanner() {
+    const b = document.getElementById('cookie-banner');
+    if (b) { b.style.opacity = '0'; setTimeout(() => b.remove(), 400); }
+  }
+
+  // Afficher la bannière uniquement si aucun choix n'a encore été fait
+  window.addEventListener('DOMContentLoaded', function() {
+    if (!localStorage.getItem('es-ga-consent')) {
+      document.getElementById('cookie-banner').style.display = 'flex';
+    }
+  });
+</script>
+
+<!-- ── BANNIÈRE RGPD — styles ── -->
+<style>
+  #cookie-banner {
+    display: none;
+    position: fixed;
+    bottom: 0; left: 0; right: 0;
+    z-index: 9999;
+    background: rgba(10,12,15,0.97);
+    border-top: 1px solid #2a3548;
+    padding: 20px 48px;
+    align-items: center;
+    justify-content: space-between;
+    gap: 24px;
+    flex-wrap: wrap;
+    backdrop-filter: blur(12px);
+    transition: opacity 0.4s;
+  }
+  .cookie-text {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 13px;
+    color: #6b7a99;
+    line-height: 1.6;
+    flex: 1;
+    min-width: 260px;
+  }
+  .cookie-text strong { color: #e8eaf0; font-weight: 500; }
+  .cookie-text a { color: #00d4ff; text-decoration: none; }
+  .cookie-text a:hover { text-decoration: underline; }
+  .cookie-actions {
+    display: flex;
+    gap: 10px;
+    flex-shrink: 0;
+    align-items: center;
+  }
+  .cookie-btn {
+    font-family: 'Space Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    padding: 9px 20px;
+    border: none;
+    cursor: pointer;
+    transition: all 0.2s;
+    white-space: nowrap;
+  }
+  .cookie-btn-accept {
+    background: #00d4ff;
+    color: #0a0c0f;
+  }
+  .cookie-btn-accept:hover { background: #fff; }
+  .cookie-btn-deny {
+    background: transparent;
+    color: #6b7a99;
+    border: 1px solid #2a3548;
+  }
+  .cookie-btn-deny:hover { border-color: #6b7a99; color: #e8eaf0; }
+  @media (max-width: 640px) {
+    #cookie-banner { padding: 16px 20px; }
+    .cookie-actions { width: 100%; justify-content: flex-end; }
+  }
+</style>
+
 </head>
 <body>
+
+<!-- ── BANNIÈRE RGPD ── -->
+<div id="cookie-banner" role="dialog" aria-label="Consentement cookies" aria-live="polite">
+  <div class="cookie-text">
+    <strong>Ce site utilise des cookies d'analyse.</strong>
+    Google Analytics me permet de comprendre comment vous utilisez ce site (pages visitées, durée, pays d'origine) afin d'améliorer son contenu.
+    Vos données sont anonymisées et aucune publicité n'est affichée.
+    <a href="https://policies.google.com/privacy" target="_blank" rel="noopener">Politique de confidentialité Google</a>
+  </div>
+  <div class="cookie-actions">
+    <button class="cookie-btn cookie-btn-deny"  onclick="denyConsent()">Refuser</button>
+    <button class="cookie-btn cookie-btn-accept" onclick="grantConsent()">Accepter</button>
+  </div>
+</div>
 
 <nav>
   <a href="#hero" class="nav-logo">E<span>lie</span> <span style="color:var(--text-dim);margin:0 4px">·</span><span>Ingénieur Conseil</span></a>
