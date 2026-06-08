@@ -3,18 +3,65 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Elie SASPORTES — Ingénieur Systèmes Embarqués</title>
+<title>Elie SASPORTES — Ingénieur Conseil Systèmes Embarqués</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Space+Mono:ital,wght@0,400;0,700;1,400&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,300&family=Bebas+Neue&display=swap" rel="stylesheet">
 <script src="https://unpkg.com/@formspree/ajax@1" defer></script>
+
+<!-- ── GOOGLE ANALYTICS 4 — Consent Mode ── -->
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('consent', 'default', {
+    analytics_storage: 'denied',
+    ad_storage:        'denied',
+    wait_for_update:   500
+  });
+  if (localStorage.getItem('es-ga-consent') === 'granted') {
+    gtag('consent', 'update', { analytics_storage: 'granted' });
+    loadGA();
+  }
+  function loadGA() {
+    if (document.getElementById('ga4-script')) return;
+    const s = document.createElement('script');
+    s.id    = 'ga4-script';
+    s.async = true;
+    s.src   = 'https://www.googletagmanager.com/gtag/js?id=G-T5KH95GT5Q';
+    document.head.appendChild(s);
+    s.onload = function() {
+      gtag('js', new Date());
+      gtag('config', 'G-T5KH95GT5Q', { anonymize_ip: true });
+    };
+  }
+  function grantConsent() {
+    localStorage.setItem('es-ga-consent', 'granted');
+    gtag('consent', 'update', { analytics_storage: 'granted' });
+    loadGA();
+    hideBanner();
+  }
+  function denyConsent() {
+    localStorage.setItem('es-ga-consent', 'denied');
+    gtag('consent', 'update', { analytics_storage: 'denied' });
+    hideBanner();
+  }
+  function hideBanner() {
+    const b = document.getElementById('cookie-banner');
+    if (b) { b.style.opacity = '0'; setTimeout(() => b.remove(), 400); }
+  }
+  window.addEventListener('DOMContentLoaded', function() {
+    if (!localStorage.getItem('es-ga-consent')) {
+      document.getElementById('cookie-banner').style.display = 'flex';
+    }
+  });
+</script>
 
 <style>
   :root {
     --bg: #0a0c0f; --bg2: #0f1217; --bg3: #141820;
     --surface: #1a1f2a; --border: #1e2535; --border-bright: #2a3548;
     --text: #e8eaf0; --text-muted: #6b7a99; --text-dim: #3d4a63;
-    --accent: #00d4ff; --accent2: #ff6b35; --accent3: #7fff6b;
+    --accent: #00d4ff; --accent2: #ff6b35; --accent3: #7fff6b; --accent4: #c792ea;
     --glow: rgba(0,212,255,0.15); --glow-strong: rgba(0,212,255,0.3);
   }
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -115,7 +162,7 @@
   #about { padding: 100px 80px; border-top: 1px solid var(--border); }
   .about-grid { display: grid; grid-template-columns: 1fr 1.5fr; gap: 80px; align-items: start; }
 
-  /* ── PARCOURS ── */
+  /* PARCOURS */
   .parcours-layout { display: grid; grid-template-columns: 1fr 1fr; gap: 40px; align-items: start; }
   .parcours-col-label { font-family: 'Space Mono', monospace; font-size: 10px; color: var(--accent); letter-spacing: 0.18em; text-transform: uppercase; margin-bottom: 20px; display: flex; align-items: center; gap: 8px; }
   .parcours-col-icon { color: var(--accent); font-size: 14px; }
@@ -191,7 +238,6 @@
   .res-arrow { color: var(--text-dim); transition: all 0.2s; font-size: 18px; flex-shrink: 0; align-self: center; }
   .sidebar-widget { background: var(--surface); border: 1px solid var(--border); padding: 28px; margin-bottom: 16px; }
   .widget-title { font-family: 'Space Mono', monospace; font-size: 10px; color: var(--text-dim); letter-spacing: 0.15em; text-transform: uppercase; margin-bottom: 20px; padding-bottom: 12px; border-bottom: 1px solid var(--border); }
-
   .topic-list { display: flex; flex-wrap: wrap; gap: 6px; }
 
   /* CONTACT */
@@ -220,7 +266,6 @@
   .form-input[type="date"] { font-family: 'Space Mono', monospace; font-size: 12px; color: var(--text); color-scheme: dark; }
   .form-input[type="date"]::-webkit-calendar-picker-indicator { filter: invert(0.6); cursor: pointer; }
   .form-input[type="date"]:invalid { color: var(--text-dim); }
-  @media (max-width: 540px) { .datetime-row { grid-template-columns: 1fr; } }
 
   /* FORMSPREE STATUS */
   .fs-success-msg { display: none; background: rgba(127,255,107,0.08); border: 1px solid var(--accent3); padding: 24px; font-family: 'Space Mono', monospace; font-size: 12px; color: var(--accent3); letter-spacing: 0.06em; text-align: center; line-height: 1.8; }
@@ -234,6 +279,19 @@
   .footer-links a { font-family: 'Space Mono', monospace; font-size: 10px; color: var(--text-dim); text-decoration: none; letter-spacing: 0.08em; text-transform: uppercase; transition: color 0.2s; }
   .footer-links a:hover { color: var(--accent); }
   .footer-copy { font-family: 'Space Mono', monospace; font-size: 10px; color: var(--text-dim); }
+
+  /* COOKIE BANNER */
+  #cookie-banner { display: none; position: fixed; bottom: 0; left: 0; right: 0; z-index: 9999; background: rgba(10,12,15,0.97); border-top: 1px solid #2a3548; padding: 20px 48px; align-items: center; justify-content: space-between; gap: 24px; flex-wrap: wrap; backdrop-filter: blur(12px); transition: opacity 0.4s; }
+  .cookie-text { font-family: 'DM Sans', sans-serif; font-size: 13px; color: #6b7a99; line-height: 1.6; flex: 1; min-width: 260px; }
+  .cookie-text strong { color: #e8eaf0; font-weight: 500; }
+  .cookie-text a { color: #00d4ff; text-decoration: none; }
+  .cookie-text a:hover { text-decoration: underline; }
+  .cookie-actions { display: flex; gap: 10px; flex-shrink: 0; align-items: center; }
+  .cookie-btn { font-family: 'Space Mono', monospace; font-size: 10px; letter-spacing: 0.12em; text-transform: uppercase; padding: 9px 20px; border: none; cursor: pointer; transition: all 0.2s; white-space: nowrap; }
+  .cookie-btn-accept { background: #00d4ff; color: #0a0c0f; }
+  .cookie-btn-accept:hover { background: #fff; }
+  .cookie-btn-deny { background: transparent; color: #6b7a99; border: 1px solid #2a3548; }
+  .cookie-btn-deny:hover { border-color: #6b7a99; color: #e8eaf0; }
 
   @keyframes fadeUp { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
   @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
@@ -257,132 +315,15 @@
     .skills-matrix { grid-template-columns: 1fr; }
     footer { flex-direction: column; gap: 16px; text-align: center; }
     .footer-links { display: none; }
-  }
-</style>
-<!-- ── GOOGLE ANALYTICS 4 — Consent Mode ── -->
-<script>
-  // GA4 ne se charge que si le consentement a été donné
-  window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}
-
-  // Consentement par défaut : refusé jusqu'à choix explicite
-  gtag('consent', 'default', {
-    analytics_storage: 'denied',
-    ad_storage:        'denied',
-    wait_for_update:   500
-  });
-
-  // Charger GA4 seulement si déjà accepté lors d'une visite précédente
-  if (localStorage.getItem('es-ga-consent') === 'granted') {
-    gtag('consent', 'update', { analytics_storage: 'granted' });
-    loadGA();
-  }
-
-  function loadGA() {
-    if (document.getElementById('ga4-script')) return;
-    const s = document.createElement('script');
-    s.id    = 'ga4-script';
-    s.async = true;
-    s.src   = 'https://www.googletagmanager.com/gtag/js?id=G-T5KH95GT5Q';
-    document.head.appendChild(s);
-    s.onload = function() {
-      gtag('js', new Date());
-      gtag('config', 'G-T5KH95GT5Q', { anonymize_ip: true });
-    };
-  }
-
-  function grantConsent() {
-    localStorage.setItem('es-ga-consent', 'granted');
-    gtag('consent', 'update', { analytics_storage: 'granted' });
-    loadGA();
-    hideBanner();
-  }
-
-  function denyConsent() {
-    localStorage.setItem('es-ga-consent', 'denied');
-    gtag('consent', 'update', { analytics_storage: 'denied' });
-    hideBanner();
-  }
-
-  function hideBanner() {
-    const b = document.getElementById('cookie-banner');
-    if (b) { b.style.opacity = '0'; setTimeout(() => b.remove(), 400); }
-  }
-
-  // Afficher la bannière uniquement si aucun choix n'a encore été fait
-  window.addEventListener('DOMContentLoaded', function() {
-    if (!localStorage.getItem('es-ga-consent')) {
-      document.getElementById('cookie-banner').style.display = 'flex';
-    }
-  });
-</script>
-
-<!-- ── BANNIÈRE RGPD — styles ── -->
-<style>
-  #cookie-banner {
-    display: none;
-    position: fixed;
-    bottom: 0; left: 0; right: 0;
-    z-index: 9999;
-    background: rgba(10,12,15,0.97);
-    border-top: 1px solid #2a3548;
-    padding: 20px 48px;
-    align-items: center;
-    justify-content: space-between;
-    gap: 24px;
-    flex-wrap: wrap;
-    backdrop-filter: blur(12px);
-    transition: opacity 0.4s;
-  }
-  .cookie-text {
-    font-family: 'DM Sans', sans-serif;
-    font-size: 13px;
-    color: #6b7a99;
-    line-height: 1.6;
-    flex: 1;
-    min-width: 260px;
-  }
-  .cookie-text strong { color: #e8eaf0; font-weight: 500; }
-  .cookie-text a { color: #00d4ff; text-decoration: none; }
-  .cookie-text a:hover { text-decoration: underline; }
-  .cookie-actions {
-    display: flex;
-    gap: 10px;
-    flex-shrink: 0;
-    align-items: center;
-  }
-  .cookie-btn {
-    font-family: 'Space Mono', monospace;
-    font-size: 10px;
-    letter-spacing: 0.12em;
-    text-transform: uppercase;
-    padding: 9px 20px;
-    border: none;
-    cursor: pointer;
-    transition: all 0.2s;
-    white-space: nowrap;
-  }
-  .cookie-btn-accept {
-    background: #00d4ff;
-    color: #0a0c0f;
-  }
-  .cookie-btn-accept:hover { background: #fff; }
-  .cookie-btn-deny {
-    background: transparent;
-    color: #6b7a99;
-    border: 1px solid #2a3548;
-  }
-  .cookie-btn-deny:hover { border-color: #6b7a99; color: #e8eaf0; }
-  @media (max-width: 640px) {
     #cookie-banner { padding: 16px 20px; }
     .cookie-actions { width: 100%; justify-content: flex-end; }
+    .datetime-row { grid-template-columns: 1fr; }
   }
 </style>
-
 </head>
 <body>
 
-<!-- ── BANNIÈRE RGPD ── -->
+<!-- COOKIE BANNER -->
 <div id="cookie-banner" role="dialog" aria-label="Consentement cookies" aria-live="polite">
   <div class="cookie-text">
     <strong>Ce site utilise des cookies d'analyse.</strong>
@@ -397,7 +338,7 @@
 </div>
 
 <nav>
-  <a href="#hero" class="nav-logo">E<span>lie</span> <span style="color:var(--text-dim);margin:0 4px">·</span><span>Ingénieur</span></a>
+  <a href="#hero" class="nav-logo">E<span>lie</span> <span style="color:var(--text-dim);margin:0 4px">·</span><span>Ingénieur Conseil</span></a>
   <div class="nav-center">
     <ul class="nav-links">
       <li><a href="#about"     data-i18n="nav.about">Profil</a></li>
@@ -423,11 +364,11 @@
 <section id="hero">
   <div class="hero-left">
     <div class="hero-status"><div class="status-dot"></div><span data-i18n="hero.status">Disponible — Sept. 2026</span></div>
-    <div class="hero-badge" data-i18n="hero.badge">Ingénieur · Alsace / Israël</div>
+    <div class="hero-badge" data-i18n="hero.badge">Ingénieur Conseil · Alsace / Paris / Israël</div>
     <div class="hero-fullname">ELIE SASPORTES</div>
     <h1 class="hero-name" data-i18n-html="hero.name">Systèmes<br><em>Embarqués</em><br>&amp; Automatisme</h1>
     <div class="hero-title">// Firmware · STM32 · Industrie 4.0 · IoT</div>
-    <p class="hero-desc" data-i18n="hero.desc">Ingénieur en électronique embarquée industrielle — conception de drivers bas-niveau, architectures temps-réel, et automatisation de systèmes critiques. 5 ans d'expérience terrain, disponible en mission à partir de septembre 2026.</p>
+    <p class="hero-desc" data-i18n="hero.desc">Expert en électronique embarquée industrielle — conception de drivers bas-niveau, architectures temps-réel, et automatisation de systèmes critiques. 5 ans d'expérience terrain, disponible en mission à partir de septembre 2026.</p>
     <div class="hero-actions">
       <a href="#contact" class="btn-primary" data-i18n="hero.cta1">Discutons de votre projet</a>
       <a href="#resources" class="btn-ghost" data-i18n="hero.cta2">Ressources →</a>
@@ -491,6 +432,7 @@
       <div style="font-family:'Space Mono',monospace;font-size:11px;color:var(--text-dim);line-height:1.8;padding:16px;background:var(--surface);border:1px solid var(--border)">
         <div style="color:var(--accent);margin-bottom:8px">// localisation.conf</div>
         <div>📍 Alsace, France</div>
+        <div>📍 Paris, France</div>
         <div>📍 Jérusalem, Israël</div>
         <div style="margin-top:8px;color:var(--accent3)">✓ <span data-i18n="about.hebrew">Hebrew speaker</span></div>
       </div>
@@ -499,7 +441,7 @@
       <h3 class="reveal" data-i18n-html="about.title">Ingénieur R&amp;D<br>Électronique Embarquée</h3>
       <p class="reveal" data-i18n="about.p1">Diplômé en microélectronique et systèmes embarqués, j'ai passé cinq ans à concevoir et industrialiser des solutions d'automatisation pour l'industrie — de la carte électronique au firmware, en passant par l'intégration système.</p>
       <div class="highlight-text reveal" data-i18n="about.quote">« Je transforme des contraintes matérielles en logiciels fiables — du registre bas-niveau à l'architecture temps-réel. »</div>
-      <p class="reveal" data-i18n="about.p2">Je mets mon expertise au service de PME industrielles en Alsace et d'industriels tech en Israël. Je maîtrise le cycle complet : analyse, architecture, développement, validation et documentation.</p>
+      <p class="reveal" data-i18n="about.p2">Ma transition vers le conseil indépendant me permet de mettre cette expertise au service de PME industrielles en Alsace et de startups tech en Israël. Je maîtrise le cycle complet : analyse, architecture, développement, validation et documentation.</p>
       <p class="reveal" data-i18n="about.p3">Bilingue français-hébreu, je suis particulièrement bien positionné pour des projets franco-israéliens ou des missions nécessitant une interface entre équipes européennes et marché tech israélien.</p>
       <div class="skills-matrix">
         <div class="skill-item reveal"><div class="skill-name">Firmware / C Embarqué</div><div class="skill-bar"><div class="skill-fill" style="width:90%"></div></div></div>
@@ -524,13 +466,11 @@
 
   <div class="parcours-layout">
 
-    <!-- ── EXPÉRIENCES PRO ── -->
     <div class="parcours-col">
       <div class="parcours-col-label reveal">
         <span class="parcours-col-icon">◈</span> Expériences professionnelles
       </div>
 
-      <!-- BDR Thermea -->
       <div class="xp-card reveal">
         <div class="xp-header">
           <div>
@@ -553,7 +493,6 @@
         </div>
       </div>
 
-      <!-- Alstom / Alten -->
       <div class="xp-card reveal">
         <div class="xp-header">
           <div>
@@ -574,7 +513,6 @@
         </div>
       </div>
 
-      <!-- STMicroelectronics -->
       <div class="xp-card reveal">
         <div class="xp-header">
           <div>
@@ -596,7 +534,6 @@
         </div>
       </div>
 
-      <!-- SoftBank Robotics -->
       <div class="xp-card xp-compact reveal">
         <div class="xp-header">
           <div>
@@ -613,13 +550,11 @@
 
     </div>
 
-    <!-- ── FORMATION ── -->
     <div class="parcours-col">
       <div class="parcours-col-label reveal">
         <span class="parcours-col-icon">◈</span> Formation académique
       </div>
 
-      <!-- École des Mines -->
       <div class="xp-card reveal">
         <div class="xp-header">
           <div>
@@ -641,7 +576,6 @@
         </div>
       </div>
 
-      <!-- CQPM -->
       <div class="xp-card xp-compact reveal">
         <div class="xp-header">
           <div>
@@ -656,7 +590,6 @@
         </div>
       </div>
 
-      <!-- CPGE -->
       <div class="xp-card xp-compact reveal">
         <div class="xp-header">
           <div>
@@ -671,7 +604,6 @@
         </div>
       </div>
 
-      <!-- Weizmann -->
       <div class="xp-card xp-weizmann reveal">
         <div class="xp-header">
           <div>
@@ -752,7 +684,6 @@
   <div class="resources-layout">
     <div>
 
-      <!-- ── PHASE 1 : STM32 BARE-METAL ── -->
       <div class="res-category-label reveal">// bare_metal.stm32 —— Phase 1</div>
 
       <a href="article-gpio.html" class="resource-card reveal">
@@ -791,7 +722,6 @@
         </div><span class="res-arrow">↗</span>
       </a>
 
-      <!-- ── PHASE 2 : FREERTOS ── -->
       <div class="res-category-label reveal">// freertos —— Phase 2</div>
 
       <a href="article-freertos-tasks.html" class="resource-card reveal">
@@ -812,7 +742,6 @@
         </div><span class="res-arrow">↗</span>
       </a>
 
-      <!-- ── PHASE 3 : LINUX EMBARQUÉ ── -->
       <div class="res-category-label reveal">// linux_embedded —— Phase 3</div>
 
       <a href="article-linux-driver.html" class="resource-card reveal">
@@ -833,7 +762,6 @@
         </div><span class="res-arrow">↗</span>
       </a>
 
-      <!-- ── RÉFÉRENCES TECHNIQUES ── -->
       <div class="res-category-label reveal">// tech_reference —— Glossaires &amp; Références</div>
 
       <a href="article-cpp-embedded.html" class="resource-card reveal">
@@ -896,6 +824,7 @@
         <div style="font-family:'Space Mono',monospace;font-size:12px;line-height:2;color:var(--text-muted)">
           <div><span style="color:var(--accent3)">✓</span> Remote / Présentiel</div>
           <div><span style="color:var(--accent3)">✓</span> Alsace &amp; Grand Est</div>
+          <div><span style="color:var(--accent3)">✓</span> Paris &amp; Île-de-France</div>
           <div><span style="color:var(--accent3)">✓</span> Israël (tech market)</div>
           <div><span style="color:var(--accent)">→</span> <span data-i18n="hero.status">Dispo : Sept. 2026</span></div>
         </div>
@@ -917,8 +846,8 @@
       <h3 class="reveal" data-i18n-html="contact.heading">Démarrons<br><em>votre projet</em></h3>
       <p class="reveal" data-i18n="contact.desc">Vous avez un projet en électronique embarquée ou en automatisation industrielle ? Prenez rendez-vous pour un premier échange gratuit de 30 minutes.</p>
       <div class="contact-info reveal">
-        <div class="contact-line"><div class="icon">📧</div><span>contact@elie-sasportes.com</span></div>
-        <div class="contact-line"><div class="icon">📍</div><span>Alsace, France · Jérusalem, Israël</span></div>
+        <div class="contact-line"><div class="icon">📧</div><span>elie.sasportes@gmail.com</span></div>
+        <div class="contact-line"><div class="icon">📍</div><span>Alsace · Paris · Jérusalem</span></div>
         <div class="contact-line"><div class="icon">🕐</div><span data-i18n="contact.response">Réponse sous 24h ouvrées</span></div>
       </div>
       <div style="margin-top:40px" class="reveal">
@@ -936,11 +865,9 @@
       </div>
     </div>
 
-    <!-- FORMSPREE FORM (Vanilla JS Ajax) -->
     <div class="reveal">
       <div class="booking-panel" data-label="RDV">
 
-        <!-- Success message shown by Formspree after submit -->
         <div data-fs-success class="fs-success-msg">
           ✓ <span data-i18n="form.success">Demande envoyée — je reviens vers vous sous 24h.</span>
         </div>
@@ -1024,7 +951,7 @@
     <li><a href="#resources" data-i18n="nav.resources">Ressources</a></li>
     <li><a href="#contact"   data-i18n="nav.contact">Contact</a></li>
   </ul>
-  <div class="footer-copy">Alsace, France · Jérusalem, Israël</div>
+  <div class="footer-copy">Alsace · Paris · Jérusalem</div>
 </footer>
 
 <script>
@@ -1032,14 +959,14 @@
 const i18n = {
   fr: {
     "nav.about":"Profil","nav.parcours":"Parcours","nav.services":"Services","nav.resources":"Ressources","nav.contact":"Contact","nav.cta":"Prendre RDV",
-    "hero.status":"Disponible — Sept. 2026","hero.badge":"Ingénieur · Alsace / Israël",
+    "hero.status":"Disponible — Sept. 2026","hero.badge":"Ingénieur Conseil · Alsace / Paris / Israël",
     "hero.name":"Systèmes<br><em>Embarqués</em><br>&amp; Automatisme",
     "hero.desc":"Expert en électronique embarquée industrielle — conception de drivers bas-niveau, architectures temps-réel, et automatisation de systèmes critiques. 5 ans d'expérience terrain, disponible en mission à partir de septembre 2026.",
     "hero.cta1":"Discutons de votre projet","hero.cta2":"Ressources →","hero.stat1":"ans terrain","hero.stat4":"Tech market",
     "about.hebrew":"Hebrew speaker","about.title":"Ingénieur R&amp;D<br>Électronique Embarquée",
     "about.p1":"Diplômé en microélectronique et systèmes embarqués, j'ai passé cinq ans à concevoir et industrialiser des solutions d'automatisation pour l'industrie — de la carte électronique au firmware, en passant par l'intégration système.",
     "about.quote":"« Je transforme des contraintes matérielles en logiciels fiables — du registre bas-niveau à l'architecture temps-réel. »",
-    "about.p2":"Je mets cette expertise au service de PME industrielles en Alsace et d'industriels tech en Israël. Je maîtrise le cycle complet : analyse, architecture, développement, validation et documentation.",
+    "about.p2":"Ma transition vers le conseil indépendant me permet de mettre cette expertise au service de PME industrielles en Alsace, à Paris et de startups tech en Israël. Je maîtrise le cycle complet : analyse, architecture, développement, validation et documentation.",
     "about.p3":"Bilingue français-hébreu, je suis particulièrement bien positionné pour des projets franco-israéliens ou des missions nécessitant une interface entre équipes européennes et marché tech israélien.",
     "srv1.title":"Développement Firmware","srv1.desc":"Conception et développement de firmwares embarqués robustes sur microcontrôleurs ARM — du pilote bas-niveau à l'architecture applicative.",
     "srv1.li1":"Drivers périphériques (GPIO, UART, SPI, I²C)","srv1.li2":"Machines à états, schedulers coopératifs","srv1.li3":"Optimisation mémoire et performance","srv1.li4":"Documentation et tests unitaires",
@@ -1047,27 +974,21 @@ const i18n = {
     "srv2.li1":"Revue de code et d'architecture","srv2.li2":"Analyse de fiabilité et maintenabilité","srv2.li3":"Migration vers RTOS ou bare-metal","srv2.li4":"Choix de composants et de plateformes",
     "srv3.title":"Automatisation Industrielle","srv3.desc":"Intégration de systèmes embarqués dans des environnements industriels — automatisation, supervision et interconnexion de machines.",
     "srv3.li1":"Systèmes de contrôle-commande","srv3.li2":"Interfaces Homme-Machine (IHM)","srv3.li3":"Protocoles industriels (Modbus, CANbus)","srv3.li4":"Industrie 4.0 &amp; IIoT",
-    "res.article":"Article","res.guide":"Guide",
-    "res1.title":"GPIO bare-metal sur STM32 : du registre au driver générique","res1.desc":"Comment passer de la manipulation directe des registres AHB1ENR et MODER à un driver réutilisable avec structs et pointeurs de fonction.",
-    "res2.title":"Architecture multi-fichiers pour projets embarqués","res2.desc":"Structure de projet scalable : séparation HAL / drivers / application, gestion des dépendances et conventions de nommage industrielles.",
-    "res3.title":"Ring buffer UART — implémentation robuste en C","res3.desc":"Implémentation complète d'un anneau circulaire pour la communication série, avec gestion des interruptions et protection contre les conditions de course.",
-    "res4.title":"Scheduler coopératif léger : principes et implémentation","res4.desc":"Construire un ordonnanceur tâches sans OS, avec priorités, timers logiciels et gestion de l'énergie.",
-    
-    "contact.heading":"Démarrons<br><em>votre projet</em>","contact.desc":"Vous avez un projet en électronique embarquée ou en automatisation industrielle ? Prenez rendez-vous pour un premier échange.",
+    "contact.heading":"Démarrons<br><em>votre projet</em>","contact.desc":"Vous avez un projet en électronique embarquée ou en automatisation industrielle ? Prenez rendez-vous pour un premier échange gratuit de 30 minutes.",
     "contact.response":"Réponse sous 24h ouvrées","contact.social":"Retrouvez-moi",
     "form.name":"Nom complet *","form.namePh":"Jean Dupont","form.phone":"Téléphone","form.mission":"Type de mission","form.select":"Sélectionner...","form.opt1":"Développement Firmware","form.opt2":"Audit & Conseil Technique","form.opt3":"Automatisation Industrielle","form.opt4":"Formation / Transfert de compétences","form.opt5":"Autre",
     "form.slot":"Date & créneau préféré","form.slotChoose":"— Choisir un créneau —","form.project":"Décrivez votre projet","form.projectPh":"Contexte, contraintes techniques, délais...","form.submit":"Envoyer la demande","form.success":"Demande envoyée — je reviens vers vous sous 24h.","form.note":"Premier échange 30 min — offert & sans engagement"
   },
   en: {
     "nav.about":"Profile","nav.parcours":"Experience","nav.services":"Services","nav.resources":"Resources","nav.contact":"Contact","nav.cta":"Book a Call",
-    "hero.status":"Available — Sept. 2026","hero.badge":"Independent Consultant · Alsace / Israel",
+    "hero.status":"Available — Sept. 2026","hero.badge":"Independent Consultant · Alsace / Paris / Israel",
     "hero.name":"Embedded<br><em>Systems</em><br>&amp; Automation",
     "hero.desc":"Expert in industrial embedded electronics — low-level driver design, real-time architectures, and critical system automation. 5+ years field experience, available from September 2026.",
     "hero.cta1":"Let's discuss your project","hero.cta2":"Resources →","hero.stat1":"years field","hero.stat4":"Tech market",
     "about.hebrew":"Hebrew speaker","about.title":"R&amp;D Engineer<br>Embedded Electronics",
     "about.p1":"Graduated in microelectronics and embedded systems, I spent five years designing and industrializing automation solutions — from hardware to firmware and system integration.",
     "about.quote":"\"I turn hardware constraints into reliable software — from low-level registers to real-time architecture.\"",
-    "about.p2":"Moving to independent consulting lets me apply this expertise to industrial SMEs in Alsace and tech startups in Israel. I master the full cycle: requirements, architecture, development, validation, and documentation.",
+    "about.p2":"Moving to independent consulting lets me apply this expertise to industrial SMEs in Alsace, Paris and tech startups in Israel. I master the full cycle: requirements, architecture, development, validation, and documentation.",
     "about.p3":"Bilingual French-Hebrew, I'm particularly well positioned for Franco-Israeli projects or missions bridging European engineering teams and the Israeli tech market.",
     "srv1.title":"Firmware Development","srv1.desc":"Design and development of robust embedded firmware on ARM microcontrollers — from low-level drivers to application architecture.",
     "srv1.li1":"Peripheral drivers (GPIO, UART, SPI, I²C)","srv1.li2":"State machines, cooperative schedulers","srv1.li3":"Memory and performance optimization","srv1.li4":"Documentation and unit testing",
@@ -1075,12 +996,6 @@ const i18n = {
     "srv2.li1":"Code and architecture review","srv2.li2":"Reliability and maintainability analysis","srv2.li3":"Migration to RTOS or bare-metal","srv2.li4":"Component and platform selection",
     "srv3.title":"Industrial Automation","srv3.desc":"Integration of embedded systems in industrial environments — automation, supervision, and machine interconnection.",
     "srv3.li1":"Control-command systems","srv3.li2":"Human-Machine Interfaces (HMI)","srv3.li3":"Industrial protocols (Modbus, CANbus)","srv3.li4":"Industry 4.0 &amp; IIoT",
-    "res.article":"Article","res.guide":"Guide",
-    "res1.title":"Bare-metal GPIO on STM32: from register to generic driver","res1.desc":"How to go from direct AHB1ENR and MODER register manipulation to a reusable driver using structs and function pointers.",
-    "res2.title":"Multi-file architecture for embedded projects","res2.desc":"Scalable project structure: HAL / drivers / application separation, dependency management, and industrial naming conventions.",
-    "res3.title":"UART ring buffer — robust C implementation","res3.desc":"Complete circular buffer for serial communication, with interrupt handling and race condition protection.",
-    "res4.title":"Lightweight cooperative scheduler: principles and implementation","res4.desc":"Building an OS-free task scheduler with priorities, software timers, and power management.",
-    
     "contact.heading":"Let's start<br><em>your project</em>","contact.desc":"Do you have a project in embedded electronics or industrial automation? Book a free 30-minute introductory call.",
     "contact.response":"Response within 24 business hours","contact.social":"Find me on",
     "form.name":"Full name *","form.namePh":"John Smith","form.phone":"Phone","form.mission":"Mission type","form.select":"Select...","form.opt1":"Firmware Development","form.opt2":"Technical Audit & Advisory","form.opt3":"Industrial Automation","form.opt4":"Training / Knowledge Transfer","form.opt5":"Other",
@@ -1088,14 +1003,14 @@ const i18n = {
   },
   he: {
     "nav.about":"פרופיל","nav.parcours":"ניסיון","nav.services":"שירותים","nav.resources":"משאבים","nav.contact":"צור קשר","nav.cta":"קביעת פגישה",
-    "hero.status":"זמין — ספטמבר 2026","hero.badge":"יועץ הנדסי · אלזס / ישראל",
+    "hero.status":"זמין — ספטמבר 2026","hero.badge":"יועץ הנדסי · אלזס / פריז / ישראל",
     "hero.name":"מערכות<br><em>משובצות</em><br>ואוטומציה",
     "hero.desc":"מומחה באלקטרוניקה משובצת תעשייתית — עיצוב דרייברים ברמה נמוכה, ארכיטקטורות זמן-אמת, ואוטומציה של מערכות קריטיות. ניסיון שטח של 5+ שנים, זמין למשימות מספטמבר 2026.",
     "hero.cta1":"בואו נדבר על הפרויקט שלכם","hero.cta2":"← משאבים","hero.stat1":"שנות ניסיון","hero.stat4":"שוק הטק",
     "about.hebrew":"דובר עברית","about.title":"מהנדס מו\"פ<br>אלקטרוניקה משובצת",
     "about.p1":"בוגר מיקרואלקטרוניקה ומערכות משובצות, עבדתי חמש שנים בעיצוב ותיעוש פתרונות אוטומציה לתעשייה — מהחומרה דרך הפירמוור ועד לאינטגרציית המערכת.",
     "about.quote":"«אני הופך אילוצי חומרה לתוכנה אמינה — מרמת הרגיסטרים ועד לארכיטקטורת זמן-אמת.»",
-    "about.p2":"המעבר ליעוץ עצמאי מאפשר לי להעמיד את המומחיות הזו לרשות עסקים תעשייתיים באלזס וסטארטאפים טכנולוגיים בישראל.",
+    "about.p2":"המעבר ליעוץ עצמאי מאפשר לי להעמיד את המומחיות הזו לרשות עסקים תעשייתיים באלזס, בפריז וסטארטאפים טכנולוגיים בישראל.",
     "about.p3":"דו-לשוני צרפתית-עברית, אני ממוקם במיוחד לפרויקטים צרפתיים-ישראליים או משימות המצריכות ממשק בין צוותי הנדסה אירופיים לשוק הטק הישראלי.",
     "srv1.title":"פיתוח פירמוור","srv1.desc":"עיצוב ופיתוח פירמוור משובץ איתן על מיקרובקרי ARM — מדרייברים ברמה נמוכה עד ארכיטקטורת אפליקציה.",
     "srv1.li1":"דרייברי היקפיים (GPIO, UART, SPI, I²C)","srv1.li2":"מכונות מצב, סקדולרים קואופרטיביים","srv1.li3":"אופטימיזציית זיכרון וביצועים","srv1.li4":"תיעוד ובדיקות יחידה",
@@ -1103,12 +1018,6 @@ const i18n = {
     "srv2.li1":"סקירת קוד וארכיטקטורה","srv2.li2":"ניתוח אמינות ותחזוקתיות","srv2.li3":"מעבר ל-RTOS או bare-metal","srv2.li4":"בחירת רכיבים ופלטפורמות",
     "srv3.title":"אוטומציה תעשייתית","srv3.desc":"אינטגרציה של מערכות משובצות בסביבות תעשייתיות — אוטומציה, ניטור וחיבור מכונות.",
     "srv3.li1":"מערכות בקרה-פיקוד","srv3.li2":"ממשקי אדם-מכונה (HMI)","srv3.li3":"פרוטוקולים תעשייתיים (Modbus, CANbus)","srv3.li4":"תעשייה 4.0 ו-IIoT",
-    "res.article":"מאמר","res.guide":"מדריך",
-    "res1.title":"GPIO bare-metal על STM32: מרגיסטר לדרייבר גנרי","res1.desc":"כיצד לעבור ממניפולציה ישירה של רגיסטרי AHB1ENR ו-MODER לדרייבר לשימוש חוזר עם structs ומצביעי פונקציה.",
-    "res2.title":"ארכיטקטורת ריבוי קבצים לפרויקטים משובצים","res2.desc":"מבנה פרויקט גמיש: הפרדת HAL / drivers / application, ניהול תלויות ומוסכמות שמות תעשייתיות.",
-    "res3.title":"Ring buffer ל-UART — מימוש איתן ב-C","res3.desc":"מימוש מלא של חוצץ מעגלי לתקשורת סידרתית, עם טיפול בהפרעות והגנה מפני race conditions.",
-    "res4.title":"סקדולר קואופרטיבי קל: עקרונות ומימוש","res4.desc":"בניית מתזמן משימות ללא מערכת הפעלה, עם עדיפויות, טיימרים תוכנתיים וניהול צריכת חשמל.",
-    
     "contact.heading":"נתחיל<br><em>את הפרויקט שלכם</em>","contact.desc":"יש לכם פרויקט באלקטרוניקה משובצת או באוטומציה תעשייתית? קבעו שיחת היכרות חינמית של 30 דקות.",
     "contact.response":"תגובה תוך 24 שעות עסקיות","contact.social":"מצאו אותי ב",
     "form.name":"שם מלא *","form.namePh":"ישראל ישראלי","form.phone":"טלפון","form.mission":"סוג משימה","form.select":"בחר...","form.opt1":"פיתוח פירמוור","form.opt2":"ביקורת ויעוץ טכני","form.opt3":"אוטומציה תעשייתית","form.opt4":"הדרכה / העברת ידע","form.opt5":"אחר",
@@ -1146,9 +1055,9 @@ function setLang(lang) {
   if (panel) panel.setAttribute('data-label', { fr:'RDV', en:'BOOK', he:'פגישה' }[lang]);
 
   document.title = {
-    fr: 'Elie SASPORTES — Ingénieur Systèmes Embarqués',
-    en: 'Elie SASPORTES — Embedded Systems Engineer',
-    he: 'אלי ספורטס — מהנדס מערכות משובצות'
+    fr: 'Elie SASPORTES — Ingénieur Conseil Systèmes Embarqués',
+    en: 'Elie SASPORTES — Embedded Systems Consultant',
+    he: 'אלי ספורטס — יועץ מערכות משובצות'
   }[lang];
 }
 
