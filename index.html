@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Elie SASPORTES — Ingénieur Conseil Systèmes Embarqués</title>
+<title>ES CONSULTING — Ingénierie Systèmes Embarqués &amp; Automatisme</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Space+Mono:ital,wght@0,400;0,700;1,400&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,300&family=Bebas+Neue&display=swap" rel="stylesheet">
@@ -72,15 +72,6 @@
     background-image: linear-gradient(var(--border) 1px, transparent 1px), linear-gradient(90deg, var(--border) 1px, transparent 1px);
     background-size: 48px 48px; opacity: 0.4; pointer-events: none; z-index: 0;
   }
-
-  /* RTL */
-  [dir="rtl"] .hero-badge::before { display: none; }
-  [dir="rtl"] .hero-badge::after { content: ''; width: 24px; height: 1px; background: var(--accent); }
-  [dir="rtl"] .highlight-text { border-left: none; border-right: 2px solid var(--accent); padding-left: 0; padding-right: 20px; }
-  [dir="rtl"] .service-list li { flex-direction: row-reverse; }
-  [dir="rtl"] .contact-line { flex-direction: row-reverse; }
-  [dir="rtl"] .stat-block::after { left: auto; right: 0; }
-  [dir="rtl"] .section-header { flex-direction: row-reverse; }
 
   /* LANG SWITCHER */
   .lang-switcher { display: flex; align-items: center; gap: 2px; }
@@ -338,7 +329,7 @@
 </div>
 
 <nav>
-  <a href="#hero" class="nav-logo">E<span>lie</span> <span style="color:var(--text-dim);margin:0 4px">·</span><span>Ingénieur Conseil</span></a>
+  <a href="#hero" class="nav-logo">ES <span>CONSULTING</span></a>
   <div class="nav-center">
     <ul class="nav-links">
       <li><a href="#about"     data-i18n="nav.about">Profil</a></li>
@@ -353,8 +344,7 @@
       <button class="lang-btn active" onclick="setLang('fr')">FR</button>
       <span class="lang-sep">·</span>
       <button class="lang-btn" onclick="setLang('en')">EN</button>
-      <span class="lang-sep">·</span>
-      <button class="lang-btn" onclick="setLang('he')">עב</button>
+
     </div>
     <a href="#contact" class="nav-cta" data-i18n="nav.cta">Prendre RDV</a>
   </div>
@@ -364,11 +354,11 @@
 <section id="hero">
   <div class="hero-left">
     <div class="hero-status"><div class="status-dot"></div><span data-i18n="hero.status">Disponible — Sept. 2026</span></div>
-    <div class="hero-badge" data-i18n="hero.badge">Ingénieur Conseil · Alsace / Paris / Israël</div>
-    <div class="hero-fullname">ELIE SASPORTES</div>
+    <div class="hero-badge" data-i18n="hero.badge">Ingénierie &amp; Conseil · Alsace / Paris</div>
+    <div class="hero-fullname">ES CONSULTING</div>
     <h1 class="hero-name" data-i18n-html="hero.name">Systèmes<br><em>Embarqués</em><br>&amp; Automatisme</h1>
     <div class="hero-title">// Firmware · STM32 · Industrie 4.0 · IoT</div>
-    <p class="hero-desc" data-i18n="hero.desc">Expert en électronique embarquée industrielle — conception de drivers bas-niveau, architectures temps-réel, et automatisation de systèmes critiques. 5 ans d'expérience terrain, disponible en mission à partir de septembre 2026.</p>
+    <p class="hero-desc" data-i18n="hero.desc">ES CONSULTING accompagne industriels et startups dans la conception de systèmes embarqués — drivers bas-niveau, architectures temps-réel et automatisation de systèmes critiques. 5 ans d'expérience terrain, interventions à partir de septembre 2026.</p>
     <div class="hero-actions">
       <a href="#contact" class="btn-primary" data-i18n="hero.cta1">Discutons de votre projet</a>
       <a href="#resources" class="btn-ghost" data-i18n="hero.cta2">Ressources →</a>
@@ -395,7 +385,7 @@
         <div class="stats-grid">
           <div class="stat-block"><div class="stat-val">5+</div><div class="stat-label" data-i18n="hero.stat1">ans terrain</div></div>
           <div class="stat-block"><div class="stat-val">32</div><div class="stat-label">bits / bare-metal</div></div>
-          <div class="stat-block"><div class="stat-val">IL</div><div class="stat-label" data-i18n="hero.stat4">Tech market</div></div>
+          <div class="stat-block"><div class="stat-val">13+</div><div class="stat-label" data-i18n="hero.stat4">ressources tech</div></div>
         </div>
       </div>
     </div>
@@ -427,22 +417,21 @@
         <span class="tag">UART / SPI / I²C</span><span class="tag">RTOS</span>
         <span class="tag">Python</span><span class="tag">C#</span>
         <span class="tag">Azure DevOps</span><span class="tag">Automates</span>
-        <span class="tag">IoT Industriel</span><span class="tag">🇫🇷 🇮🇱</span>
+        <span class="tag">IoT Industriel</span>
       </div>
       <div style="font-family:'Space Mono',monospace;font-size:11px;color:var(--text-dim);line-height:1.8;padding:16px;background:var(--surface);border:1px solid var(--border)">
         <div style="color:var(--accent);margin-bottom:8px">// localisation.conf</div>
         <div>📍 Alsace, France</div>
         <div>📍 Paris, France</div>
-        <div>📍 Jérusalem, Israël</div>
-        <div style="margin-top:8px;color:var(--accent3)">✓ <span data-i18n="about.hebrew">Hebrew speaker</span></div>
+        <div style="margin-top:8px;color:var(--accent3)">✓ <span data-i18n="about.remote">Remote &amp; sur site</span></div>
       </div>
     </div>
     <div class="about-content">
       <h3 class="reveal" data-i18n-html="about.title">Ingénieur R&amp;D<br>Électronique Embarquée</h3>
-      <p class="reveal" data-i18n="about.p1">Diplômé en microélectronique et systèmes embarqués, j'ai passé cinq ans à concevoir et industrialiser des solutions d'automatisation pour l'industrie — de la carte électronique au firmware, en passant par l'intégration système.</p>
+      <p class="reveal" data-i18n="about.p1">Je suis Elie Sasportes, fondateur d'ES CONSULTING. Diplômé en microélectronique et systèmes embarqués, j'ai passé cinq ans à concevoir et industrialiser des solutions d'automatisation pour l'industrie — de la carte électronique au firmware, en passant par l'intégration système.</p>
       <div class="highlight-text reveal" data-i18n="about.quote">« Je transforme des contraintes matérielles en logiciels fiables — du registre bas-niveau à l'architecture temps-réel. »</div>
-      <p class="reveal" data-i18n="about.p2">Ma transition vers le conseil indépendant me permet de mettre cette expertise au service de PME industrielles en Alsace et de startups tech en Israël. Je maîtrise le cycle complet : analyse, architecture, développement, validation et documentation.</p>
-      <p class="reveal" data-i18n="about.p3">Bilingue français-hébreu, je suis particulièrement bien positionné pour des projets franco-israéliens ou des missions nécessitant une interface entre équipes européennes et marché tech israélien.</p>
+      <p class="reveal" data-i18n="about.p2">ES CONSULTING met cette expertise au service de PME industrielles et de startups en Alsace, à Paris et en Île-de-France. Je maîtrise le cycle complet : analyse, architecture, développement, validation et documentation.</p>
+      <p class="reveal" data-i18n="about.p3">À l'aise en environnement international, j'interviens aussi bien auprès d'équipes locales que de groupes multi-sites — documentation, revues techniques et coordination en français comme en anglais.</p>
       <div class="skills-matrix">
         <div class="skill-item reveal"><div class="skill-name">Firmware / C Embarqué</div><div class="skill-bar"><div class="skill-fill" style="width:90%"></div></div></div>
         <div class="skill-item reveal"><div class="skill-name">STM32 / ARM Cortex</div><div class="skill-bar"><div class="skill-fill" style="width:85%"></div></div></div>
@@ -825,7 +814,6 @@
           <div><span style="color:var(--accent3)">✓</span> Remote / Présentiel</div>
           <div><span style="color:var(--accent3)">✓</span> Alsace &amp; Grand Est</div>
           <div><span style="color:var(--accent3)">✓</span> Paris &amp; Île-de-France</div>
-          <div><span style="color:var(--accent3)">✓</span> Israël (tech market)</div>
           <div><span style="color:var(--accent)">→</span> <span data-i18n="hero.status">Dispo : Sept. 2026</span></div>
         </div>
       </div>
@@ -847,7 +835,7 @@
       <p class="reveal" data-i18n="contact.desc">Vous avez un projet en électronique embarquée ou en automatisation industrielle ? Prenez rendez-vous pour un premier échange gratuit de 30 minutes.</p>
       <div class="contact-info reveal">
         <div class="contact-line"><div class="icon">📧</div><span>elie.sasportes@gmail.com</span></div>
-        <div class="contact-line"><div class="icon">📍</div><span>Alsace · Paris · Jérusalem</span></div>
+        <div class="contact-line"><div class="icon">📍</div><span>Alsace · Paris</span></div>
         <div class="contact-line"><div class="icon">🕐</div><span data-i18n="contact.response">Réponse sous 24h ouvrées</span></div>
       </div>
       <div style="margin-top:40px" class="reveal">
@@ -943,7 +931,7 @@
 </section>
 
 <footer>
-  <div class="footer-logo">© 2026 Elie SASPORTES</div>
+  <div class="footer-logo">© 2026 ES CONSULTING</div>
   <ul class="footer-links">
     <li><a href="#about"     data-i18n="nav.about">Profil</a></li>
     <li><a href="#parcours"  data-i18n="nav.parcours">Parcours</a></li>
@@ -951,7 +939,7 @@
     <li><a href="#resources" data-i18n="nav.resources">Ressources</a></li>
     <li><a href="#contact"   data-i18n="nav.contact">Contact</a></li>
   </ul>
-  <div class="footer-copy">Alsace · Paris · Jérusalem</div>
+  <div class="footer-copy">ES CONSULTING · Alsace · Paris</div>
 </footer>
 
 <script>
@@ -959,15 +947,15 @@
 const i18n = {
   fr: {
     "nav.about":"Profil","nav.parcours":"Parcours","nav.services":"Services","nav.resources":"Ressources","nav.contact":"Contact","nav.cta":"Prendre RDV",
-    "hero.status":"Disponible — Sept. 2026","hero.badge":"Ingénieur Conseil · Alsace / Paris / Israël",
+    "hero.status":"Disponible — Sept. 2026","hero.badge":"Ingénierie & Conseil · Alsace / Paris",
     "hero.name":"Systèmes<br><em>Embarqués</em><br>&amp; Automatisme",
-    "hero.desc":"Expert en électronique embarquée industrielle — conception de drivers bas-niveau, architectures temps-réel, et automatisation de systèmes critiques. 5 ans d'expérience terrain, disponible en mission à partir de septembre 2026.",
-    "hero.cta1":"Discutons de votre projet","hero.cta2":"Ressources →","hero.stat1":"ans terrain","hero.stat4":"Tech market",
-    "about.hebrew":"Hebrew speaker","about.title":"Ingénieur R&amp;D<br>Électronique Embarquée",
-    "about.p1":"Diplômé en microélectronique et systèmes embarqués, j'ai passé cinq ans à concevoir et industrialiser des solutions d'automatisation pour l'industrie — de la carte électronique au firmware, en passant par l'intégration système.",
+    "hero.desc":"ES CONSULTING accompagne industriels et startups dans la conception de systèmes embarqués — drivers bas-niveau, architectures temps-réel et automatisation de systèmes critiques. 5 ans d'expérience terrain, interventions à partir de septembre 2026.",
+    "hero.cta1":"Discutons de votre projet","hero.cta2":"Ressources →","hero.stat1":"ans terrain","hero.stat4":"ressources tech",
+    "about.remote":"Remote & sur site","about.title":"Ingénieur R&amp;D<br>Électronique Embarquée",
+    "about.p1":"Je suis Elie Sasportes, fondateur d'ES CONSULTING. Diplômé en microélectronique et systèmes embarqués, j'ai passé cinq ans à concevoir et industrialiser des solutions d'automatisation pour l'industrie — de la carte électronique au firmware, en passant par l'intégration système.",
     "about.quote":"« Je transforme des contraintes matérielles en logiciels fiables — du registre bas-niveau à l'architecture temps-réel. »",
-    "about.p2":"Ma transition vers le conseil indépendant me permet de mettre cette expertise au service de PME industrielles en Alsace, à Paris et de startups tech en Israël. Je maîtrise le cycle complet : analyse, architecture, développement, validation et documentation.",
-    "about.p3":"Bilingue français-hébreu, je suis particulièrement bien positionné pour des projets franco-israéliens ou des missions nécessitant une interface entre équipes européennes et marché tech israélien.",
+    "about.p2":"ES CONSULTING met cette expertise au service de PME industrielles et de startups en Alsace, à Paris et en Île-de-France. Je maîtrise le cycle complet : analyse, architecture, développement, validation et documentation.",
+    "about.p3":"À l'aise en environnement international, j'interviens aussi bien auprès d'équipes locales que de groupes multi-sites — documentation, revues techniques et coordination en français comme en anglais.",
     "srv1.title":"Développement Firmware","srv1.desc":"Conception et développement de firmwares embarqués robustes sur microcontrôleurs ARM — du pilote bas-niveau à l'architecture applicative.",
     "srv1.li1":"Drivers périphériques (GPIO, UART, SPI, I²C)","srv1.li2":"Machines à états, schedulers coopératifs","srv1.li3":"Optimisation mémoire et performance","srv1.li4":"Documentation et tests unitaires",
     "srv2.title":"Audit &amp; Conseil Technique","srv2.desc":"Analyse critique de votre architecture embarquée existante — identification des risques, recommandations et roadmap technique.",
@@ -981,15 +969,15 @@ const i18n = {
   },
   en: {
     "nav.about":"Profile","nav.parcours":"Experience","nav.services":"Services","nav.resources":"Resources","nav.contact":"Contact","nav.cta":"Book a Call",
-    "hero.status":"Available — Sept. 2026","hero.badge":"Independent Consultant · Alsace / Paris / Israel",
+    "hero.status":"Available — Sept. 2026","hero.badge":"Engineering & Consulting · Alsace / Paris",
     "hero.name":"Embedded<br><em>Systems</em><br>&amp; Automation",
-    "hero.desc":"Expert in industrial embedded electronics — low-level driver design, real-time architectures, and critical system automation. 5+ years field experience, available from September 2026.",
-    "hero.cta1":"Let's discuss your project","hero.cta2":"Resources →","hero.stat1":"years field","hero.stat4":"Tech market",
-    "about.hebrew":"Hebrew speaker","about.title":"R&amp;D Engineer<br>Embedded Electronics",
-    "about.p1":"Graduated in microelectronics and embedded systems, I spent five years designing and industrializing automation solutions — from hardware to firmware and system integration.",
+    "hero.desc":"ES CONSULTING supports manufacturers and startups in embedded systems design — low-level drivers, real-time architectures, and critical system automation. 5+ years field experience, engagements from September 2026.",
+    "hero.cta1":"Let's discuss your project","hero.cta2":"Resources →","hero.stat1":"years field","hero.stat4":"tech resources",
+    "about.remote":"Remote & on-site","about.title":"R&amp;D Engineer<br>Embedded Electronics",
+    "about.p1":"I'm Elie Sasportes, founder of ES CONSULTING. Graduated in microelectronics and embedded systems, I spent five years designing and industrializing automation solutions — from hardware to firmware and system integration.",
     "about.quote":"\"I turn hardware constraints into reliable software — from low-level registers to real-time architecture.\"",
-    "about.p2":"Moving to independent consulting lets me apply this expertise to industrial SMEs in Alsace, Paris and tech startups in Israel. I master the full cycle: requirements, architecture, development, validation, and documentation.",
-    "about.p3":"Bilingual French-Hebrew, I'm particularly well positioned for Franco-Israeli projects or missions bridging European engineering teams and the Israeli tech market.",
+    "about.p2":"ES CONSULTING brings this expertise to industrial SMEs and startups across Alsace, Paris, and Île-de-France. I master the full cycle: requirements, architecture, development, validation, and documentation.",
+    "about.p3":"Comfortable in international environments, I work with local teams as well as multi-site organizations — documentation, technical reviews, and coordination in French or English.",
     "srv1.title":"Firmware Development","srv1.desc":"Design and development of robust embedded firmware on ARM microcontrollers — from low-level drivers to application architecture.",
     "srv1.li1":"Peripheral drivers (GPIO, UART, SPI, I²C)","srv1.li2":"State machines, cooperative schedulers","srv1.li3":"Memory and performance optimization","srv1.li4":"Documentation and unit testing",
     "srv2.title":"Technical Audit &amp; Advisory","srv2.desc":"Critical review of your existing embedded architecture — risk identification, improvement recommendations, and technical roadmap.",
@@ -1000,28 +988,6 @@ const i18n = {
     "contact.response":"Response within 24 business hours","contact.social":"Find me on",
     "form.name":"Full name *","form.namePh":"John Smith","form.phone":"Phone","form.mission":"Mission type","form.select":"Select...","form.opt1":"Firmware Development","form.opt2":"Technical Audit & Advisory","form.opt3":"Industrial Automation","form.opt4":"Training / Knowledge Transfer","form.opt5":"Other",
     "form.slot":"Preferred date & time","form.slotChoose":"— Choose a time slot —","form.project":"Describe your project","form.projectPh":"Context, technical constraints, timeline...","form.submit":"Send request","form.success":"Request sent — I'll get back to you within 24h.","form.note":"First 30-min call — free & no commitment"
-  },
-  he: {
-    "nav.about":"פרופיל","nav.parcours":"ניסיון","nav.services":"שירותים","nav.resources":"משאבים","nav.contact":"צור קשר","nav.cta":"קביעת פגישה",
-    "hero.status":"זמין — ספטמבר 2026","hero.badge":"יועץ הנדסי · אלזס / פריז / ישראל",
-    "hero.name":"מערכות<br><em>משובצות</em><br>ואוטומציה",
-    "hero.desc":"מומחה באלקטרוניקה משובצת תעשייתית — עיצוב דרייברים ברמה נמוכה, ארכיטקטורות זמן-אמת, ואוטומציה של מערכות קריטיות. ניסיון שטח של 5+ שנים, זמין למשימות מספטמבר 2026.",
-    "hero.cta1":"בואו נדבר על הפרויקט שלכם","hero.cta2":"← משאבים","hero.stat1":"שנות ניסיון","hero.stat4":"שוק הטק",
-    "about.hebrew":"דובר עברית","about.title":"מהנדס מו\"פ<br>אלקטרוניקה משובצת",
-    "about.p1":"בוגר מיקרואלקטרוניקה ומערכות משובצות, עבדתי חמש שנים בעיצוב ותיעוש פתרונות אוטומציה לתעשייה — מהחומרה דרך הפירמוור ועד לאינטגרציית המערכת.",
-    "about.quote":"«אני הופך אילוצי חומרה לתוכנה אמינה — מרמת הרגיסטרים ועד לארכיטקטורת זמן-אמת.»",
-    "about.p2":"המעבר ליעוץ עצמאי מאפשר לי להעמיד את המומחיות הזו לרשות עסקים תעשייתיים באלזס, בפריז וסטארטאפים טכנולוגיים בישראל.",
-    "about.p3":"דו-לשוני צרפתית-עברית, אני ממוקם במיוחד לפרויקטים צרפתיים-ישראליים או משימות המצריכות ממשק בין צוותי הנדסה אירופיים לשוק הטק הישראלי.",
-    "srv1.title":"פיתוח פירמוור","srv1.desc":"עיצוב ופיתוח פירמוור משובץ איתן על מיקרובקרי ARM — מדרייברים ברמה נמוכה עד ארכיטקטורת אפליקציה.",
-    "srv1.li1":"דרייברי היקפיים (GPIO, UART, SPI, I²C)","srv1.li2":"מכונות מצב, סקדולרים קואופרטיביים","srv1.li3":"אופטימיזציית זיכרון וביצועים","srv1.li4":"תיעוד ובדיקות יחידה",
-    "srv2.title":"ביקורת ויעוץ טכני","srv2.desc":"סקירה ביקורתית של הארכיטקטורה המשובצת הקיימת שלכם — זיהוי סיכונים, המלצות שיפור ומפת דרכים טכנית.",
-    "srv2.li1":"סקירת קוד וארכיטקטורה","srv2.li2":"ניתוח אמינות ותחזוקתיות","srv2.li3":"מעבר ל-RTOS או bare-metal","srv2.li4":"בחירת רכיבים ופלטפורמות",
-    "srv3.title":"אוטומציה תעשייתית","srv3.desc":"אינטגרציה של מערכות משובצות בסביבות תעשייתיות — אוטומציה, ניטור וחיבור מכונות.",
-    "srv3.li1":"מערכות בקרה-פיקוד","srv3.li2":"ממשקי אדם-מכונה (HMI)","srv3.li3":"פרוטוקולים תעשייתיים (Modbus, CANbus)","srv3.li4":"תעשייה 4.0 ו-IIoT",
-    "contact.heading":"נתחיל<br><em>את הפרויקט שלכם</em>","contact.desc":"יש לכם פרויקט באלקטרוניקה משובצת או באוטומציה תעשייתית? קבעו שיחת היכרות חינמית של 30 דקות.",
-    "contact.response":"תגובה תוך 24 שעות עסקיות","contact.social":"מצאו אותי ב",
-    "form.name":"שם מלא *","form.namePh":"ישראל ישראלי","form.phone":"טלפון","form.mission":"סוג משימה","form.select":"בחר...","form.opt1":"פיתוח פירמוור","form.opt2":"ביקורת ויעוץ טכני","form.opt3":"אוטומציה תעשייתית","form.opt4":"הדרכה / העברת ידע","form.opt5":"אחר",
-    "form.slot":"תאריך וחלון זמן מועדף","form.slotChoose":"— בחר חלון זמן —","form.project":"תארו את הפרויקט שלכם","form.projectPh":"הקשר, אילוצים טכניים, לוחות זמנים...","form.submit":"שליחת הבקשה","form.success":"הבקשה נשלחה — אחזור אליכם תוך 24 שעות.","form.note":"שיחה ראשונה 30 דק׳ — ללא עלות וללא התחייבות"
   }
 };
 
@@ -1029,10 +995,10 @@ const i18n = {
 function setLang(lang) {
   const html = document.documentElement;
   html.setAttribute('lang', lang);
-  html.setAttribute('dir', lang === 'he' ? 'rtl' : 'ltr');
+  html.setAttribute('dir', 'ltr');
 
   document.querySelectorAll('.lang-btn').forEach(btn => {
-    const map = { 'FR': 'fr', 'EN': 'en', 'עב': 'he' };
+    const map = { 'FR': 'fr', 'EN': 'en' };
     btn.classList.toggle('active', map[btn.textContent.trim()] === lang);
   });
 
@@ -1052,12 +1018,11 @@ function setLang(lang) {
   });
 
   const panel = document.querySelector('.booking-panel');
-  if (panel) panel.setAttribute('data-label', { fr:'RDV', en:'BOOK', he:'פגישה' }[lang]);
+  if (panel) panel.setAttribute('data-label', { fr:'RDV', en:'BOOK' }[lang]);
 
   document.title = {
-    fr: 'Elie SASPORTES — Ingénieur Conseil Systèmes Embarqués',
-    en: 'Elie SASPORTES — Embedded Systems Consultant',
-    he: 'אלי ספורטס — יועץ מערכות משובצות'
+    fr: 'ES CONSULTING — Ingénierie Systèmes Embarqués & Automatisme',
+    en: 'ES CONSULTING — Embedded Systems Engineering & Automation'
   }[lang];
 }
 
